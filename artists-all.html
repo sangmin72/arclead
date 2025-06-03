@@ -189,50 +189,13 @@
     <section class="elements-area section_padding_50 mt-50">
         <div class="portfolio-menu2">
             <a class="btn" href="artists-all.html">ALL</a>
-            <a class="btn" href="artists-sigyeong.html">김시경</a>
-            <a class="btn" href="artists-sigyeong.html">최  건</a>
-            <a class="btn" href="artists-sigyeong.html">채하진</a>
-            <a class="btn" href="artists-sigyeong.html">송수현</a>
-            <a class="btn" href="artists-sigyeong.html">유이솔</a>
-            <a class="btn" href="artists-sigyeong.html">차채민</a>
         </div>
         <div class="container">
-            <div class="artist-grid">
-                <div class="artist-item">
-                    <img src="/assets/artists/1.png" alt="김시경">
-                    <div class="artist-info">
-                        <p>김시경</p>
-                    </div>
-                </div>
-                <div class="artist-item">
-                    <img src="/assets/artists/2.png" alt="최건">
-                    <div class="artist-info">
-                        <p>최건</p>
-                    </div>
-                </div>
-                <div class="artist-item">
-                    <img src="/assets/artists/3.png" alt="채하진">
-                    <div class="artist-info">
-                        <p>채하진</p>
-                    </div>
-                </div>
-                <div class="artist-item">
-                    <img src="/assets/artists/4.png" alt="송수현">
-                    <div class="artist-info">
-                        <p>송수현</p>
-                    </div>
-                </div>
-                <div class="artist-item">
-                    <img src="/assets/artists/5.png" alt="유이솔">
-                    <div class="artist-info">
-                        <p>유이솔</p>
-                    </div>
-                </div>
-                <div class="artist-item">
-                    <img src="/assets/artists/6.png" alt="차채민">
-                    <div class="artist-info">
-                        <p>차채민</p>
-                    </div>
+            <div class="artist-grid" id="artistsGrid">
+                <!-- Artists will be loaded here dynamically -->
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                    <p>아티스트 정보를 불러오는 중...</p>
                 </div>
             </div>
         </div>
@@ -278,5 +241,82 @@
     <script src="js/plugins.js"></script>
     <!-- Active js -->
     <script src="js/active.js"></script>
+
+    <script>
+        // Load artists from API
+        async function loadArtists() {
+            try {
+                const response = await fetch('/api/artists');
+                const artists = await response.json();
+                renderArtists(artists);
+            } catch (error) {
+                console.error('Error loading artists:', error);
+                renderError();
+            }
+        }
+
+        // Render artists grid
+        function renderArtists(artists) {
+            const grid = document.getElementById('artistsGrid');
+            
+            if (artists.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
+                        <h3>등록된 아티스트가 없습니다</h3>
+                        <p>관리자 페이지에서 아티스트를 추가해주세요.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = artists.map(artist => `
+                <div class="artist-item" onclick="goToArtist('${artist.id}')">
+                    <img src="/assets/artists/${artist.id}/${artist.images && artist.images.length > 0 ? artist.images[0] : 'default.png'}" 
+                         alt="${artist.name}" 
+                         onerror="this.src='/assets/artists/default.png'">
+                    <div class="artist-info">
+                        <p>${artist.name}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render error message
+        function renderError() {
+            const grid = document.getElementById('artistsGrid');
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #e74c3c;">
+                    <h3>오류가 발생했습니다</h3>
+                    <p>아티스트 정보를 불러오는데 실패했습니다.</p>
+                    <button onclick="loadArtists()" style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">다시 시도</button>
+                </div>
+            `;
+        }
+
+        // Navigate to artist page
+        function goToArtist(artistId) {
+            window.location.href = `artist.html?id=${artistId}`;
+        }
+
+        // Add spinner animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            .artist-item {
+                cursor: pointer;
+                transition: transform 0.3s ease;
+            }
+            .artist-item:hover {
+                transform: translateY(-5px);
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Load artists when page loads
+        document.addEventListener('DOMContentLoaded', loadArtists);
+    </script>
 </body>
 </html>

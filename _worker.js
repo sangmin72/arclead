@@ -433,7 +433,7 @@ function getContentType(filePath) {
 async function handleApiRequest(request, env, url) {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   };
 
@@ -442,6 +442,10 @@ async function handleApiRequest(request, env, url) {
   }
 
   try {
+    if (url.pathname.startsWith('/api/artists')) {
+      return handleArtistsRequest(request, env, url, corsHeaders);
+    }
+
     switch (url.pathname) {
       case '/api/slides':
         return handleSlidesRequest(request, env, corsHeaders);
@@ -458,6 +462,391 @@ async function handleApiRequest(request, env, url) {
     return new Response('Internal Server Error', { 
       status: 500, 
       headers: corsHeaders 
+    });
+  }
+}
+
+// Handle artists API requests
+async function handleArtistsRequest(request, env, url, corsHeaders) {
+  const pathParts = url.pathname.split('/');
+  // /api/artists or /api/artists/{artistId}
+  
+  if (pathParts.length === 3) {
+    // /api/artists
+    switch (request.method) {
+      case 'GET':
+        return handleGetAllArtists(request, env, corsHeaders);
+      case 'POST':
+        return handleCreateArtist(request, env, corsHeaders);
+      default:
+        return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+    }
+  } else if (pathParts.length === 4) {
+    // /api/artists/{artistId}
+    const artistId = pathParts[3];
+    switch (request.method) {
+      case 'GET':
+        return handleGetArtist(request, env, artistId, corsHeaders);
+      case 'PUT':
+        return handleUpdateArtist(request, env, artistId, corsHeaders);
+      case 'DELETE':
+        return handleDeleteArtist(request, env, artistId, corsHeaders);
+      default:
+        return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+    }
+  }
+  
+  return new Response('Not Found', { status: 404, headers: corsHeaders });
+}
+
+// Get all artists
+async function handleGetAllArtists(request, env, corsHeaders) {
+  try {
+    // Get artists data from KV (or return sample data for now)
+    let artists = [];
+    
+    try {
+      const artistsData = await env.ARCLEAD_KV?.get('artists');
+      if (artistsData) {
+        artists = JSON.parse(artistsData);
+      }
+    } catch (error) {
+      console.log('No KV storage or no artists data, returning empty array');
+    }
+
+    return new Response(JSON.stringify(artists), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=300', // Cache for 5 minutes
+        ...corsHeaders
+      }
+    });
+  } catch (error) {
+    console.error('Error getting artists:', error);
+    return new Response(JSON.stringify({ error: 'Failed to get artists' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  }
+}
+
+// Get single artist
+async function handleGetArtist(request, env, artistId, corsHeaders) {
+  try {
+    let artists = [];
+    
+    try {
+      const artistsData = await env.ARCLEAD_KV?.get('artists');
+      if (artistsData) {
+        artists = JSON.parse(artistsData);
+      }
+    } catch (error) {
+      // No KV storage, return sample data for testing
+      artists = [
+        {
+          id: 'kim-sigyeong',
+          name: '김시경',
+          nameEn: 'KIM SIGYEONG',
+          images: ['profile1.jpg', 'profile2.jpg', 'profile3.jpg'],
+          filmography: {
+            movies: {
+              '2024': ['웃으면 사랑하자 주인공 미리역', '기면뒤 어둠 조연', '서울 하늘아래 수련역'],
+              '2023': ['사랑한 후에 미열역'],
+              '2022': ['조용한 거리 길거리 행인 3역', '사람, 사람, 사람 단역']
+            },
+            dramas: {
+              '2024': ['웃으면 사랑하자 주인공 미리역', '기면뒤 어둠 조연'],
+              '2023': ['사랑한 후에 미열역']
+            },
+            commercials: {
+              '2024': ['브랜드A 광고', '브랜드B 광고']
+            }
+          }
+        }
+      ];
+    }
+
+    const artist = artists.find(a => a.id === artistId);
+    
+    if (!artist) {
+      return new Response(JSON.stringify({ error: 'Artist not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    return new Response(JSON.stringify(artist), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=300',
+        ...corsHeaders
+      }
+    });
+  } catch (error) {
+    console.error('Error getting artist:', error);
+    return new Response(JSON.stringify({ error: 'Failed to get artist' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  }
+}
+
+// Create new artist
+async function handleCreateArtist(request, env, corsHeaders) {
+  try {
+    const formData = await request.formData();
+    const artistDataStr = formData.get('artistData');
+    
+    if (!artistDataStr) {
+      return new Response(JSON.stringify({ error: 'Artist data is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    const artistData = JSON.parse(artistDataStr);
+    
+    // Validate required fields
+    if (!artistData.id || !artistData.name) {
+      return new Response(JSON.stringify({ error: 'Artist ID and name are required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    // Get existing artists
+    let artists = [];
+    try {
+      const existingData = await env.ARCLEAD_KV?.get('artists');
+      if (existingData) {
+        artists = JSON.parse(existingData);
+      }
+    } catch (error) {
+      console.log('No existing artists data');
+    }
+
+    // Check for duplicate ID
+    if (artists.some(a => a.id === artistData.id)) {
+      return new Response(JSON.stringify({ error: 'Artist ID already exists' }), {
+        status: 409,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    // Handle image uploads
+    const imageFiles = formData.getAll('images');
+    const uploadedImages = [];
+
+    for (const imageFile of imageFiles) {
+      if (imageFile && imageFile.size > 0) {
+        const fileExtension = imageFile.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
+        const imagePath = `artists/${artistData.id}/${fileName}`;
+        
+        try {
+          await env.ARCLEAD_ASSETS.put(imagePath, imageFile);
+          uploadedImages.push(fileName);
+        } catch (error) {
+          console.error('Error uploading image:', error);
+        }
+      }
+    }
+
+    // Create artist object
+    const newArtist = {
+      ...artistData,
+      images: uploadedImages,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    // Add to artists array
+    artists.push(newArtist);
+
+    // Save to KV
+    try {
+      await env.ARCLEAD_KV?.put('artists', JSON.stringify(artists));
+    } catch (error) {
+      console.error('Error saving to KV:', error);
+    }
+
+    return new Response(JSON.stringify({ 
+      success: true, 
+      artist: newArtist,
+      message: 'Artist created successfully' 
+    }), {
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      }
+    });
+  } catch (error) {
+    console.error('Error creating artist:', error);
+    return new Response(JSON.stringify({ error: 'Failed to create artist' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  }
+}
+
+// Update artist
+async function handleUpdateArtist(request, env, artistId, corsHeaders) {
+  try {
+    const formData = await request.formData();
+    const artistDataStr = formData.get('artistData');
+    
+    if (!artistDataStr) {
+      return new Response(JSON.stringify({ error: 'Artist data is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    const artistData = JSON.parse(artistDataStr);
+
+    // Get existing artists
+    let artists = [];
+    try {
+      const existingData = await env.ARCLEAD_KV?.get('artists');
+      if (existingData) {
+        artists = JSON.parse(existingData);
+      }
+    } catch (error) {
+      return new Response(JSON.stringify({ error: 'No artists data found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    const artistIndex = artists.findIndex(a => a.id === artistId);
+    if (artistIndex === -1) {
+      return new Response(JSON.stringify({ error: 'Artist not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    const existingArtist = artists[artistIndex];
+
+    // Handle new image uploads
+    const imageFiles = formData.getAll('images');
+    const newImages = [];
+
+    for (const imageFile of imageFiles) {
+      if (imageFile && imageFile.size > 0) {
+        const fileExtension = imageFile.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
+        const imagePath = `artists/${artistId}/${fileName}`;
+        
+        try {
+          await env.ARCLEAD_ASSETS.put(imagePath, imageFile);
+          newImages.push(fileName);
+        } catch (error) {
+          console.error('Error uploading image:', error);
+        }
+      }
+    }
+
+    // Update artist object
+    const updatedArtist = {
+      ...existingArtist,
+      ...artistData,
+      id: artistId, // Keep original ID
+      images: [...(existingArtist.images || []), ...newImages],
+      updatedAt: new Date().toISOString()
+    };
+
+    // Update in artists array
+    artists[artistIndex] = updatedArtist;
+
+    // Save to KV
+    try {
+      await env.ARCLEAD_KV?.put('artists', JSON.stringify(artists));
+    } catch (error) {
+      console.error('Error saving to KV:', error);
+    }
+
+    return new Response(JSON.stringify({ 
+      success: true, 
+      artist: updatedArtist,
+      message: 'Artist updated successfully' 
+    }), {
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      }
+    });
+  } catch (error) {
+    console.error('Error updating artist:', error);
+    return new Response(JSON.stringify({ error: 'Failed to update artist' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  }
+}
+
+// Delete artist
+async function handleDeleteArtist(request, env, artistId, corsHeaders) {
+  try {
+    // Get existing artists
+    let artists = [];
+    try {
+      const existingData = await env.ARCLEAD_KV?.get('artists');
+      if (existingData) {
+        artists = JSON.parse(existingData);
+      }
+    } catch (error) {
+      return new Response(JSON.stringify({ error: 'No artists data found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    const artistIndex = artists.findIndex(a => a.id === artistId);
+    if (artistIndex === -1) {
+      return new Response(JSON.stringify({ error: 'Artist not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    const artist = artists[artistIndex];
+
+    // Delete artist images from R2
+    if (artist.images && artist.images.length > 0) {
+      for (const image of artist.images) {
+        try {
+          await env.ARCLEAD_ASSETS.delete(`artists/${artistId}/${image}`);
+        } catch (error) {
+          console.error(`Error deleting image ${image}:`, error);
+        }
+      }
+    }
+
+    // Remove artist from array
+    artists.splice(artistIndex, 1);
+
+    // Save to KV
+    try {
+      await env.ARCLEAD_KV?.put('artists', JSON.stringify(artists));
+    } catch (error) {
+      console.error('Error saving to KV:', error);
+    }
+
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: 'Artist deleted successfully' 
+    }), {
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting artist:', error);
+    return new Response(JSON.stringify({ error: 'Failed to delete artist' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
   }
 }
