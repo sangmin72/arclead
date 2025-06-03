@@ -6,6 +6,78 @@
             overflow: auto !important;
             -webkit-overflow-scrolling: touch !important;
         }
+
+        .artist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 40px 0;
+        }
+
+        .artist-item {
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .artist-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .artist-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .artist-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .artist-info {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .artist-info p {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .artist-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+                padding: 20px 0;
+            }
+            
+            .artist-item img {
+                height: 200px;
+            }
+            
+            .artist-info {
+                padding: 15px;
+            }
+            
+            .artist-info p {
+                font-size: 1.1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .artist-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
     </style>
 <head>
     <meta charset="UTF-8">
@@ -125,61 +197,41 @@
             <a class="btn" href="artists-sigyeong.html">차채민</a>
         </div>
         <div class="container">
-            <div class="row">
-                <div class="col-3 artist-stats">
-                    <h2>OUR ARTISTS</h2>
-                    <div class="total-artists">
-                        <h1>6</h1>
-                    </div>
-                    <div class="gender-stats">
-                        <p>woman</p>
-                        <h3>5</h3>
-                        <p>man</p>
-                        <h3>1</h3>
+            <div class="artist-grid">
+                <div class="artist-item">
+                    <img src="/assets/artists/1.png" alt="김시경">
+                    <div class="artist-info">
+                        <p>김시경</p>
                     </div>
                 </div>
-                <div class="col-9 artist-grid">
-                    <div class="row">
-                        <div class="artist-item">
-                            <img src="/assets/artists/1.png" alt="Artist 1">
-                            <p>김시경</p>
-                        </div>
-                        <div class="artist-item">
-                            <img src="/assets/artists/2.png" alt="Artist 2">
-                            <p>최건</p>
-                        </div>
-                        <div class="artist-item">
-                            <img src="/assets/artists/3.png" alt="Artist 3">
-                            <p>채하진</p>
-                        </div>
+                <div class="artist-item">
+                    <img src="/assets/artists/2.png" alt="최건">
+                    <div class="artist-info">
+                        <p>최건</p>
                     </div>
-                    <div class="row">
-                        <div class="artist-item">
-                            <img src="/assets/artists/4.png" alt="Artist 4">
-                            <p>송수현</p>
-                        </div>
-                        <div class="artist-item">
-                            <img src="/assets/artists/5.png" alt="Artist 5">
-                            <p>유이솔</p>
-                        </div>
-                        <div class="artist-item">
-                            <img src="/assets/artists/6.png" alt="Artist 6">
-                            <p>김시경</p>
-                        </div>
+                </div>
+                <div class="artist-item">
+                    <img src="/assets/artists/3.png" alt="채하진">
+                    <div class="artist-info">
+                        <p>채하진</p>
                     </div>
-                    <div class="row">
-                        <div class="artist-item">
-                            <img src="/assets/artists/7.png" alt="Artist 7">
-                            <p>최건</p>
-                        </div>
-                        <div class="artist-item">
-                            <img src="/assets/artists/8.png" alt="Artist 8">
-                            <p>채하진</p>
-                        </div>
-                        <div class="artist-item">
-                            <img src="/assets/artists/9.png" alt="Artist 9">
-                            <p>송수현</p>
-                        </div>
+                </div>
+                <div class="artist-item">
+                    <img src="/assets/artists/4.png" alt="송수현">
+                    <div class="artist-info">
+                        <p>송수현</p>
+                    </div>
+                </div>
+                <div class="artist-item">
+                    <img src="/assets/artists/5.png" alt="유이솔">
+                    <div class="artist-info">
+                        <p>유이솔</p>
+                    </div>
+                </div>
+                <div class="artist-item">
+                    <img src="/assets/artists/6.png" alt="차채민">
+                    <div class="artist-info">
+                        <p>차채민</p>
                     </div>
                 </div>
             </div>
