@@ -364,7 +364,7 @@
             <form id="artistForm">
                 <div class="form-group">
                     <label for="artistId">아티스트 ID (영문, 숫자, - 만 사용)</label>
-                    <input type="text" id="artistId" class="form-control" required pattern="[a-zA-Z0-9-]+">
+                    <input type="text" id="artistId" class="form-control" required pattern="[a-zA-Z0-9\-]+">
                 </div>
                 <div class="form-group">
                     <label for="artistName">한글 이름</label>
@@ -376,8 +376,9 @@
                 </div>
                 <div class="form-group">
                     <label for="artistImages">이미지 파일 업로드</label>
-                    <input type="file" id="artistImages" class="form-control" multiple accept="image/*">
-                    <small>여러 이미지를 선택할 수 있습니다.</small>
+                    <input type="file" id="artistImages" class="form-control" multiple accept="image/*" onchange="handleImageSelection(this)">
+                    <small>여러 이미지를 선택할 수 있습니다. (각 파일 최대 2MB, 자동 리사이즈됩니다)</small>
+                    <div id="imagePreview" style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
                 </div>
 
                 <h4>필모그래피</h4>
@@ -426,6 +427,7 @@
     <script>
         let allArtists = [];
         let editingArtist = null;
+        let processedImages = []; // 처리된 이미지들을 저장
 
         // Show status message
         function showStatus(message, type = 'info') {
@@ -526,6 +528,8 @@
         function closeArtistModal() {
             document.getElementById('artistModal').style.display = 'none';
             editingArtist = null;
+            processedImages = [];
+            document.getElementById('imagePreview').innerHTML = '';
         }
 
         // Clear filmography containers
@@ -594,7 +598,7 @@
             };
 
             // Validate ID format
-            if (!/^[a-zA-Z0-9-]+$/.test(artistData.id)) {
+            if (!/^[a-zA-Z0-9\-]+$/.test(artistData.id)) {
                 showStatus('아티스트 ID는 영문, 숫자, - 만 사용할 수 있습니다.', 'error');
                 return;
             }
@@ -607,10 +611,12 @@
 
             formData.append('artistData', JSON.stringify(artistData));
             
-            // Add images
-            const imageFiles = document.getElementById('artistImages').files;
-            for (let i = 0; i < imageFiles.length; i++) {
-                formData.append('images', imageFiles[i]);
+            // Add processed images instead of original files
+            if (processedImages.length > 0) {
+                for (let i = 0; i < processedImages.length; i++) {
+                    formData.append('images', processedImages[i]);
+                }
+                console.log(`Uploading ${processedImages.length} processed images`);
             }
 
             setLoading(true);
@@ -623,7 +629,10 @@
                     body: formData
                 });
 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
                 
                 const result = await response.json();
                 showStatus(editingArtist ? '아티스트 정보가 수정되었습니다.' : '새 아티스트가 추가되었습니다.', 'success');
@@ -633,7 +642,11 @@
                 
             } catch (error) {
                 console.error('Error saving artist:', error);
-                showStatus('아티스트 저장에 실패했습니다: ' + error.message, 'error');
+                if (error.message.includes('413')) {
+                    showStatus('업로드 파일 크기가 너무 큽니다. 이미지를 더 작게 만들어 주세요.', 'error');
+                } else {
+                    showStatus('아티스트 저장에 실패했습니다: ' + error.message, 'error');
+                }
             }
             setLoading(false);
         });
@@ -744,6 +757,99 @@
             }
             
             input.value = '';
+        }
+
+        // Handle image selection and processing
+        async function handleImageSelection(input) {
+            const files = Array.from(input.files);
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            processedImages = [];
+
+            if (files.length === 0) return;
+
+            showStatus('이미지를 처리하는 중...', 'info');
+
+            for (const file of files) {
+                try {
+                    // Check file size (10MB limit before processing)
+                    if (file.size > 10 * 1024 * 1024) {
+                        showStatus(`${file.name}은 너무 큽니다 (10MB 초과). 건너뜁니다.`, 'error');
+                        continue;
+                    }
+
+                    const processedFile = await resizeImage(file, 800, 600, 0.8);
+                    processedImages.push(processedFile);
+
+                    // Create preview
+                    const previewDiv = document.createElement('div');
+                    previewDiv.style.cssText = 'position: relative; display: inline-block;';
+                    
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(processedFile);
+                    img.style.cssText = 'width: 80px; height: 80px; object-fit: cover; border-radius: 5px; border: 2px solid #ddd;';
+                    
+                    const sizeSpan = document.createElement('span');
+                    sizeSpan.textContent = `${(processedFile.size / 1024).toFixed(1)}KB`;
+                    sizeSpan.style.cssText = 'position: absolute; bottom: -15px; left: 0; font-size: 10px; color: #666;';
+                    
+                    previewDiv.appendChild(img);
+                    previewDiv.appendChild(sizeSpan);
+                    preview.appendChild(previewDiv);
+
+                } catch (error) {
+                    console.error('Error processing image:', error);
+                    showStatus(`${file.name} 처리 실패: ${error.message}`, 'error');
+                }
+            }
+
+            showStatus(`${processedImages.length}개 이미지가 처리되었습니다.`, 'success');
+        }
+
+        // Resize image function
+        function resizeImage(file, maxWidth, maxHeight, quality) {
+            return new Promise((resolve, reject) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+
+                img.onload = function() {
+                    // Calculate new dimensions
+                    let { width, height } = img;
+                    
+                    if (width > maxWidth || height > maxHeight) {
+                        const ratio = Math.min(maxWidth / width, maxHeight / height);
+                        width *= ratio;
+                        height *= ratio;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    // Draw and compress
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    canvas.toBlob(
+                        (blob) => {
+                            if (blob) {
+                                // Create new file with original name
+                                const resizedFile = new File([blob], file.name, {
+                                    type: 'image/jpeg',
+                                    lastModified: Date.now()
+                                });
+                                resolve(resizedFile);
+                            } else {
+                                reject(new Error('Failed to compress image'));
+                            }
+                        },
+                        'image/jpeg',
+                        quality
+                    );
+                };
+
+                img.onerror = () => reject(new Error('Failed to load image'));
+                img.src = URL.createObjectURL(file);
+            });
         }
 
         // Initialize
