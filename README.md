@@ -6,10 +6,9 @@ This website has been migrated from Firebase to Cloudflare Pages with R2 Bucket 
 
 The site has been converted from Firebase to use:
 - **Cloudflare Pages** for hosting
-- **R2 Bucket** for asset storage (images, videos, etc.)
+- **R2 Bucket** for asset storage (images, videos, etc.) and data storage
 - **Cloudflare Workers** for backend API functionality and image serving
-- **KV Storage** for contact form data (optional)
-- **Admin Panel** for R2 bucket management
+- **Admin Panel** for R2 bucket management and artist management
 
 ## Setup Instructions
 
@@ -39,10 +38,7 @@ You'll need to bind the R2 bucket in Cloudflare Pages settings:
 Set these environment variables in Cloudflare Pages dashboard:
 - `CONTACT_EMAIL`: Email address to receive contact form submissions
 
-### 5. KV Storage (Optional)
-If you want to store contact form submissions, create a KV namespace in Cloudflare dashboard and bind it to your Pages project.
-
-### 6. Deploy to Cloudflare Pages
+### 5. Deploy to Cloudflare Pages
 1. Connect your repository to Cloudflare Pages
 2. Set build output directory to `.` (root)
 3. Configure your R2 bindings and environment variables
@@ -50,14 +46,25 @@ If you want to store contact form submissions, create a KV namespace in Cloudfla
 
 ## Admin Panel Features
 
-### 🎛️ Access Admin Panel
-Visit `/admin.html` to access the R2 Bucket management interface.
+### 🎛️ Access Admin Panels
+- **File Management**: Visit `/admin.html` to access the R2 Bucket management interface
+- **Artist Management**: Visit `/admin-artists.html` to manage artists and their filmography
 
-### 📁 File Management
+### 📁 File Management (`/admin.html`)
 - **View all files** in R2 bucket with thumbnails
 - **Upload new files** with custom paths
 - **Delete files** individually
+- **Replace files** with new versions
 - **File information** (size, last modified, etc.)
+
+### 🎭 Artist Management (`/admin-artists.html`)
+- **Add new artists** with photos and filmography
+- **Edit existing artists** and their information
+- **Delete artists** and all associated images
+- **Dynamic filmography** management (movies, dramas, commercials)
+- **Image gallery** for each artist
+- **Import/Export** artist data
+- **Statistics** and overview
 
 ### 🔄 Auto Sync Features
 - **Auto Sync from Local**: Automatically uploads all local files to R2
@@ -78,21 +85,35 @@ img/bg-img/1.jpg                       →  artists/1.png
 
 ## How It Works
 
+### Data Storage
+- **All data stored in R2 Bucket** as JSON files
+- **Artist data**: Stored as `artists-data.json` in R2
+- **Images**: Organized in folders like `artists/{artist-id}/`
+- **No external database required**
+
 ### Image Serving via Worker
 - **No custom domain needed!** 🎉
 - All images are served through the Worker at `/assets/` endpoint
 - Examples:
   - `/assets/logo-horizon-arclead.png` → R2: `logo-horizon-arclead.png`
   - `/assets/slides/1.png` → R2: `slides/1.png`
-  - `/assets/artists/1.png` → R2: `artists/1.png`
+  - `/assets/artists/{artist-id}/{image}` → R2: `artists/{artist-id}/{image}`
+
+### Artist System
+- **Dynamic artist pages**: `/artist.html?id={artist-id}`
+- **Grid-based artist listing**: `/artists-all.html`
+- **Comprehensive admin interface**: `/admin-artists.html`
+- **Automatic image management**: Images stored in organized R2 folders
 
 ### Benefits:
 - ✅ **No CORS issues** - Same domain serving
+- ✅ **No external database required** - All data in R2
 - ✅ **No custom domain setup required**
 - ✅ **Automatic caching** with ETag support
 - ✅ **Proper Content-Type headers**
 - ✅ **24-hour browser cache**
-- ✅ **Easy file management** via admin panel
+- ✅ **Easy management** via admin panels
+- ✅ **Scalable data storage** in R2
 
 ## File Structure Changes
 
@@ -101,16 +122,20 @@ img/bg-img/1.jpg                       →  artists/1.png
 - Firebase Storage and Database integration
 - Need for R2 custom domain setup
 - Manual file upload process
+- KV Storage dependency
 
 ### Added:
 - `_worker.js` - Cloudflare Pages Functions for API endpoints and image serving
 - `admin.html` - R2 Bucket management interface
-- R2 bucket integration for all assets via Worker proxy
+- `admin-artists.html` - Artist management interface
+- `artist.html` - Dynamic artist page template
+- R2 bucket integration for all assets and data via Worker proxy
 - Auto-sync functionality from local files
+- Complete artist management system
 
 ### Modified:
 - `index.html` - Updated to use `/assets/` paths for all images
-- `artists-all.html` - Updated image references to `/assets/` paths
+- `artists-all.html` - Updated to dynamic grid loading from API
 - All image references changed from local/Firebase to Worker-served paths
 
 ## API Endpoints
@@ -126,9 +151,17 @@ The worker provides these endpoints:
 ### Admin API
 - `GET /admin/files` - List all files in R2 bucket
 - `POST /admin/upload` - Upload file to R2 bucket
+- `POST /admin/replace` - Replace existing file
 - `DELETE /admin/files/{key}` - Delete specific file
 - `POST /admin/sync` - Auto-sync local files to R2
 - `DELETE /admin/clear` - Clear all files from bucket
+
+### Artist API
+- `GET /api/artists` - Get all artists
+- `GET /api/artists/{id}` - Get specific artist
+- `POST /api/artists` - Create new artist
+- `PUT /api/artists/{id}` - Update artist
+- `DELETE /api/artists/{id}` - Delete artist
 
 ### Public API Routes  
 - `GET /api/slides` - Returns slide text data
@@ -136,17 +169,19 @@ The worker provides these endpoints:
 
 ## Features
 
-- **Image Loading**: All images served from R2 via Worker proxy
+- **Dynamic Artist System**: Complete CRUD operations for artists
+- **Image Management**: All images served from R2 via Worker proxy
 - **Contact Forms**: Processed by Cloudflare Workers
 - **Slide Management**: Dynamic slide text loading via API
 - **Email Integration**: Optional MailChannels integration for contact forms
 - **Performance**: Automatic caching and optimization
-- **Admin Interface**: Easy R2 bucket management
+- **Admin Interfaces**: Easy R2 bucket and artist management
 - **Auto Sync**: One-click upload from local files
+- **Pure R2 Storage**: No external database dependencies
 
 ## Development
 
-To modify slide data, edit the `slideData` object in `_worker.js`. For a more dynamic solution, consider using Cloudflare D1 database or KV storage.
+To modify slide data, edit the `slideData` object in `_worker.js`. For artists, use the admin panel at `/admin-artists.html`.
 
 ## Quick Start Guide
 
@@ -154,7 +189,28 @@ To modify slide data, edit the `slideData` object in `_worker.js`. For a more dy
 2. **Configure R2 binding** (`ARCLEAD_ASSETS` → `arclead`)
 3. **Visit `/admin.html`**
 4. **Click "🔄 Auto Sync from Local"**
-5. **Done!** Your site is fully functional
+5. **Visit `/admin-artists.html`** to add artists
+6. **Done!** Your site is fully functional
+
+## Data Storage Structure
+
+### R2 Bucket Structure:
+```
+arclead/
+├── artists-data.json           # All artist data
+├── logo-horizon-arclead.png    # Site assets
+├── favicon-arclead.ico
+├── slides/
+│   ├── 1.png
+│   ├── 2.png
+│   └── ...
+└── artists/
+    ├── kim-sigyeong/
+    │   ├── profile1.jpg
+    │   └── profile2.jpg
+    └── other-artist/
+        └── images...
+```
 
 ## Troubleshooting
 
@@ -163,18 +219,33 @@ To modify slide data, edit the `slideData` object in `_worker.js`. For a more dy
    - Use admin panel to verify files are uploaded
    - Check browser console for 404 errors
 
-2. **Auto sync not working**:
+2. **Artist data not saving**:
+   - Verify R2 binding (`ARCLEAD_ASSETS`) is properly configured
+   - Check Cloudflare Workers logs for errors
+   - Ensure bucket has write permissions
+
+3. **Auto sync not working**:
    - Verify R2 binding is properly configured
    - Check that local files exist in `img/` folders
    - Use admin panel to manually upload if needed
 
-3. **Admin panel errors**: 
+4. **Admin panel errors**: 
    - Check Cloudflare Workers logs in dashboard
    - Verify R2 permissions are correctly set
 
-4. **API errors**: Check Cloudflare Workers logs in dashboard
+5. **API errors**: Check Cloudflare Workers logs in dashboard
 
-5. **Contact form not working**: Verify environment variables are set
+6. **Contact form not working**: Verify environment variables are set
+
+---
+
+**Technical Configuration:**
+
+- **R2 Bucket**: `arclead`
+- **R2 Binding Variable**: `ARCLEAD_ASSETS`
+- **Data Storage**: Pure R2 (no KV required)
+- **Image Serving**: Worker proxy at `/assets/`
+- **Artist Data**: JSON file in R2 (`artists-data.json`)
 
 ---
 
@@ -197,11 +268,6 @@ Alternatively, here's our top most trending and selling items:
 * [**Sparrow**](https://themewagon.com/themes/sparrow/) - A multipurpose template made with Bootstrap 4.1 and world's finest animation.
 * [**Posh**](https://themewagon.com/themes/posh-html5-bootstrap-4-template/) - Bootstrap 4 template with a myriad number of ready-to-deploy sections. 
 * [**Elixir**](https://themewagon.com/themes/elixir-elegant-html5-bootstrap-template-consultancy-agency-website/) - Bootstrap 4 agency template. Best for smooth animated scrolling. 
-* [**Freya**](https://themewagon.com/themes/bootstrap-4-premium-interior-design-template-freya/) - Interior design template made with Bootstrap 4. 
-* [**Reign Pro**](https://themewagon.com/themes/reign-pro-premium-corporate-agency-html5-template/) - A corporate template with a visually unique design scheme. 
-* [**Boots4**](https://themewagon.com/themes/first-ever-bootstrap-4-template/) - One of the first Bootstrap 4 templates ever made on earth. 
-* [**Hideaway**](https://themewagon.com/themes/hideaway/) - A template for resorts. Built with Bootstrap 4. 
-* [**Baikal**](https://themewagon.com/themes/bootstrap-4-startup-small-business-website-template/) - A smart Bootstrap template for start-up. 
-* [**Mega Discount**](https://themewagon.com/themes/mega-discount-bundle/) - A bundle of 26 HTML5 templates; best value for your money. 
+* [**Freya**](https://themewagon.com/themes/bootstrap-4-premium-interior-design-template-freya/) - Interior design template made with Bootstrap 4.
 
 

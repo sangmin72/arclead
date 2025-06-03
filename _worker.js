@@ -502,22 +502,26 @@ async function handleArtistsRequest(request, env, url, corsHeaders) {
 // Get all artists
 async function handleGetAllArtists(request, env, corsHeaders) {
   try {
-    // Get artists data from KV (or return sample data for now)
     let artists = [];
     
+    // Load from R2
     try {
-      const artistsData = await env.ARCLEAD_KV?.get('artists');
-      if (artistsData) {
-        artists = JSON.parse(artistsData);
+      const r2Object = await env.ARCLEAD_ASSETS.get('artists-data.json');
+      if (r2Object) {
+        const text = await r2Object.text();
+        artists = JSON.parse(text);
+        console.log(`Loaded ${artists.length} artists from R2`);
+      } else {
+        console.log('No artists data found in R2');
       }
     } catch (error) {
-      console.log('No KV storage or no artists data, returning empty array');
+      console.log('Error loading artists from R2:', error.message);
     }
 
     return new Response(JSON.stringify(artists), {
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=300', // Cache for 5 minutes
+        'Cache-Control': 'public, max-age=300',
         ...corsHeaders
       }
     });
@@ -535,13 +539,20 @@ async function handleGetArtist(request, env, artistId, corsHeaders) {
   try {
     let artists = [];
     
+    // Load from R2
     try {
-      const artistsData = await env.ARCLEAD_KV?.get('artists');
-      if (artistsData) {
-        artists = JSON.parse(artistsData);
+      const r2Object = await env.ARCLEAD_ASSETS.get('artists-data.json');
+      if (r2Object) {
+        const text = await r2Object.text();
+        artists = JSON.parse(text);
+        console.log(`Loaded ${artists.length} artists from R2`);
       }
     } catch (error) {
-      // No KV storage, return sample data for testing
+      console.log('Error loading artists from R2:', error.message);
+    }
+
+    // If still no data, return sample data for testing
+    if (artists.length === 0) {
       artists = [
         {
           id: 'kim-sigyeong',
@@ -591,9 +602,47 @@ async function handleGetArtist(request, env, artistId, corsHeaders) {
   }
 }
 
+// Save artists data to R2
+async function saveArtistsData(artists, env) {
+  const artistsJson = JSON.stringify(artists, null, 2);
+  
+  try {
+    await env.ARCLEAD_ASSETS.put('artists-data.json', artistsJson, {
+      httpMetadata: {
+        contentType: 'application/json',
+      },
+    });
+    console.log(`Successfully saved ${artists.length} artists to R2`);
+  } catch (error) {
+    console.error('Failed to save to R2:', error);
+    throw error;
+  }
+}
+
+// Load existing artists data from R2
+async function loadExistingArtists(env) {
+  let artists = [];
+  
+  try {
+    const r2Object = await env.ARCLEAD_ASSETS.get('artists-data.json');
+    if (r2Object) {
+      const text = await r2Object.text();
+      artists = JSON.parse(text);
+      console.log(`Loaded ${artists.length} artists from R2`);
+    } else {
+      console.log('No existing artists data in R2');
+    }
+  } catch (error) {
+    console.log('Error loading existing artists data:', error.message);
+  }
+
+  return artists;
+}
+
 // Create new artist
 async function handleCreateArtist(request, env, corsHeaders) {
   try {
+    console.log('Creating new artist...');
     const formData = await request.formData();
     const artistDataStr = formData.get('artistData');
     
@@ -605,6 +654,7 @@ async function handleCreateArtist(request, env, corsHeaders) {
     }
 
     const artistData = JSON.parse(artistDataStr);
+    console.log('Artist data:', artistData);
     
     // Validate required fields
     if (!artistData.id || !artistData.name) {
@@ -614,16 +664,16 @@ async function handleCreateArtist(request, env, corsHeaders) {
       });
     }
 
-    // Get existing artists
-    let artists = [];
-    try {
-      const existingData = await env.ARCLEAD_KV?.get('artists');
-      if (existingData) {
-        artists = JSON.parse(existingData);
-      }
-    } catch (error) {
-      console.log('No existing artists data');
+    // Validate ID format
+    if (!/^[a-zA-Z0-9-]+$/.test(artistData.id)) {
+      return new Response(JSON.stringify({ error: 'Invalid artist ID format' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
     }
+
+    // Get existing artists
+    const artists = await loadExistingArtists(env);
 
     // Check for duplicate ID
     if (artists.some(a => a.id === artistData.id)) {
@@ -636,16 +686,18 @@ async function handleCreateArtist(request, env, corsHeaders) {
     // Handle image uploads
     const imageFiles = formData.getAll('images');
     const uploadedImages = [];
+    console.log(`Uploading ${imageFiles.length} images...`);
 
     for (const imageFile of imageFiles) {
       if (imageFile && imageFile.size > 0) {
-        const fileExtension = imageFile.name.split('.').pop();
+        const fileExtension = imageFile.name.split('.').pop().toLowerCase();
         const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
         const imagePath = `artists/${artistData.id}/${fileName}`;
         
         try {
           await env.ARCLEAD_ASSETS.put(imagePath, imageFile);
           uploadedImages.push(fileName);
+          console.log(`Uploaded image: ${fileName}`);
         } catch (error) {
           console.error('Error uploading image:', error);
         }
@@ -663,12 +715,10 @@ async function handleCreateArtist(request, env, corsHeaders) {
     // Add to artists array
     artists.push(newArtist);
 
-    // Save to KV
-    try {
-      await env.ARCLEAD_KV?.put('artists', JSON.stringify(artists));
-    } catch (error) {
-      console.error('Error saving to KV:', error);
-    }
+    // Save data
+    await saveArtistsData(artists, env);
+
+    console.log(`Successfully created artist: ${newArtist.name}`);
 
     return new Response(JSON.stringify({ 
       success: true, 
@@ -682,7 +732,10 @@ async function handleCreateArtist(request, env, corsHeaders) {
     });
   } catch (error) {
     console.error('Error creating artist:', error);
-    return new Response(JSON.stringify({ error: 'Failed to create artist' }), {
+    return new Response(JSON.stringify({ 
+      error: 'Failed to create artist',
+      details: error.message 
+    }), {
       status: 500,
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
@@ -692,6 +745,7 @@ async function handleCreateArtist(request, env, corsHeaders) {
 // Update artist
 async function handleUpdateArtist(request, env, artistId, corsHeaders) {
   try {
+    console.log(`Updating artist: ${artistId}`);
     const formData = await request.formData();
     const artistDataStr = formData.get('artistData');
     
@@ -705,18 +759,7 @@ async function handleUpdateArtist(request, env, artistId, corsHeaders) {
     const artistData = JSON.parse(artistDataStr);
 
     // Get existing artists
-    let artists = [];
-    try {
-      const existingData = await env.ARCLEAD_KV?.get('artists');
-      if (existingData) {
-        artists = JSON.parse(existingData);
-      }
-    } catch (error) {
-      return new Response(JSON.stringify({ error: 'No artists data found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders }
-      });
-    }
+    const artists = await loadExistingArtists(env);
 
     const artistIndex = artists.findIndex(a => a.id === artistId);
     if (artistIndex === -1) {
@@ -734,13 +777,14 @@ async function handleUpdateArtist(request, env, artistId, corsHeaders) {
 
     for (const imageFile of imageFiles) {
       if (imageFile && imageFile.size > 0) {
-        const fileExtension = imageFile.name.split('.').pop();
+        const fileExtension = imageFile.name.split('.').pop().toLowerCase();
         const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
         const imagePath = `artists/${artistId}/${fileName}`;
         
         try {
           await env.ARCLEAD_ASSETS.put(imagePath, imageFile);
           newImages.push(fileName);
+          console.log(`Uploaded new image: ${fileName}`);
         } catch (error) {
           console.error('Error uploading image:', error);
         }
@@ -759,12 +803,10 @@ async function handleUpdateArtist(request, env, artistId, corsHeaders) {
     // Update in artists array
     artists[artistIndex] = updatedArtist;
 
-    // Save to KV
-    try {
-      await env.ARCLEAD_KV?.put('artists', JSON.stringify(artists));
-    } catch (error) {
-      console.error('Error saving to KV:', error);
-    }
+    // Save data
+    await saveArtistsData(artists, env);
+
+    console.log(`Successfully updated artist: ${updatedArtist.name}`);
 
     return new Response(JSON.stringify({ 
       success: true, 
@@ -778,7 +820,10 @@ async function handleUpdateArtist(request, env, artistId, corsHeaders) {
     });
   } catch (error) {
     console.error('Error updating artist:', error);
-    return new Response(JSON.stringify({ error: 'Failed to update artist' }), {
+    return new Response(JSON.stringify({ 
+      error: 'Failed to update artist',
+      details: error.message 
+    }), {
       status: 500,
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
@@ -788,19 +833,10 @@ async function handleUpdateArtist(request, env, artistId, corsHeaders) {
 // Delete artist
 async function handleDeleteArtist(request, env, artistId, corsHeaders) {
   try {
+    console.log(`Deleting artist: ${artistId}`);
+
     // Get existing artists
-    let artists = [];
-    try {
-      const existingData = await env.ARCLEAD_KV?.get('artists');
-      if (existingData) {
-        artists = JSON.parse(existingData);
-      }
-    } catch (error) {
-      return new Response(JSON.stringify({ error: 'No artists data found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders }
-      });
-    }
+    const artists = await loadExistingArtists(env);
 
     const artistIndex = artists.findIndex(a => a.id === artistId);
     if (artistIndex === -1) {
@@ -817,6 +853,7 @@ async function handleDeleteArtist(request, env, artistId, corsHeaders) {
       for (const image of artist.images) {
         try {
           await env.ARCLEAD_ASSETS.delete(`artists/${artistId}/${image}`);
+          console.log(`Deleted image: ${image}`);
         } catch (error) {
           console.error(`Error deleting image ${image}:`, error);
         }
@@ -826,12 +863,10 @@ async function handleDeleteArtist(request, env, artistId, corsHeaders) {
     // Remove artist from array
     artists.splice(artistIndex, 1);
 
-    // Save to KV
-    try {
-      await env.ARCLEAD_KV?.put('artists', JSON.stringify(artists));
-    } catch (error) {
-      console.error('Error saving to KV:', error);
-    }
+    // Save data
+    await saveArtistsData(artists, env);
+
+    console.log(`Successfully deleted artist: ${artist.name}`);
 
     return new Response(JSON.stringify({ 
       success: true, 
@@ -844,7 +879,10 @@ async function handleDeleteArtist(request, env, artistId, corsHeaders) {
     });
   } catch (error) {
     console.error('Error deleting artist:', error);
-    return new Response(JSON.stringify({ error: 'Failed to delete artist' }), {
+    return new Response(JSON.stringify({ 
+      error: 'Failed to delete artist',
+      details: error.message 
+    }), {
       status: 500,
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
