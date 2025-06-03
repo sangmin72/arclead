@@ -93,6 +93,16 @@
             background: linear-gradient(135deg, #27ae60, #2ecc71);
         }
 
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 14px;
+            margin: 2px;
+        }
+
         .file-upload {
             margin-bottom: 20px;
         }
@@ -164,6 +174,25 @@
             color: #6c757d;
         }
 
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .replace-input {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .replace-input input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
         .status {
             padding: 15px;
             margin: 10px 0;
@@ -217,6 +246,10 @@
             
             .files-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .file-actions {
+                flex-direction: column;
             }
         }
     </style>
@@ -311,7 +344,7 @@
                 return;
             }
 
-            grid.innerHTML = files.map(file => `
+            grid.innerHTML = files.map((file, index) => `
                 <div class="file-card">
                     ${isImage(file.key) ? 
                         `<img class="file-preview" src="/assets/${file.key}" alt="${file.key}" onerror="this.style.display='none'">` :
@@ -324,9 +357,75 @@
                             Modified: ${new Date(file.lastModified).toLocaleString()}
                         </div>
                     </div>
-                    <button class="btn btn-danger" onclick="deleteFile('${file.key}')">🗑️ Delete</button>
+                    <div class="file-actions">
+                        <button class="btn btn-warning btn-small" onclick="toggleReplaceInput(${index})">🔄 Change</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteFile('${file.key}')">🗑️ Delete</button>
+                    </div>
+                    <div class="replace-input" id="replace-${index}">
+                        <input type="file" id="replaceFile-${index}" accept="image/*,video/*,audio/*">
+                        <button class="btn btn-success btn-small" onclick="replaceFile('${file.key}', ${index})">✅ Replace</button>
+                        <button class="btn btn-small" onclick="cancelReplace(${index})">❌ Cancel</button>
+                    </div>
                 </div>
             `).join('');
+        }
+
+        // Toggle replace input
+        function toggleReplaceInput(index) {
+            const replaceDiv = document.getElementById(`replace-${index}`);
+            const isVisible = replaceDiv.style.display === 'block';
+            
+            // Hide all other replace inputs
+            document.querySelectorAll('.replace-input').forEach(div => {
+                div.style.display = 'none';
+            });
+            
+            // Toggle current one
+            replaceDiv.style.display = isVisible ? 'none' : 'block';
+        }
+
+        // Cancel replace
+        function cancelReplace(index) {
+            document.getElementById(`replace-${index}`).style.display = 'none';
+            document.getElementById(`replaceFile-${index}`).value = '';
+        }
+
+        // Replace file
+        async function replaceFile(key, index) {
+            const fileInput = document.getElementById(`replaceFile-${index}`);
+            
+            if (!fileInput.files.length) {
+                showStatus('Please select a file to replace with', 'error');
+                return;
+            }
+
+            setLoading(true);
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('key', key);
+
+                const response = await fetch('/admin/replace', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const result = await response.json();
+                showStatus(`Successfully replaced "${key}"`, 'success');
+                
+                // Reset input and hide replace section
+                fileInput.value = '';
+                cancelReplace(index);
+                
+                // Refresh file list
+                refreshFileList();
+            } catch (error) {
+                console.error('Error replacing file:', error);
+                showStatus('Failed to replace file: ' + error.message, 'error');
+            }
+            setLoading(false);
         }
 
         // Check if file is image

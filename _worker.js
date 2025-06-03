@@ -40,6 +40,8 @@ async function handleAdminRequest(request, env, url) {
         return handleAdminFilesList(request, env, corsHeaders);
       case '/admin/upload':
         return handleAdminUpload(request, env, corsHeaders);
+      case '/admin/replace':
+        return handleAdminReplace(request, env, corsHeaders);
       case '/admin/sync':
         return handleAdminSync(request, env, corsHeaders);
       case '/admin/clear':
@@ -316,6 +318,46 @@ async function handleAdminClear(request, env, corsHeaders) {
   } catch (error) {
     console.error('Error clearing bucket:', error);
     return new Response(JSON.stringify({ error: 'Failed to clear bucket' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    });
+  }
+}
+
+// Replace/update file in R2 bucket
+async function handleAdminReplace(request, env, corsHeaders) {
+  if (request.method !== 'POST') {
+    return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+  }
+
+  try {
+    const formData = await request.formData();
+    const file = formData.get('file');
+    const key = formData.get('key');
+
+    if (!file || !key) {
+      return new Response(JSON.stringify({ error: 'File and key are required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    // Replace the file (overwrite existing)
+    await env.ARCLEAD_ASSETS.put(key, file);
+
+    return new Response(JSON.stringify({ 
+      success: true, 
+      key: key,
+      message: `File ${key} replaced successfully` 
+    }), {
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      }
+    });
+  } catch (error) {
+    console.error('Error replacing file:', error);
+    return new Response(JSON.stringify({ error: 'Failed to replace file' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
