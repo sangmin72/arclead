@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+    <style>
+        html, body {
+            height: 100%;
+            overflow: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+    </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <!-- Title  -->
+    <title>Arclead Entertainment : Artist All</title>
+
+    <!-- Favicon  -->
+    <link rel="icon" href="/assets/favicon-arclead.ico">
+
+    <!-- Core Style CSS -->
+    <link rel="stylesheet" href="css/core-style.css">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Responsive CSS -->
+    <link href="css/responsive.css" rel="stylesheet">
+
+    <script type="text/javascript">
+        function getTime() {
+            var d = new Date(); // 현재 날짜와 시간
+            var year = d.getFullYear(); // 연
+            var month = (d.getMonth() + 1).toString().padStart(2, '0'); // 월
+            var date = d.getDate().toString().padStart(2, '0'); // 일
+            var hours = d.getHours().toString().padStart(2, '0'); // 시
+            var minutes = d.getMinutes().toString().padStart(2, '0'); // 분
+            var seconds = d.getSeconds().toString().padStart(2, '0'); // 초
+
+            var timeBoard = document.getElementById("current-time"); // 값이 입력될 공간
+            var time = year + "년 " + month + "월 " + date + "일 " + hours + ":" + minutes + ":" + seconds; // 형식 지정
+
+            timeBoard.innerHTML = time; // 출력
+
+            setTimeout(getTime, 1000); // 1000밀리초(1초)마다 반복
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            getTime(); // 페이지가 로드될 때 시간을 즉시 표시
+        });
+    </script>
+
+</head>
+
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="showbox">
+            <div class="loader">
+                <svg class="circular" viewBox="25 25 50 50">
+                    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                </svg>
+            </div>
+        </div>
+        <div class="questions-area text-center">
+            <p>Arclead Entertainment</p>
+            <ul>
+                <li>당신은 동체시력 보유자!!! 축하합니다. (네트웍이 느린거죠? 맞죠? ㅠㅠ)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Header Area Start -->
+    <header class="header-area bg-img" style="background-color: black;">
+        <div class="container-fluid h-100">
+            <div class="row h-100 align-items-center">
+                <div class="col-12 h-100">
+                    <div class="main-menu h-100">
+                        <nav class="navbar h-100 navbar-expand-lg">
+                            <!-- Logo Area  -->
+                            <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
+                            <!-- Current Time -->
+                            <div id="current-time"></div>
+
+                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
+
+                            <div class="collapse navbar-collapse" id="studioMenu">
+                                <!-- Menu Area Start  -->
+                                <ul class="navbar-nav ml-auto">
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="index.html">Company <span class="sr-only">(current)</span></a>
+                                    </li>
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="artists-all.html">Artists <span class="sr-only">(current)</span></a>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">PR</a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <a class="dropdown-item" href="index.html">Media</a>
+                                            <a class="dropdown-item" href="about-me.html">News</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="audition.html">Auditon</a>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Header Area End -->
+
+    <section class="elements-area section_padding_50 mt-50">
+        <div class="portfolio-menu2">
+            <a class="btn" href="artists-all.html">ALL</a>
+            <a class="btn" href="artists-sigyeong.html">김시경</a>
+            <a class="btn" href="artists-sigyeong.html">최  건</a>
+            <a class="btn" href="artists-sigyeong.html">채하진</a>
+            <a class="btn" href="artists-sigyeong.html">송수현</a>
+            <a class="btn" href="artists-sigyeong.html">유이솔</a>
+            <a class="btn" href="artists-sigyeong.html">차채민</a>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-3 artist-stats">
+                    <h2>OUR ARTISTS</h2>
+                    <div class="total-artists">
+                        <h1>6</h1>
+                    </div>
+                    <div class="gender-stats">
+                        <p>woman</p>
+                        <h3>5</h3>
+                        <p>man</p>
+                        <h3>1</h3>
+                    </div>
+                </div>
+                <div class="col-9 artist-grid">
+                    <div class="row">
+                        <div class="artist-item">
+                            <img src="/assets/artists/1.png" alt="Artist 1">
+                            <p>김시경</p>
+                        </div>
+                        <div class="artist-item">
+                            <img src="/assets/artists/2.png" alt="Artist 2">
+                            <p>최건</p>
+                        </div>
+                        <div class="artist-item">
+                            <img src="/assets/artists/3.png" alt="Artist 3">
+                            <p>채하진</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="artist-item">
+                            <img src="/assets/artists/4.png" alt="Artist 4">
+                            <p>송수현</p>
+                        </div>
+                        <div class="artist-item">
+                            <img src="/assets/artists/5.png" alt="Artist 5">
+                            <p>유이솔</p>
+                        </div>
+                        <div class="artist-item">
+                            <img src="/assets/artists/6.png" alt="Artist 6">
+                            <p>김시경</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="artist-item">
+                            <img src="/assets/artists/7.png" alt="Artist 7">
+                            <p>최건</p>
+                        </div>
+                        <div class="artist-item">
+                            <img src="/assets/artists/8.png" alt="Artist 8">
+                            <p>채하진</p>
+                        </div>
+                        <div class="artist-item">
+                            <img src="/assets/artists/9.png" alt="Artist 9">
+                            <p>송수현</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** Elements Area End ***** -->
+
+    <!-- Footer Area Start -->
+    <footer class="footer-area">
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+                <div class="col-12 h-100">
+                    <div class="footer-content h-100 d-md-flex align-items-center justify-content-between">
+                        <!-- Single Footer Content -->
+                        <div class="single-footer-content">
+                            <img src="/assets/map.png" alt="">
+                            <a href="#">(04782) 서울시 성동구 연무장5가길 25, SK V1 Tower 705호</a>
+                        </div>
+                        <!-- Single Footer Content -->
+                        <div class="single-footer-content">
+                            <img src="/assets/smartphone.png" alt="">
+                            <a href="#">02-123-4567</a>
+                        </div>
+                        <!-- Single Footer Content -->
+                        <div class="single-footer-content">
+                            <img src="/assets/envelope-2.png" alt="">
+                            <a href="#">arclead@arclead.co.kr</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer Area End -->
+
+
+    <!-- jQuery (Necessary for All JavaScript Plugins) -->
+    <script src="js/jquery/jquery-2.2.4.min.js"></script>
+    <!-- Popper js -->
+    <script src="js/popper.min.js"></script>
+    <!-- Bootstrap js -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- Plugins js -->
+    <script src="js/plugins.js"></script>
+    <!-- Active js -->
+    <script src="js/active.js"></script>
+</body>
+</html>

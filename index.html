@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <!-- Title  -->
+    <title>Arclead</title>
+
+    <!-- Favicon  -->
+    <link rel="icon" href="/assets/favicon-arclead.ico">
+
+    <!-- Core Style CSS -->
+    <link rel="stylesheet" href="css/core-style.css">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Responsive CSS -->
+    <link href="css/responsive.css" rel="stylesheet">
+
+    <!-- Font : Pretendard CSS -->
+    <link rel="stylesheet" href="css/pretendard.css">
+    <link rel="stylesheet" href="css/pretendard-subset.css">
+
+    <!-- R2 Integration Script -->
+    <script>
+        async function loadSlideData() {
+            try {
+                const response = await fetch('/api/slides');
+                const data = await response.json();
+                
+                // Update carousel items with slide data
+                data.slides.forEach((slide, index) => {
+                    const slideId = `slide${String(index + 1).padStart(2, '0')}`;
+                    const carouselItem = document.getElementById(slideId);
+                    if (carouselItem) {
+                        const spanElement = carouselItem.querySelector('.slide-text span');
+                        const h2Element = carouselItem.querySelector('.slide-text h2');
+                        if (spanElement && h2Element) {
+                            spanElement.innerText = slide.text_big || "";
+                            h2Element.innerText = slide.text_small || "";
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading slide data:', error);
+            }
+        }
+
+        function setImageSources() {
+            // Set carousel background images from R2 via Worker
+            const carouselItems = document.querySelectorAll('.carousel-item');
+            carouselItems.forEach((item, index) => {
+                const imageUrl = `/assets/slides/${index + 1}.png`;
+                item.style.backgroundImage = `url(${imageUrl})`;
+            });
+
+            // Set carousel indicator background images from R2 via Worker
+            const carouselIndicators = document.querySelectorAll('.carousel-indicators li');
+            carouselIndicators.forEach((indicator, index) => {
+                const imageUrl = `/assets/slides/${index + 1}.png`;
+                indicator.style.backgroundImage = `url(${imageUrl})`;
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setImageSources();
+            loadSlideData();
+        });
+    </script>
+
+</head>
+
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="showbox">
+            <div class="loader">
+                <svg class="circular" viewBox="25 25 50 50">
+                    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                </svg>
+            </div>
+        </div>
+        <div class="questions-area text-center">
+            <p>Arclead Entertainment</p>
+            <ul>
+                <li>당신은 동체시력 보유자!!! 축하합니다. (네트웍이 느린거죠? 맞죠? ㅠㅠ)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Gradient Background Overlay -->
+    <div class="gradient-background-overlay"></div>
+
+    <!-- Header Area Start -->
+    <header class="header-area bg-img" style="background-color: black;">
+        <div class="container-fluid h-100">
+            <div class="row h-100 align-items-center">
+                <div class="col-12 h-100">
+                    <div class="main-menu h-100">
+                        <nav class="navbar h-100 navbar-expand-lg">
+                            <!-- Logo Area  -->
+                            <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
+                            <!-- Current Time -->
+                            <div id="current-time"></div>
+
+                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
+
+                            <div class="collapse navbar-collapse" id="studioMenu">
+                                <!-- Menu Area Start  -->
+                                <ul class="navbar-nav ml-auto">
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="index.html">Company <span class="sr-only">(current)</span></a>
+                                    </li>
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="artists-all.html">Artists <span class="sr-only">(current)</span></a>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">PR</a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <a class="dropdown-item" href="index.html">Media</a>
+                                            <a class="dropdown-item" href="about-me.html">News</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="audition.html">Auditon</a>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Header Area End -->
+
+    <!-- Social Sidebar Area Start -->
+    <div class="social-sidebar-area bg-white">
+        <!-- Social Area -->
+        <div class="social-info-area">
+            <a href="#" data-toggle="tooltip" data-placement="right" title="YouTube"><i class="fa fa-facebook" aria-hidden="true"></i> <span>YouTube</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Naver Post"><i class="fa fa-twitter" aria-hidden="true"></i> <span>Naver Post</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Naver TV"><i class="fa fa-pinterest" aria-hidden="true"></i> <span>Naver TV</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Instagram"><i class="fa fa-behance" aria-hidden="true"></i> <span>Instagram</span></a>
+        </div>
+        <!-- Message Box -->
+        <div class="message-box">
+            <a href="#" data-toggle="modal" data-target=".contact-modal-lg"><img src="/assets/envelope.png" alt=""></a>
+        </div>
+    </div>
+    <!-- Social Sidebar Area End -->
+    
+    <!-- ***** Welcome Area Start ***** -->
+    <section class="welcome-area">
+        <div class="carousel h-100 slide" data-ride="carousel" id="welcomeSlider">
+            <!-- Carousel Inner -->
+            <div class="carousel-inner h-100">
+
+                <div id="slide01" class="carousel-item h-100 bg-img active">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>김시경</span>
+                            <h2>KIM SIGYEONG</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="slide02" class="carousel-item h-100 bg-img">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>02.</span>
+                            <h2>Believe you can fly</h2>
+                        </div>
+                    </div>
+                </div>
+                <div id="slide03" class="carousel-item h-100 bg-img">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>03.</span>
+                            <h2>Believe you can fly</h2>
+                        </div>
+                    </div>
+                </div>
+                <div id="slide04" class="carousel-item h-100 bg-img">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>04.</span>
+                            <h2>Believe you can fly</h2>
+                        </div>
+                    </div>
+                </div>
+                <div id="slide05" class="carousel-item h-100 bg-img">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>05.</span>
+                            <h2>Believe you can fly</h2>
+                        </div>
+                    </div>
+                </div>
+                <div id="slide06" class="carousel-item h-100 bg-img">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>06.</span>
+                            <h2>Believe you can fly</h2>
+                        </div>
+                    </div>
+                </div>
+                <div id="slide07" class="carousel-item h-100 bg-img">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>07.</span>
+                            <h2>Believe you can fly</h2>
+                        </div>
+                    </div>
+                </div>
+                <div id="slide08" class="carousel-item h-100 bg-img">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>08.</span>
+                            <h2>Believe you can fly</h2>
+                        </div>
+                    </div>
+                </div>
+                <div id="slide09" class="carousel-item h-100 bg-img">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>09.</span>
+                            <h2>Believe you can fly</h2>
+                        </div>
+                    </div>
+                </div>
+                <div id="slide10" class="carousel-item h-100 bg-img">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>10.</span>
+                            <h2>Believe you can fly</h2>
+                        </div>
+                    </div>
+                </div>
+                <div id="slide11" class="carousel-item h-100 bg-img">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>11.</span>
+                            <h2>Believe you can fly</h2>
+                        </div>
+                    </div>
+                </div>
+                <div id="slide12" class="carousel-item h-100 bg-img">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>12.</span>
+                            <h2>Believe you can fly</h2>
+                        </div>
+                    </div>
+                </div>
+                <div id="slide13" class="carousel-item h-100 bg-img">
+                    <div class="carousel-content h-100">
+                        <div class="slide-text">
+                            <span>13.</span>
+                            <h2>Believe you can fly</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Carousel Indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#welcomeSlider" data-slide-to="0" class="active bg-img"></li>
+                <li data-target="#welcomeSlider" data-slide-to="1" class="bg-img"></li>
+                <li data-target="#welcomeSlider" data-slide-to="2" class="bg-img"></li>
+                <li data-target="#welcomeSlider" data-slide-to="3" class="bg-img"></li>
+                <li data-target="#welcomeSlider" data-slide-to="4" class="bg-img"></li>
+                <li data-target="#welcomeSlider" data-slide-to="5" class="bg-img"></li>
+                <li data-target="#welcomeSlider" data-slide-to="6" class="bg-img"></li>
+                <li data-target="#welcomeSlider" data-slide-to="7" class="bg-img"></li>
+                <li data-target="#welcomeSlider" data-slide-to="8" class="bg-img"></li>
+                <li data-target="#welcomeSlider" data-slide-to="9" class="bg-img"></li>
+                <li data-target="#welcomeSlider" data-slide-to="10" class="bg-img"></li>
+                <li data-target="#welcomeSlider" data-slide-to="11" class="bg-img"></li>
+                <li data-target="#welcomeSlider" data-slide-to="12" class="bg-img"></li>
+            </ol>
+        </div>
+    </section>
+    <!-- ***** Welcome Area End ***** -->
+
+    <!-- ***** Contact Area Start ***** -->
+    <div class="contact-popup-form" id="contact-modal-lg">
+        <div class="modal fade contact-modal-lg" tabindex="-1" role="dialog" aria-labelledby="contact-modal-lg" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="contact-heading-text text-center mb-30">
+                                    <span></span>
+                                    <h2>Please get in touch</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Contact Form Area -->
+                    <div class="contact-form-area">
+                        <div class="container-fluid">
+                            <form action="/api/contact" method="post">
+                                <div class="row">
+                                    <div class="col-12 col-md-4">
+                                        <input type="text" class="form-control" name="name" id="name" placeholder="Your Name">
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <input type="email" class="form-control" name="email" id="email" placeholder="Your Email">
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject">
+                                    </div>
+                                    <div class="col-12">
+                                        <textarea name="message" class="form-control" id="message" cols="30" rows="10" placeholder="Message"></textarea>
+                                    </div>
+                                    <div class="col-12 text-center">
+                                        <button type="submit" class="btn studio-btn mt-3"><img src="/assets/logo-icon.png" alt=""> Send</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Contact Area End ***** -->
+
+
+    <!-- jQuery (Necessary for All JavaScript Plugins) -->
+    <script src="js/jquery/jquery-2.2.4.min.js"></script>
+    <!-- Popper js -->
+    <script src="js/popper.min.js"></script>
+    <!-- Bootstrap js -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- Plugins js -->
+    <script src="js/plugins.js"></script>
+    <!-- Active js -->
+    <script src="js/active.js"></script>
+
+</body>
+
+</html>
