@@ -948,7 +948,9 @@ async function handleSlidesRequest(request, env, corsHeaders) {
       artists.forEach(artist => {
         slideData.slides.push({
           text_big: artist.name || "아티스트",
-          text_small: artist.nameEn || "ARTIST"
+          text_small: artist.nameEn || "ARTIST",
+          image: artist.representativeImages?.home ? `/assets/artists/${artist.id}/${artist.representativeImages.home}` : null,
+          artistId: artist.id
         });
       });
     } else {

@@ -43,19 +43,33 @@
                             spanElement.innerText = slide.text_big || "";
                             h2Element.innerText = slide.text_small || "";
                         }
+                        
+                        // Set background image if artist has representative image
+                        if (slide.image) {
+                            carouselItem.style.backgroundImage = `url(${slide.image})`;
+                        } else {
+                            // Use default slide image
+                            const imageUrl = `/assets/slides/${index + 1}.png`;
+                            carouselItem.style.backgroundImage = `url(${imageUrl})`;
+                        }
                     }
                 });
             } catch (error) {
                 console.error('Error loading slide data:', error);
+                // Fallback to default images
+                setImageSources();
             }
         }
 
         function setImageSources() {
-            // Set carousel background images from R2 via Worker
+            // Set carousel background images from R2 via Worker (fallback)
             const carouselItems = document.querySelectorAll('.carousel-item');
             carouselItems.forEach((item, index) => {
-                const imageUrl = `/assets/slides/${index + 1}.png`;
-                item.style.backgroundImage = `url(${imageUrl})`;
+                // Only set default image if no background image is already set
+                if (!item.style.backgroundImage) {
+                    const imageUrl = `/assets/slides/${index + 1}.png`;
+                    item.style.backgroundImage = `url(${imageUrl})`;
+                }
             });
 
             // Set carousel indicator background images from R2 via Worker
@@ -67,7 +81,7 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            setImageSources();
+            // Load slide data first, then set default images as fallback
             loadSlideData();
         });
     </script>

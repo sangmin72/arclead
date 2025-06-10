@@ -269,16 +269,26 @@
                 return;
             }
 
-            grid.innerHTML = artists.map(artist => `
-                <div class="artist-item" onclick="goToArtist('${artist.id}')">
-                    <img src="/assets/artists/${artist.id}/${artist.representativeImages?.artists || (artist.images && artist.images.length > 0 ? artist.images[0] : 'default.png')}" 
-                         alt="${artist.name}" 
-                         onerror="this.src='/assets/artists/default.png'">
-                    <div class="artist-info">
-                        <p>${artist.name}</p>
+            grid.innerHTML = artists.map(artist => {
+                // Get representative image for artists page, fallback to first image, then default
+                let imageUrl = '/assets/artists/default.png';
+                if (artist.representativeImages?.artists) {
+                    imageUrl = `/assets/artists/${artist.id}/${artist.representativeImages.artists}`;
+                } else if (artist.images && artist.images.length > 0) {
+                    imageUrl = `/assets/artists/${artist.id}/${artist.images[0]}`;
+                }
+                
+                return `
+                    <div class="artist-item" onclick="goToArtist('${artist.id}')">
+                        <img src="${imageUrl}" 
+                             alt="${artist.name}" 
+                             onerror="this.src='/assets/artists/default.png'">
+                        <div class="artist-info">
+                            <p>${artist.name}</p>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Render error message

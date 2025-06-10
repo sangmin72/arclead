@@ -202,24 +202,11 @@
             carouselInner.innerHTML = '';
             
             if (artist.images && artist.images.length > 0) {
-                // Add representative image first if exists
-                if (artist.representativeImages?.artists) {
-                    carouselInner.innerHTML += `
-                        <div class="carousel-item active">
-                            <img src="/assets/artists/${artist.id}/${artist.representativeImages.artists}" class="d-block w-100" alt="${artist.name}">
-                        </div>
-                    `;
-                }
-                
-                // Add remaining images
                 artist.images.forEach((image, index) => {
-                    // Skip if this is the representative image
-                    if (image === artist.representativeImages?.artists) return;
-                    
-                    const isActive = !artist.representativeImages?.artists && index === 0 ? 'active' : '';
+                    const isActive = index === 0 ? 'active' : '';
                     carouselInner.innerHTML += `
                         <div class="carousel-item ${isActive}">
-                            <img src="/assets/artists/${artist.id}/${image}" class="d-block w-100" alt="${artist.name} ${index + 1}">
+                            <img src="/assets/artists/${artist.id}/${image}" class="d-block w-100" alt="${artist.name} ${index + 1}" style="cursor: pointer;" onclick="openGallery('${artist.id}')">
                         </div>
                     `;
                 });
@@ -288,6 +275,11 @@
                 </div>
             `;
             showLoading(false);
+        }
+
+        // Open gallery page
+        function openGallery(artistId) {
+            window.location.href = `artist-gallery.html?id=${artistId}`;
         }
 
         document.addEventListener("DOMContentLoaded", function() {
