@@ -271,7 +271,7 @@
 
             grid.innerHTML = artists.map(artist => `
                 <div class="artist-item" onclick="goToArtist('${artist.id}')">
-                    <img src="/assets/artists/${artist.id}/${artist.images && artist.images.length > 0 ? artist.images[0] : 'default.png'}" 
+                    <img src="/assets/artists/${artist.id}/${artist.representativeImages?.artists || (artist.images && artist.images.length > 0 ? artist.images[0] : 'default.png')}" 
                          alt="${artist.name}" 
                          onerror="this.src='/assets/artists/default.png'">
                     <div class="artist-info">

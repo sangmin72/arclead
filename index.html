@@ -344,6 +344,59 @@
     <!-- Active js -->
     <script src="js/active.js"></script>
 
+    <script>
+        // Load artists for homepage
+        async function loadHomeArtists() {
+            try {
+                const response = await fetch('/api/artists');
+                const artists = await response.json();
+                
+                // Get artists with home representative images
+                const homeArtists = artists.filter(artist => artist.representativeImages?.home);
+                
+                // Update carousel slides
+                const carouselInner = document.querySelector('.carousel-inner');
+                carouselInner.innerHTML = '';
+                
+                homeArtists.forEach((artist, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    carouselInner.innerHTML += `
+                        <div id="slide${index + 1}" class="carousel-item h-100 bg-img ${isActive}" 
+                             style="background-image: url('/assets/artists/${artist.id}/${artist.representativeImages.home}')">
+                            <div class="carousel-content h-100">
+                                <div class="slide-text">
+                                    <span>${artist.name}</span>
+                                    <h2>${artist.nameEn || artist.name}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                // If no artists with home images, show default slide
+                if (homeArtists.length === 0) {
+                    carouselInner.innerHTML = `
+                        <div class="carousel-item h-100 bg-img active">
+                            <div class="carousel-content h-100">
+                                <div class="slide-text">
+                                    <span>Arclead Entertainment</span>
+                                    <h2>Welcome to Arclead</h2>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading home artists:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            getTime();
+            loadHomeArtists();
+        });
+    </script>
+
 </body>
 
 </html>
