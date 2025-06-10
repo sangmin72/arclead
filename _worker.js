@@ -770,6 +770,33 @@ async function handleUpdateArtist(request, env, artistId, corsHeaders) {
     }
 
     const existingArtist = artists[artistIndex];
+    const newArtistId = artistData.id;
+
+    // Check if ID is changing and if new ID already exists
+    if (newArtistId !== artistId) {
+      if (artists.some(a => a.id === newArtistId && a.id !== artistId)) {
+        return new Response(JSON.stringify({ error: 'New artist ID already exists' }), {
+          status: 409,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        });
+      }
+
+      // If ID is changing, move existing images to new folder
+      if (existingArtist.images && existingArtist.images.length > 0) {
+        for (const image of existingArtist.images) {
+          try {
+            const oldImageObject = await env.ARCLEAD_ASSETS.get(`artists/${artistId}/${image}`);
+            if (oldImageObject) {
+              await env.ARCLEAD_ASSETS.put(`artists/${newArtistId}/${image}`, oldImageObject.body);
+              await env.ARCLEAD_ASSETS.delete(`artists/${artistId}/${image}`);
+              console.log(`Moved image: ${image} from ${artistId} to ${newArtistId}`);
+            }
+          } catch (error) {
+            console.error(`Error moving image ${image}:`, error);
+          }
+        }
+      }
+    }
 
     // Handle new image uploads
     const imageFiles = formData.getAll('images');
@@ -779,7 +806,7 @@ async function handleUpdateArtist(request, env, artistId, corsHeaders) {
       if (imageFile && imageFile.size > 0) {
         const fileExtension = imageFile.name.split('.').pop().toLowerCase();
         const fileName = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
-        const imagePath = `artists/${artistId}/${fileName}`;
+        const imagePath = `artists/${newArtistId}/${fileName}`;
         
         try {
           await env.ARCLEAD_ASSETS.put(imagePath, imageFile);
@@ -795,7 +822,7 @@ async function handleUpdateArtist(request, env, artistId, corsHeaders) {
     const updatedArtist = {
       ...existingArtist,
       ...artistData,
-      id: artistId, // Keep original ID
+      id: newArtistId, // Use the new ID
       images: [...(existingArtist.images || []), ...newImages],
       updatedAt: new Date().toISOString()
     };
@@ -897,32 +924,77 @@ async function handleSlidesRequest(request, env, corsHeaders) {
     });
   }
 
-  // Sample slide data - you can modify this or store it in KV/D1
-  const slideData = {
-    slides: [
-      { text_big: "김시경", text_small: "KIM SIGYEONG" },
-      { text_big: "02.", text_small: "Believe you can fly" },
-      { text_big: "03.", text_small: "Believe you can fly" },
-      { text_big: "04.", text_small: "Believe you can fly" },
-      { text_big: "05.", text_small: "Believe you can fly" },
-      { text_big: "06.", text_small: "Believe you can fly" },
-      { text_big: "07.", text_small: "Believe you can fly" },
-      { text_big: "08.", text_small: "Believe you can fly" },
-      { text_big: "09.", text_small: "Believe you can fly" },
-      { text_big: "10.", text_small: "Believe you can fly" },
-      { text_big: "11.", text_small: "Believe you can fly" },
-      { text_big: "12.", text_small: "Believe you can fly" },
-      { text_big: "13.", text_small: "Believe you can fly" }
-    ]
-  };
-
-  return new Response(JSON.stringify(slideData), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
-      ...corsHeaders
+  try {
+    // Load artists data to create slides
+    let artists = [];
+    
+    try {
+      const r2Object = await env.ARCLEAD_ASSETS.get('artists-data.json');
+      if (r2Object) {
+        const text = await r2Object.text();
+        artists = JSON.parse(text);
+      }
+    } catch (error) {
+      console.log('Error loading artists data for slides:', error.message);
     }
-  });
+
+    // Create slide data from artists
+    const slideData = {
+      slides: []
+    };
+
+    if (artists.length > 0) {
+      // Use actual artist data for slides
+      artists.forEach(artist => {
+        slideData.slides.push({
+          text_big: artist.name || "아티스트",
+          text_small: artist.nameEn || "ARTIST"
+        });
+      });
+    } else {
+      // Fallback slides if no artists data
+      slideData.slides = [
+        { text_big: "Arclead", text_small: "ARTIST AGENCY" },
+        { text_big: "02.", text_small: "Believe you can fly" },
+        { text_big: "03.", text_small: "Believe you can fly" },
+        { text_big: "04.", text_small: "Believe you can fly" },
+        { text_big: "05.", text_small: "Believe you can fly" },
+        { text_big: "06.", text_small: "Believe you can fly" },
+        { text_big: "07.", text_small: "Believe you can fly" },
+        { text_big: "08.", text_small: "Believe you can fly" },
+        { text_big: "09.", text_small: "Believe you can fly" },
+        { text_big: "10.", text_small: "Believe you can fly" },
+        { text_big: "11.", text_small: "Believe you can fly" },
+        { text_big: "12.", text_small: "Believe you can fly" },
+        { text_big: "13.", text_small: "Believe you can fly" }
+      ];
+    }
+
+    return new Response(JSON.stringify(slideData), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=300', // Cache for 5 minutes since data can change
+        ...corsHeaders
+      }
+    });
+  } catch (error) {
+    console.error('Error generating slides:', error);
+    
+    // Return fallback data on error
+    const fallbackSlideData = {
+      slides: [
+        { text_big: "Arclead", text_small: "ARTIST AGENCY" }
+      ]
+    };
+
+    return new Response(JSON.stringify(fallbackSlideData), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=60',
+        ...corsHeaders
+      }
+    });
+  }
 }
 
 async function handleContactRequest(request, env, corsHeaders) {

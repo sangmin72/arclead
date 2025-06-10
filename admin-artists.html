@@ -392,7 +392,7 @@
             </div>
             <form id="artistForm">
                 <div class="form-group">
-                    <label for="artistId">아티스트 ID</label>
+                    <label for="artistId">영문명</label>
                     <input type="text" id="artistId" class="form-control" required>
                 </div>
                 <div class="form-group">
@@ -529,8 +529,8 @@
                         </div>
                     </div>
                     
-                    <div><strong>ID:</strong> ${artist.id}</div>
-                    ${artist.nameEn ? `<div><strong>영문명:</strong> ${artist.nameEn}</div>` : ''}
+                    <div><strong>영문명:</strong> ${artist.id}</div>
+                    ${artist.nameEn ? `<div><strong>홈화면 작은글씨:</strong> ${artist.nameEn}</div>` : ''}
                     
                     <div class="artist-images">
                         ${(artist.images || []).slice(0, 4).map(img => 
@@ -645,22 +645,103 @@
             processedImages.forEach((file, index) => {
                 const option = document.createElement('option');
                 option.value = file.name;
-                option.textContent = `이미지 ${index + 1}`;
+                option.textContent = `새 이미지 ${index + 1}`;
                 homeSelect.add(option.cloneNode(true));
                 artistsSelect.add(option);
             });
+        }
+
+        // Update image select options with existing images
+        function updateImageSelectsWithExisting(existingImages) {
+            const homeSelect = document.getElementById('homeImage');
+            const artistsSelect = document.getElementById('artistsImage');
+            
+            // Clear existing options except the first one
+            while (homeSelect.options.length > 1) homeSelect.remove(1);
+            while (artistsSelect.options.length > 1) artistsSelect.remove(1);
+            
+            // Add options for existing images
+            existingImages.forEach((img, index) => {
+                const option = document.createElement('option');
+                option.value = img;
+                option.textContent = `기존 이미지 ${index + 1}`;
+                homeSelect.add(option.cloneNode(true));
+                artistsSelect.add(option);
+            });
+
+            // Add options for new processed images
+            processedImages.forEach((file, index) => {
+                const option = document.createElement('option');
+                option.value = file.name;
+                option.textContent = `새 이미지 ${index + 1}`;
+                homeSelect.add(option.cloneNode(true));
+                artistsSelect.add(option);
+            });
+        }
+
+        // Delete existing image
+        async function deleteExistingImage(artistId, imageName, previewDiv) {
+            if (!confirm(`"${imageName}" 이미지를 삭제하시겠습니까?`)) return;
+
+            try {
+                const response = await fetch(`/admin/files/artists/${artistId}/${imageName}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                // Remove from UI
+                previewDiv.remove();
+                
+                // Update the artist data locally
+                const artist = allArtists.find(a => a.id === artistId);
+                if (artist && artist.images) {
+                    artist.images = artist.images.filter(img => img !== imageName);
+                }
+
+                showStatus('이미지가 삭제되었습니다.', 'success');
+            } catch (error) {
+                console.error('Error deleting image:', error);
+                showStatus('이미지 삭제에 실패했습니다: ' + error.message, 'error');
+            }
         }
 
         // Modify handleImageSelection to update selects
         async function handleImageSelection(input) {
             const files = Array.from(input.files);
             const preview = document.getElementById('imagePreview');
-            preview.innerHTML = '';
             processedImages = [];
 
             if (files.length === 0) return;
 
+            // Check for duplicate filenames if editing existing artist
+            if (editingArtist) {
+                const artist = allArtists.find(a => a.id === editingArtist);
+                if (artist && artist.images) {
+                    const duplicateFiles = files.filter(file => 
+                        artist.images.some(existingImg => 
+                            existingImg.toLowerCase() === file.name.toLowerCase()
+                        )
+                    );
+                    
+                    if (duplicateFiles.length > 0) {
+                        showStatus(`다음 파일명이 이미 존재합니다: ${duplicateFiles.map(f => f.name).join(', ')}`, 'error');
+                        input.value = '';
+                        return;
+                    }
+                }
+            }
+
             showStatus('이미지를 처리하는 중...', 'info');
+
+            // Clear existing preview except for existing images when editing
+            if (!editingArtist) {
+                preview.innerHTML = '';
+            } else {
+                // Only remove new image previews, keep existing ones
+                const newImagePreviews = preview.querySelectorAll('[data-new-image]');
+                newImagePreviews.forEach(div => div.remove());
+            }
 
             for (const file of files) {
                 try {
@@ -674,11 +755,12 @@
 
                     // Create preview
                     const previewDiv = document.createElement('div');
-                    previewDiv.style.cssText = 'position: relative; display: inline-block;';
+                    previewDiv.style.cssText = 'position: relative; display: inline-block; margin: 5px;';
+                    previewDiv.setAttribute('data-new-image', 'true'); // Mark as new image
                     
                     const img = document.createElement('img');
                     img.src = URL.createObjectURL(processedFile);
-                    img.style.cssText = 'width: 80px; height: 80px; object-fit: cover; border-radius: 5px; border: 2px solid #ddd;';
+                    img.style.cssText = 'width: 80px; height: 80px; object-fit: cover; border-radius: 5px; border: 2px solid #28a745;'; // Green border for new images
                     
                     const sizeSpan = document.createElement('span');
                     sizeSpan.textContent = `${(processedFile.size / 1024).toFixed(1)}KB`;
@@ -694,7 +776,13 @@
             }
 
             // Update image select options
-            updateImageSelects();
+            if (editingArtist) {
+                const artist = allArtists.find(a => a.id === editingArtist);
+                const existingImages = artist && artist.images ? artist.images : [];
+                updateImageSelectsWithExisting(existingImages);
+            } else {
+                updateImageSelects();
+            }
         }
 
         // Resize image function
@@ -748,8 +836,9 @@
             e.preventDefault();
             
             const formData = new FormData();
+            const newArtistId = document.getElementById('artistId').value.trim();
             const artistData = {
-                id: document.getElementById('artistId').value.trim(),
+                id: newArtistId,
                 name: document.getElementById('artistName').value.trim(),
                 nameEn: document.getElementById('artistNameEn').value.trim(),
                 filmography: collectFilmographyData(),
@@ -761,13 +850,14 @@
 
             // Validate ID format
             if (!/^[a-zA-Z0-9\-]+$/.test(artistData.id)) {
-                showStatus('아티스트 ID는 영문, 숫자, - 만 사용할 수 있습니다.', 'error');
+                showStatus('영문명은 영문, 숫자, - 만 사용할 수 있습니다.', 'error');
                 return;
             }
 
-            // Check for duplicate ID (when adding new)
-            if (!editingArtist && allArtists.some(a => a.id === artistData.id)) {
-                showStatus('이미 존재하는 아티스트 ID입니다.', 'error');
+            // Check for duplicate ID (when adding new or changing existing ID)
+            const isIdChanged = editingArtist && editingArtist !== newArtistId;
+            if ((!editingArtist || isIdChanged) && allArtists.some(a => a.id === newArtistId)) {
+                showStatus('이미 존재하는 영문명입니다.', 'error');
                 return;
             }
 
@@ -799,6 +889,11 @@
                 const result = await response.json();
                 showStatus(editingArtist ? '아티스트 정보가 수정되었습니다.' : '새 아티스트가 추가되었습니다.', 'success');
                 
+                // If ID was changed, update the editingArtist reference
+                if (editingArtist && isIdChanged) {
+                    editingArtist = newArtistId;
+                }
+                
                 closeArtistModal();
                 refreshArtistsList();
                 
@@ -806,6 +901,8 @@
                 console.error('Error saving artist:', error);
                 if (error.message.includes('413')) {
                     showStatus('업로드 파일 크기가 너무 큽니다. 이미지를 더 작게 만들어 주세요.', 'error');
+                } else if (error.message.includes('409')) {
+                    showStatus('이미 존재하는 영문명입니다.', 'error');
                 } else {
                     showStatus('아티스트 저장에 실패했습니다: ' + error.message, 'error');
                 }
@@ -830,6 +927,34 @@
             if (artist.representativeImages) {
                 document.getElementById('homeImage').value = artist.representativeImages.home || '';
                 document.getElementById('artistsImage').value = artist.representativeImages.artists || '';
+            }
+            
+            // Clear existing images and show existing ones
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            
+            if (artist.images && artist.images.length > 0) {
+                artist.images.forEach((img, index) => {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.style.cssText = 'position: relative; display: inline-block; margin: 5px;';
+                    
+                    const imgElement = document.createElement('img');
+                    imgElement.src = `/assets/artists/${artist.id}/${img}`;
+                    imgElement.style.cssText = 'width: 80px; height: 80px; object-fit: cover; border-radius: 5px; border: 2px solid #ddd;';
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = '✕';
+                    deleteBtn.type = 'button';
+                    deleteBtn.style.cssText = 'position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;';
+                    deleteBtn.onclick = () => deleteExistingImage(artist.id, img, previewDiv);
+                    
+                    previewDiv.appendChild(imgElement);
+                    previewDiv.appendChild(deleteBtn);
+                    preview.appendChild(previewDiv);
+                });
+
+                // Update image select options with existing images
+                updateImageSelectsWithExisting(artist.images);
             }
             
             // Clear and fill filmography
