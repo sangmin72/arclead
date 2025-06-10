@@ -365,8 +365,8 @@
                              style="background-image: url('/assets/artists/${artist.id}/${artist.representativeImages.home}')">
                             <div class="carousel-content h-100">
                                 <div class="slide-text">
-                                    <span>${artist.name}</span>
-                                    <h2>${artist.nameEn || artist.name}</h2>
+                                    <h2>${artist.name}</h2>
+                                    ${artist.nameEn ? `<span>${artist.nameEn}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -379,8 +379,8 @@
                         <div class="carousel-item h-100 bg-img active">
                             <div class="carousel-content h-100">
                                 <div class="slide-text">
-                                    <span>Arclead Entertainment</span>
-                                    <h2>Welcome to Arclead</h2>
+                                    <h2>Arclead Entertainment</h2>
+                                    <span>Welcome to Arclead</span>
                                 </div>
                             </div>
                         </div>
