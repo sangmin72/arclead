@@ -341,6 +341,48 @@
             border-radius: 4px;
             background: white;
         }
+
+        /* 대표 이미지 표시 스타일 */
+        .representative-image-preview {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .representative-image-preview:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        .representative-image-preview img {
+            transition: box-shadow 0.2s ease;
+        }
+
+        .representative-image-preview:hover img {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .representative-label {
+            font-size: 0.7em;
+            margin-top: 2px;
+            font-weight: bold;
+        }
+
+        .unset-representative {
+            width: 50px;
+            height: 50px;
+            background: #e9ecef;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed #adb5bd;
+            transition: background-color 0.2s ease;
+        }
+
+        .unset-representative:hover {
+            background: #dee2e6;
+        }
     </style>
 </head>
 <body>
@@ -522,7 +564,20 @@
             grid.innerHTML = artists.map(artist => `
                 <div class="artist-card">
                     <div class="artist-header">
-                        <div class="artist-name">${artist.name}</div>
+                        <div class="artist-name">
+                            ${artist.name}
+                            ${(() => {
+                                const hasHome = artist.representativeImages?.home;
+                                const hasArtists = artist.representativeImages?.artists;
+                                if (hasHome && hasArtists) {
+                                    return '<span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7em; margin-left: 8px;">대표이미지 완료</span>';
+                                } else if (hasHome || hasArtists) {
+                                    return '<span style="background: #ffc107; color: #212529; padding: 2px 6px; border-radius: 10px; font-size: 0.7em; margin-left: 8px;">대표이미지 부분설정</span>';
+                                } else {
+                                    return '<span style="background: #dc3545; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7em; margin-left: 8px;">대표이미지 미설정</span>';
+                                }
+                            })()}
+                        </div>
                         <div>
                             <button class="btn btn-warning btn-small" onclick="editArtist('${artist.id}')">✏️ 수정</button>
                             <button class="btn btn-danger btn-small" onclick="deleteArtist('${artist.id}')">🗑️ 삭제</button>
@@ -532,11 +587,80 @@
                     <div><strong>영문명:</strong> ${artist.id}</div>
                     ${artist.nameEn ? `<div><strong>홈화면 작은글씨:</strong> ${artist.nameEn}</div>` : ''}
                     
-                    <div class="artist-images">
-                        ${(artist.images || []).slice(0, 4).map(img => 
-                            `<img src="/assets/artists/${artist.id}/${img}" class="artist-image" alt="${artist.name}">`
-                        ).join('')}
-                        ${(artist.images || []).length > 4 ? `<div style="display: flex; align-items: center; color: #666;">+${(artist.images || []).length - 4}</div>` : ''}
+                    <!-- 대표 이미지 섹션 -->
+                    <div class="representative-images-display" style="margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px; font-size: 0.9em;">📌 대표 이미지</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            ${artist.representativeImages?.home ? `
+                                <div style="text-align: center;">
+                                    <img src="/assets/artists/${artist.id}/${artist.representativeImages.home}" 
+                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid #28a745;" 
+                                         alt="홈화면 대표">
+                                    <div style="font-size: 0.7em; color: #28a745; margin-top: 2px;">홈화면</div>
+                                </div>
+                            ` : `
+                                <div style="text-align: center;">
+                                    <div style="width: 50px; height: 50px; background: #e9ecef; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px dashed #adb5bd;">
+                                        <span style="font-size: 0.7em; color: #6c757d;">미지정</span>
+                                    </div>
+                                    <div style="font-size: 0.7em; color: #6c757d; margin-top: 2px;">홈화면</div>
+                                </div>
+                            `}
+                            ${artist.representativeImages?.artists ? `
+                                <div style="text-align: center;">
+                                    <img src="/assets/artists/${artist.id}/${artist.representativeImages.artists}" 
+                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid #007bff;" 
+                                         alt="아티스트 화면 대표">
+                                    <div style="font-size: 0.7em; color: #007bff; margin-top: 2px;">아티스트</div>
+                                </div>
+                            ` : `
+                                <div style="text-align: center;">
+                                    <div style="width: 50px; height: 50px; background: #e9ecef; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px dashed #adb5bd;">
+                                        <span style="font-size: 0.7em; color: #6c757d;">미지정</span>
+                                    </div>
+                                    <div style="font-size: 0.7em; color: #6c757d; margin-top: 2px;">아티스트</div>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                    
+                    <!-- 전체 업로드 이미지 섹션 -->
+                    <div class="all-images-display" style="margin: 15px 0;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px; font-size: 0.9em;">📸 전체 업로드 이미지 (${(artist.images || []).length}개)</div>
+                        <div class="artist-images">
+                            ${(artist.images || []).slice(0, 4).map((img, index) => {
+                                const isHomeRep = artist.representativeImages?.home === img;
+                                const isArtistRep = artist.representativeImages?.artists === img;
+                                let borderColor = '#ddd';
+                                let badgeText = '';
+                                let badgeColor = '';
+                                
+                                if (isHomeRep && isArtistRep) {
+                                    borderColor = '#6f42c1';
+                                    badgeText = '홈+아티';
+                                    badgeColor = '#6f42c1';
+                                } else if (isHomeRep) {
+                                    borderColor = '#28a745';
+                                    badgeText = '홈';
+                                    badgeColor = '#28a745';
+                                } else if (isArtistRep) {
+                                    borderColor = '#007bff';
+                                    badgeText = '아티';
+                                    badgeColor = '#007bff';
+                                }
+                                
+                                return `<div style="position: relative; display: inline-block; margin: 2px;">
+                                    <img src="/assets/artists/${artist.id}/${img}" 
+                                         class="artist-image" 
+                                         style="border: 2px solid ${borderColor};" 
+                                         alt="${artist.name}"
+                                         title="${img}${badgeText ? ' (' + badgeText + ' 대표)' : ''}">
+                                    <span style="position: absolute; top: 2px; left: 2px; background: rgba(0,0,0,0.7); color: white; border-radius: 2px; padding: 1px 4px; font-size: 0.7em;">${index + 1}</span>
+                                    ${badgeText ? `<span style="position: absolute; bottom: 2px; right: 2px; background: ${badgeColor}; color: white; border-radius: 2px; padding: 1px 3px; font-size: 0.6em; font-weight: bold;">${badgeText}</span>` : ''}
+                                </div>`;
+                            }).join('')}
+                            ${(artist.images || []).length > 4 ? `<div style="display: flex; align-items: center; color: #666;">+${(artist.images || []).length - 4}</div>` : ''}
+                        </div>
                     </div>
 
                     <div class="filmography-section">
@@ -934,15 +1058,10 @@
             document.getElementById('artistName').value = artist.name;
             document.getElementById('artistNameEn').value = artist.nameEn || '';
             
-            // Set representative images if they exist
-            if (artist.representativeImages) {
-                document.getElementById('homeImage').value = artist.representativeImages.home || '';
-                document.getElementById('artistsImage').value = artist.representativeImages.artists || '';
-            }
-            
             // Clear existing images and show existing ones
             const preview = document.getElementById('imagePreview');
             preview.innerHTML = '';
+            processedImages = []; // Reset processed images
             
             if (artist.images && artist.images.length > 0) {
                 artist.images.forEach((img, index) => {
@@ -969,8 +1088,30 @@
                     preview.appendChild(previewDiv);
                 });
 
-                // Update image select options with existing images
+                // Update image select options with existing images first
                 updateImageSelectsWithExisting(artist.images);
+                
+                // Then set representative images if they exist (after options are created)
+                setTimeout(() => {
+                    if (artist.representativeImages) {
+                        const homeSelect = document.getElementById('homeImage');
+                        const artistsSelect = document.getElementById('artistsImage');
+                        
+                        if (artist.representativeImages.home) {
+                            homeSelect.value = artist.representativeImages.home;
+                        }
+                        if (artist.representativeImages.artists) {
+                            artistsSelect.value = artist.representativeImages.artists;
+                        }
+                    }
+                }, 100);
+            } else {
+                // Clear select options if no images
+                const homeSelect = document.getElementById('homeImage');
+                const artistsSelect = document.getElementById('artistsImage');
+                
+                while (homeSelect.options.length > 1) homeSelect.remove(1);
+                while (artistsSelect.options.length > 1) artistsSelect.remove(1);
             }
             
             // Clear and fill filmography

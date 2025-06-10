@@ -202,15 +202,24 @@
             carouselInner.innerHTML = '';
             
             if (artist.images && artist.images.length > 0) {
+                console.log(`Loading ${artist.images.length} images for artist ${artist.name}:`, artist.images);
                 artist.images.forEach((image, index) => {
                     const isActive = index === 0 ? 'active' : '';
+                    const imageUrl = `/assets/artists/${artist.id}/${image}`;
+                    console.log(`Image ${index + 1}: ${imageUrl}`);
                     carouselInner.innerHTML += `
                         <div class="carousel-item ${isActive}">
-                            <img src="/assets/artists/${artist.id}/${image}" class="d-block w-100" alt="${artist.name} ${index + 1}" style="cursor: pointer;" onclick="openGallery('${artist.id}')">
+                            <img src="${imageUrl}" 
+                                 class="d-block w-100" 
+                                 alt="${artist.name} ${index + 1}" 
+                                 style="cursor: pointer;" 
+                                 onclick="openGallery('${artist.id}')"
+                                 onerror="console.error('Failed to load artist image: ${imageUrl}'); this.src='/assets/artists/default.png'">
                         </div>
                     `;
                 });
             } else {
+                console.log(`No images found for artist ${artist.name}`);
                 carouselInner.innerHTML = `
                     <div class="carousel-item active">
                         <img src="/assets/artists/default.png" class="d-block w-100" alt="No Image">

@@ -32,6 +32,8 @@
                 const response = await fetch('/api/slides');
                 const data = await response.json();
                 
+                console.log('Loaded slide data:', data);
+                
                 // Update carousel items with slide data
                 data.slides.forEach((slide, index) => {
                     const slideId = `slide${String(index + 1).padStart(2, '0')}`;
@@ -46,10 +48,12 @@
                         
                         // Set background image if artist has representative image
                         if (slide.image) {
+                            console.log(`Setting slide ${index + 1} background to: ${slide.image}`);
                             carouselItem.style.backgroundImage = `url(${slide.image})`;
                         } else {
                             // Use default slide image
                             const imageUrl = `/assets/slides/${index + 1}.png`;
+                            console.log(`Setting slide ${index + 1} to default: ${imageUrl}`);
                             carouselItem.style.backgroundImage = `url(${imageUrl})`;
                         }
                     }

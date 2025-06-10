@@ -946,13 +946,23 @@ async function handleSlidesRequest(request, env, corsHeaders) {
     if (artists.length > 0) {
       // Use actual artist data for slides
       artists.forEach(artist => {
-        slideData.slides.push({
+        const slide = {
           text_big: artist.name || "아티스트",
           text_small: artist.nameEn || "ARTIST",
-          image: artist.representativeImages?.home ? `/assets/artists/${artist.id}/${artist.representativeImages.home}` : null,
           artistId: artist.id
-        });
+        };
+        
+        // Add image path if representative image exists
+        if (artist.representativeImages?.home) {
+          slide.image = `/assets/artists/${artist.id}/${artist.representativeImages.home}`;
+          console.log(`Adding home image for ${artist.name}: ${slide.image}`);
+        } else {
+          console.log(`No home representative image for ${artist.name}`);
+        }
+        
+        slideData.slides.push(slide);
       });
+      console.log(`Generated ${slideData.slides.length} slides from ${artists.length} artists`);
     } else {
       // Fallback slides if no artists data
       slideData.slides = [

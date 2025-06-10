@@ -271,18 +271,24 @@
 
             grid.innerHTML = artists.map(artist => {
                 // Get representative image for artists page, fallback to first image, then default
-                let imageUrl = '/assets/artists/default.png';
+                let imageUrl = '/assets/logo-icon.png'; // Use logo as default instead
+                let imageSource = 'default logo';
+                
                 if (artist.representativeImages?.artists) {
                     imageUrl = `/assets/artists/${artist.id}/${artist.representativeImages.artists}`;
+                    imageSource = `representative: ${artist.representativeImages.artists}`;
                 } else if (artist.images && artist.images.length > 0) {
                     imageUrl = `/assets/artists/${artist.id}/${artist.images[0]}`;
+                    imageSource = `first image: ${artist.images[0]}`;
                 }
+                
+                console.log(`Artist ${artist.name} (${artist.id}): using ${imageSource} -> ${imageUrl}`);
                 
                 return `
                     <div class="artist-item" onclick="goToArtist('${artist.id}')">
                         <img src="${imageUrl}" 
                              alt="${artist.name}" 
-                             onerror="this.src='/assets/artists/default.png'">
+                             onerror="console.error('Failed to load image: ${imageUrl}'); this.src='/assets/logo-icon.png'">
                         <div class="artist-info">
                             <p>${artist.name}</p>
                         </div>

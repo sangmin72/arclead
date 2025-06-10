@@ -73,18 +73,24 @@
             galleryContainer.innerHTML = '';
 
             if (artist.images && artist.images.length > 0) {
+                console.log(`Loading gallery with ${artist.images.length} images for ${artist.name}:`, artist.images);
                 artist.images.forEach((image, index) => {
                     const galleryItem = document.createElement('div');
                     galleryItem.className = 'col-12 col-sm-6 col-md-4 col-lg-3 column_single_gallery_item';
+                    const imageUrl = `/assets/artists/${artist.id}/${image}`;
+                    console.log(`Gallery image ${index + 1}: ${imageUrl}`);
                     galleryItem.innerHTML = `
-                        <img src="/assets/artists/${artist.id}/${image}" alt="${artist.name} ${index + 1}">
+                        <img src="${imageUrl}" 
+                             alt="${artist.name} ${index + 1}"
+                             onerror="console.error('Failed to load gallery image: ${imageUrl}'); this.src='/assets/artists/default.png'">
                         <div class="hover_overlay">
-                            <a class="gallery_img" href="/assets/artists/${artist.id}/${image}"><i class="fa fa-eye"></i></a>
+                            <a class="gallery_img" href="${imageUrl}"><i class="fa fa-eye"></i></a>
                         </div>
                     `;
                     galleryContainer.appendChild(galleryItem);
                 });
             } else {
+                console.log(`No images found for artist ${artist.name} gallery`);
                 galleryContainer.innerHTML = `
                     <div class="col-12 text-center">
                         <p>등록된 사진이 없습니다.</p>
