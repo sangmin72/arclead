@@ -30,7 +30,8 @@
     .carousel-item img {
         width: 100%;
         height: 500px;
-        object-fit: cover;
+        object-fit: contain;
+        background-color: #f8f9fa;
         border-radius: 10px;
     }
 
@@ -112,167 +113,8 @@
             font-size: 2em;
         }
     }
-
-    .artist-navigation {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        position: sticky;
-        top: 100px;
-        margin-bottom: 30px;
-    }
-
-    .nav-title {
-        color: #333;
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 15px;
-        border-bottom: 2px solid #007bff;
-        padding-bottom: 8px;
-    }
-
-    .artist-nav-item {
-        display: block;
-        padding: 8px 12px;
-        margin-bottom: 5px;
-        color: #666;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .artist-nav-item:hover {
-        background: #007bff;
-        color: white;
-        transform: translateX(3px);
-        text-decoration: none;
-    }
-
-    .artist-nav-item.active {
-        background: #007bff;
-        color: white;
-        font-weight: 600;
-    }
-
-    .artist-nav-item::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 3px;
-        background: #007bff;
-        transform: scaleY(0);
-        transition: transform 0.3s ease;
-    }
-
-    .artist-nav-item.active::before {
-        transform: scaleY(1);
-    }
-
-    .artist-info-section {
-        padding: 20px 0;
-    }
-
-    .artist-main-name {
-        color: #333;
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 15px;
-        line-height: 1.2;
-    }
-
-    .artist-social {
-        margin-bottom: 20px;
-    }
-
-    .artist-social a {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 15px;
-        background: linear-gradient(45deg, #e1306c, #fd1d1d, #fcb045);
-        color: white;
-        text-decoration: none;
-        border-radius: 25px;
-        font-size: 14px;
-        font-weight: 500;
-        transition: transform 0.3s ease;
-    }
-
-    .artist-social a:hover {
-        transform: scale(1.05);
-        text-decoration: none;
-        color: white;
-    }
-
-    .artist-profile-text {
-        color: #666;
-        line-height: 1.6;
-        font-size: 15px;
-    }
-
-    .artist-main-image {
-        padding: 0 20px;
-    }
-
-    .artist-photo {
-        border-radius: 10px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    }
-
-    .artist-gallery-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .gallery-item {
-        position: relative;
-        border-radius: 10px;
-        overflow: hidden;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-    }
-
-    .gallery-item:hover {
-        transform: scale(1.02);
-    }
-
-    .gallery-item img {
-        width: 100%;
-        height: 200px;
-        object-fit: contain;
-        background-color: #f8f9fa;
-    }
-
-    .gallery-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.7);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .gallery-item:hover .gallery-overlay {
-        opacity: 1;
-    }
-
-    .gallery-overlay i {
-        color: white;
-        font-size: 24px;
-    }
 </style>
+
 <head>
     <meta charset="UTF-8">
     <meta name="description" content="">
@@ -312,125 +154,6 @@
             timeBoard.innerHTML = time;
             setTimeout(getTime, 1000);
         }
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const artistId = urlParams.get('id');
-
-        // Load all artists for navigation
-        async function loadAllArtists() {
-            try {
-                const response = await fetch('/_worker.js', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'list' })
-                });
-
-                if (response.ok) {
-                    const artists = await response.json();
-                    displayArtistNavigation(artists);
-                    
-                    // Load current artist if ID is provided
-                    if (artistId) {
-                        const currentArtist = artists.find(a => a.id === artistId);
-                        if (currentArtist) {
-                            displayArtist(currentArtist);
-                        } else {
-                            showError('아티스트를 찾을 수 없습니다.');
-                        }
-                    } else {
-                        showError('아티스트 ID가 제공되지 않았습니다.');
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading artists:', error);
-                showError('아티스트 정보를 불러오는 중 오류가 발생했습니다.');
-            }
-        }
-
-        function displayArtistNavigation(artists) {
-            const navList = document.getElementById('artistNavList');
-            
-            navList.innerHTML = artists.map(artist => `
-                <a href="artist.html?id=${artist.id}" 
-                   class="artist-nav-item ${artist.id === artistId ? 'active' : ''}"
-                   title="${artist.profile ? artist.profile.substring(0, 100) : artist.name}">
-                    ${artist.name}
-                </a>
-            `).join('');
-        }
-
-        function displayArtist(artist) {
-            console.log('Displaying artist:', artist);
-            
-            // Set artist name
-            document.getElementById('artistName').textContent = artist.name;
-            
-            // Set Instagram link if available
-            const socialDiv = document.getElementById('artistSocial');
-            if (artist.instagram) {
-                socialDiv.innerHTML = `
-                    <a href="${artist.instagram}" target="_blank">
-                        <i class="fa fa-instagram"></i> Instagram
-                    </a>`;
-            } else {
-                socialDiv.innerHTML = '';
-            }
-            
-            // Set profile
-            document.getElementById('artistProfile').textContent = artist.profile || '프로필 정보가 없습니다.';
-            
-            // Set main image (use first image or representative image)
-            const mainImage = document.getElementById('artistMainImage');
-            if (artist.images && artist.images.length > 0) {
-                const firstImage = artist.images[0];
-                const imageUrl = `/assets/artists/${artist.id}/${firstImage}`;
-                mainImage.src = imageUrl;
-                mainImage.alt = `${artist.name} - ${firstImage}`;
-                mainImage.onerror = function() {
-                    this.src = '/img/core-img/default-artist.jpg';
-                };
-            } else {
-                mainImage.src = '/img/core-img/default-artist.jpg';
-                mainImage.alt = artist.name;
-            }
-            
-            // Display gallery
-            displayGallery(artist);
-        }
-
-        function displayGallery(artist) {
-            const gallery = document.getElementById('artistGallery');
-            
-            if (!artist.images || artist.images.length === 0) {
-                gallery.innerHTML = '<p class="text-center">등록된 이미지가 없습니다.</p>';
-                return;
-            }
-
-            gallery.innerHTML = artist.images.map((image, index) => `
-                <div class="gallery-item" onclick="openGallery('${artist.id}', ${index})">
-                    <img src="/assets/artists/${artist.id}/${image}" 
-                         alt="${artist.name} - Image ${index + 1}"
-                         onerror="this.src='/img/core-img/default-artist.jpg'">
-                    <div class="gallery-overlay">
-                        <i class="fa fa-search-plus"></i>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function openGallery(artistId, startIndex) {
-            window.location.href = `artist-gallery.html?id=${artistId}&start=${startIndex}`;
-        }
-
-        function showError(message) {
-            document.getElementById('artistName').textContent = '오류';
-            document.getElementById('artistProfile').textContent = message;
-            document.getElementById('artistMainImage').src = '/img/core-img/default-artist.jpg';
-            document.getElementById('artistGallery').innerHTML = `<p class="text-center text-danger">${message}</p>`;
-        }
-
-        // Load artists when page loads
-        document.addEventListener('DOMContentLoaded', loadAllArtists);
     </script>
 </head>
 
@@ -452,6 +175,9 @@
         </div>
     </div>
 
+    <!-- Gradient Background Overlay -->
+    <div class="gradient-background-overlay"></div>
+
     <!-- Header Area Start -->
     <header class="header-area bg-img" style="background-color: black;">
         <div class="container-fluid h-100">
@@ -459,15 +185,15 @@
                 <div class="col-12 h-100">
                     <div class="main-menu h-100">
                         <nav class="navbar h-100 navbar-expand-lg">
-                            <!-- Logo Area -->
+                            <!-- Logo Area  -->
                             <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
                             <!-- Current Time -->
-                            <div id="current-time"></div>
+                            <div id="current-time" style="position: absolute; left: 50%; transform: translateX(-50%); color: white; font-size: 0.9rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); bottom: 15px;"></div>
 
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
 
                             <div class="collapse navbar-collapse" id="studioMenu">
-                                <!-- Menu Area Start -->
+                                <!-- Menu Area Start  -->
                                 <ul class="navbar-nav ml-auto">
                                     <li class="nav-item">
                                         <a class="nav-link" href="index.html">Company</a>
@@ -495,64 +221,48 @@
     </header>
     <!-- Header Area End -->
 
-    <!-- Loading -->
-    <div id="loading" class="loading">
+    <div class="loading" id="loading">
         <div class="spinner"></div>
         <p>아티스트 정보를 불러오는 중...</p>
     </div>
 
-    <!-- Artist Profile Area Start -->
-    <div class="artist-profile-area section-padding-100">
-        <div class="container-fluid">
-            <div class="row">
-                <!-- Artist Navigation Sidebar -->
-                <div class="col-lg-2 col-md-3">
-                    <div class="artist-navigation">
-                        <h5 class="nav-title">Artists</h5>
-                        <div id="artistNavList" class="artist-nav-list">
-                            <!-- Artists navigation will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Main Content -->
-                <div class="col-lg-10 col-md-9">
-                    <div class="row">
-                        <!-- Artist Info -->
-                        <div class="col-lg-4 col-md-5">
-                            <div class="artist-info-section">
-                                <h2 id="artistName" class="artist-main-name"></h2>
-                                <div class="artist-social" id="artistSocial">
-                                    <!-- Instagram link will be added here if available -->
-                                </div>
-                                <div class="artist-profile-text">
-                                    <p id="artistProfile"></p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Artist Image -->
-                        <div class="col-lg-8 col-md-7">
-                            <div class="artist-main-image">
-                                <img id="artistMainImage" src="" alt="" class="img-fluid artist-photo" style="object-fit: contain; width: 100%; height: 400px; background-color: #f8f9fa;">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Artist Gallery -->
-                    <div class="row mt-5">
-                        <div class="col-12">
-                            <h4>Photo Gallery</h4>
-                            <div id="artistGallery" class="artist-gallery-grid">
-                                <!-- Gallery images will be loaded here -->
-                            </div>
-                        </div>
-                    </div>
+    <!-- Artist Content Area Start -->
+    <section id="artistContent" class="elements-area section_padding_50 mt-50" style="display: none;">
+        <div class="portfolio-menu2">
+            <a class="btn" href="artists-all.html">ALL</a>
+        </div>
+
+        <div class="container artist-profile">
+            <div class="col-12">
+                <div class="artist-title">
+                    <h2 id="artistName">아티스트</h2>
                 </div>
             </div>
+            
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-7 image-area">
+                <div id="imageCarousel" class="carousel slide" data-ride="carousel">
+                    <div class="carousel-inner" id="carouselInner">
+                        <!-- Images will be loaded here dynamically -->
+                    </div>
+                    <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-5 content-area" id="contentArea">
+                <!-- Filmography will be loaded here dynamically -->
+            </div>
         </div>
-    </div>
-    <!-- Artist Profile Area End -->
+        </div>
+    </section>
+    <!-- Artist Content Area End -->
 
     <!-- Footer Area Start -->
     <footer class="footer-area">
@@ -560,20 +270,17 @@
             <div class="row h-100">
                 <div class="col-12 h-100">
                     <div class="footer-content h-100 d-md-flex align-items-center justify-content-between">
-                        <!-- Single Footer Content -->
                         <div class="single-footer-content">
-                            <img src="/assets/map.png" alt="">
-                            <a href="#">(04782) 서울시 성동구 연무장5가길 25, SK V1 Tower 705호</a>
+                            <img src="img/core-img/map.png" alt="">
+                            <a href="#">Blvd Libertad, 34 m05200 Arévalo</a>
                         </div>
-                        <!-- Single Footer Content -->
                         <div class="single-footer-content">
-                            <img src="/assets/smartphone.png" alt="">
-                            <a href="#">02-123-4567</a>
+                            <img src="img/core-img/smartphone.png" alt="">
+                            <a href="#">0034 37483 2445 322</a>
                         </div>
-                        <!-- Single Footer Content -->
                         <div class="single-footer-content">
-                            <img src="/assets/envelope-2.png" alt="">
-                            <a href="#">arclead@arclead.co.kr</a>
+                            <img src="img/core-img/envelope-2.png" alt="">
+                            <a href="#">hello@company.com</a>
                         </div>
                     </div>
                 </div>
@@ -584,13 +291,158 @@
 
     <!-- jQuery (Necessary for All JavaScript Plugins) -->
     <script src="js/jquery/jquery-2.2.4.min.js"></script>
-    <!-- Popper js -->
     <script src="js/popper.min.js"></script>
-    <!-- Bootstrap js -->
     <script src="js/bootstrap.min.js"></script>
-    <!-- Plugins js -->
     <script src="js/plugins.js"></script>
-    <!-- Active js -->
     <script src="js/active.js"></script>
+
+    <script>
+        let currentArtist = null;
+
+        // Get artist ID from URL parameter
+        function getArtistId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id') || urlParams.get('artist');
+        }
+
+        // Load artist data
+        async function loadArtistData() {
+            const artistId = getArtistId();
+            
+            if (!artistId) {
+                showError('아티스트 ID가 지정되지 않았습니다.');
+                return;
+            }
+
+            try {
+                showLoading(true);
+                const response = await fetch('/_worker.js', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get', id: artistId })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`아티스트를 찾을 수 없습니다. (${response.status})`);
+                }
+                
+                currentArtist = await response.json();
+                renderArtistData(currentArtist);
+                
+            } catch (error) {
+                console.error('Error loading artist:', error);
+                showError(error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Render artist data
+        function renderArtistData(artist) {
+            // Update page title
+            document.title = `Arclead Entertainment : ${artist.name}`;
+            
+            // Update artist name
+            document.getElementById('artistName').textContent = `${artist.name} ${artist.nameEn || ''}`;
+            
+            // Update carousel images
+            const carouselInner = document.getElementById('carouselInner');
+            carouselInner.innerHTML = '';
+            
+            if (artist.images && artist.images.length > 0) {
+                console.log(`Loading ${artist.images.length} images for artist ${artist.name}:`, artist.images);
+                artist.images.forEach((image, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    const imageUrl = `/assets/artists/${artist.id}/${image}`;
+                    console.log(`Image ${index + 1}: ${imageUrl}`);
+                    carouselInner.innerHTML += `
+                        <div class="carousel-item ${isActive}">
+                            <img src="${imageUrl}" 
+                                 class="d-block w-100" 
+                                 alt="${artist.name} ${index + 1}" 
+                                 style="cursor: pointer;" 
+                                 onclick="openGallery('${artist.id}')"
+                                 onerror="console.error('Failed to load artist image: ${imageUrl}'); this.src='/assets/artists/default.png'">
+                        </div>
+                    `;
+                });
+            } else {
+                console.log(`No images found for artist ${artist.name}`);
+                carouselInner.innerHTML = `
+                    <div class="carousel-item active">
+                        <img src="/assets/artists/default.png" class="d-block w-100" alt="No Image">
+                    </div>
+                `;
+            }
+            
+            // Update filmography
+            const contentArea = document.getElementById('contentArea');
+            contentArea.innerHTML = '';
+            
+            if (artist.filmography) {
+                ['movies', 'dramas', 'commercials'].forEach(category => {
+                    const categoryName = {
+                        'movies': '영화',
+                        'dramas': '드라마', 
+                        'commercials': '광고'
+                    }[category];
+                    
+                    const works = artist.filmography[category];
+                    if (works && Object.keys(works).length > 0) {
+                        contentArea.innerHTML += `
+                            <div class="channel-name">${categoryName}</div>
+                            <div class="channel-list">
+                                ${Object.entries(works).sort(([a], [b]) => b.localeCompare(a)).map(([year, workList]) => `
+                                    <div class="channel-year">${year}</div>
+                                    <div class="channel-works">${Array.isArray(workList) ? workList.join('<br>') : workList}</div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                });
+            }
+            
+            if (contentArea.innerHTML === '') {
+                contentArea.innerHTML = '<p style="text-align: center; color: #666;">아직 등록된 필모그래피가 없습니다.</p>';
+            }
+        }
+
+        // Show loading state
+        function showLoading(show) {
+            const loadingDiv = document.getElementById('loading');
+            const contentDiv = document.getElementById('artistContent');
+            
+            if (show) {
+                loadingDiv.style.display = 'block';
+                contentDiv.style.display = 'none';
+            } else {
+                loadingDiv.style.display = 'none';
+                contentDiv.style.display = 'block';
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const contentDiv = document.getElementById('artistContent');
+            contentDiv.innerHTML = `
+                <div class="error-message">
+                    <h3>오류가 발생했습니다</h3>
+                    <p>${message}</p>
+                    <button class="btn btn-primary" onclick="window.history.back()">돌아가기</button>
+                </div>
+            `;
+            showLoading(false);
+        }
+
+        // Open gallery page
+        function openGallery(artistId) {
+            window.location.href = `artist-gallery.html?id=${artistId}`;
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            getTime();
+            loadArtistData();
+        });
+    </script>
 </body>
 </html> 
