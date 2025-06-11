@@ -123,7 +123,7 @@
                             <!-- Logo Area  -->
                             <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
                             <!-- Current Time -->
-                            <div id="header-time" style="position: absolute; left: 50%; transform: translateX(-50%); color: white; font-size: 0.9rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); bottom: 15px;"></div>
+                            <div id="current-time"></div>
 
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
 
@@ -158,11 +158,17 @@
     <!-- Header Area End -->
 
     <!-- Social Sidebar Area Start -->
-    <div class="social-sidebar-area">
+    <div class="social-sidebar-area bg-white">
         <!-- Social Area -->
         <div class="social-info-area">
-            <a href="#" data-toggle="tooltip" data-placement="right" title="YouTube"><i class="fa fa-youtube" aria-hidden="true"></i> <span>YouTube</span></a>
-            <a href="#" data-toggle="tooltip" data-placement="right" title="Instagram"><i class="fa fa-instagram" aria-hidden="true"></i> <span>Instagram</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="YouTube"><i class="fa fa-facebook" aria-hidden="true"></i> <span>YouTube</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Naver Post"><i class="fa fa-twitter" aria-hidden="true"></i> <span>Naver Post</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Naver TV"><i class="fa fa-pinterest" aria-hidden="true"></i> <span>Naver TV</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Instagram"><i class="fa fa-behance" aria-hidden="true"></i> <span>Instagram</span></a>
+        </div>
+        <!-- Message Box -->
+        <div class="message-box">
+            <a href="#" data-toggle="modal" data-target=".contact-modal-lg"><img src="/assets/envelope.png" alt=""></a>
         </div>
     </div>
     <!-- Social Sidebar Area End -->
@@ -176,8 +182,8 @@
                 <div id="slide01" class="carousel-item h-100 bg-img active">
                     <div class="carousel-content h-100">
                         <div class="slide-text">
-                            <span>01.</span>
-                            <h2>Arclead Entertainment</h2>
+                            <span>김시경</span>
+                            <h2>KIM SIGYEONG</h2>
                         </div>
                     </div>
                 </div>
@@ -357,92 +363,46 @@
     <script src="js/active.js"></script>
 
     <script>
-        // Update clock every second
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('ko-KR', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            });
-            const dateString = now.toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-            document.getElementById('header-time').innerHTML = `${dateString} ${timeString}`;
-        }
-        
-        // Load artists for homepage slides
+        // Load artists for homepage
         async function loadHomeArtists() {
             try {
-                const response = await fetch('/_worker.js', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'list' })
-                });
+                const response = await fetch('/api/artists');
+                const artists = await response.json();
                 
-                if (response.ok) {
-                    const artists = await response.json();
-                    console.log('Loaded artists for home:', artists);
-                    
-                    // Get artists with home representative images
-                    const homeArtists = artists.filter(artist => artist.representativeImages?.home);
-                    
-                    // Update carousel slides
-                    const carouselInner = document.querySelector('.carousel-inner');
-                    carouselInner.innerHTML = '';
-                    
-                    if (homeArtists.length > 0) {
-                        homeArtists.forEach((artist, index) => {
-                            const isActive = index === 0 ? 'active' : '';
-                            carouselInner.innerHTML += `
-                                <div id="slide${index + 1}" class="carousel-item h-100 bg-img ${isActive}" 
-                                     style="background-image: url('/assets/artists/${artist.id}/${artist.representativeImages.home}'); background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #000;">
-                                    <div class="carousel-content h-100">
-                                        <div class="slide-text">
-                                            <span>${artist.name}</span>
-                                            <h2>${artist.nameEn || artist.id}</h2>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        
-                        // If we need more slides, repeat artists
-                        let totalSlides = homeArtists.length;
-                        while (totalSlides < 5) {  // Minimum 5 slides
-                            const artistIndex = totalSlides % homeArtists.length;
-                            const artist = homeArtists[artistIndex];
-                            carouselInner.innerHTML += `
-                                <div id="slide${totalSlides + 1}" class="carousel-item h-100 bg-img" 
-                                     style="background-image: url('/assets/artists/${artist.id}/${artist.representativeImages.home}'); background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #000;">
-                                    <div class="carousel-content h-100">
-                                        <div class="slide-text">
-                                            <span>${artist.name}</span>
-                                            <h2>${artist.nameEn || artist.id}</h2>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                            totalSlides++;
-                        }
-                    } else {
-                        // Fallback if no artists with home images
-                        carouselInner.innerHTML = `
-                            <div class="carousel-item h-100 bg-img active">
-                                <div class="carousel-content h-100">
-                                    <div class="slide-text">
-                                        <span>Arclead</span>
-                                        <h2>Entertainment</h2>
-                                    </div>
+                // Get artists with home representative images
+                const homeArtists = artists.filter(artist => artist.representativeImages?.home);
+                
+                // Update carousel slides
+                const carouselInner = document.querySelector('.carousel-inner');
+                carouselInner.innerHTML = '';
+                
+                homeArtists.forEach((artist, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    carouselInner.innerHTML += `
+                        <div id="slide${index + 1}" class="carousel-item h-100 bg-img ${isActive}" 
+                             style="background-image: url('/assets/artists/${artist.id}/${artist.representativeImages.home}')">
+                            <div class="carousel-content h-100">
+                                <div class="slide-text">
+                                    <h2>${artist.name}</h2>
+                                    ${artist.nameEn ? `<span>${artist.nameEn}</span>` : ''}
                                 </div>
                             </div>
-                        `;
-                    }
-                } else {
-                    console.error('Failed to load artists');
+                        </div>
+                    `;
+                });
+                
+                // If no artists with home images, show default slide
+                if (homeArtists.length === 0) {
+                    carouselInner.innerHTML = `
+                        <div class="carousel-item h-100 bg-img active">
+                            <div class="carousel-content h-100">
+                                <div class="slide-text">
+                                    <h2>Arclead Entertainment</h2>
+                                    <span>Welcome to Arclead</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 }
             } catch (error) {
                 console.error('Error loading home artists:', error);
@@ -450,8 +410,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            updateClock();
-            setInterval(updateClock, 1000);
+            getTime();
             loadHomeArtists();
         });
     </script>

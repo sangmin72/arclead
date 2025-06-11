@@ -30,8 +30,7 @@
     .carousel-item img {
         width: 100%;
         height: 500px;
-        object-fit: contain;
-        background-color: #f8f9fa;
+        object-fit: cover;
         border-radius: 10px;
     }
 
@@ -114,7 +113,6 @@
         }
     }
 </style>
-
 <head>
     <meta charset="UTF-8">
     <meta name="description" content="">
@@ -154,149 +152,7 @@
             timeBoard.innerHTML = time;
             setTimeout(getTime, 1000);
         }
-    </script>
-</head>
 
-<body>
-    <!-- Preloader -->
-    <div id="preloader">
-        <div class="showbox">
-            <div class="loader">
-                <svg class="circular" viewBox="25 25 50 50">
-                    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
-                </svg>
-            </div>
-        </div>
-        <div class="questions-area text-center">
-            <p>Arclead Entertainment</p>
-            <ul>
-                <li>당신은 동체시력 보유자!!! 축하합니다. (네트웍이 느린거죠? 맞죠? ㅠㅠ)</li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Gradient Background Overlay -->
-    <div class="gradient-background-overlay"></div>
-
-    <!-- Header Area Start -->
-    <header class="header-area bg-img" style="background-color: black;">
-        <div class="container-fluid h-100">
-            <div class="row h-100 align-items-center">
-                <div class="col-12 h-100">
-                    <div class="main-menu h-100">
-                        <nav class="navbar h-100 navbar-expand-lg">
-                            <!-- Logo Area  -->
-                            <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
-                            <!-- Current Time -->
-                            <div id="current-time" style="position: absolute; left: 50%; transform: translateX(-50%); color: white; font-size: 0.9rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); bottom: 15px;"></div>
-
-                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
-
-                            <div class="collapse navbar-collapse" id="studioMenu">
-                                <!-- Menu Area Start  -->
-                                <ul class="navbar-nav ml-auto">
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="index.html">Company</a>
-                                    </li>
-                                    <li class="nav-item active">
-                                        <a class="nav-link" href="artists-all.html">Artists <span class="sr-only">(current)</span></a>
-                                    </li>
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">PR</a>
-                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                            <a class="dropdown-item" href="index.html">Media</a>
-                                            <a class="dropdown-item" href="about-me.html">News</a>
-                                        </div>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="audition.html">Audition</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-    <!-- Header Area End -->
-
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <p>아티스트 정보를 불러오는 중...</p>
-    </div>
-
-    <!-- Artist Content Area Start -->
-    <section id="artistContent" class="elements-area section_padding_50 mt-50" style="display: none;">
-        <div class="portfolio-menu2">
-            <a class="btn" href="artists-all.html">ALL</a>
-        </div>
-
-        <div class="container artist-profile">
-            <div class="col-12">
-                <div class="artist-title">
-                    <h2 id="artistName">아티스트</h2>
-                </div>
-            </div>
-            
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-7 image-area">
-                <div id="imageCarousel" class="carousel slide" data-ride="carousel">
-                    <div class="carousel-inner" id="carouselInner">
-                        <!-- Images will be loaded here dynamically -->
-                    </div>
-                    <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-12 col-md-5 content-area" id="contentArea">
-                <!-- Filmography will be loaded here dynamically -->
-            </div>
-        </div>
-        </div>
-    </section>
-    <!-- Artist Content Area End -->
-
-    <!-- Footer Area Start -->
-    <footer class="footer-area">
-        <div class="container-fluid h-100">
-            <div class="row h-100">
-                <div class="col-12 h-100">
-                    <div class="footer-content h-100 d-md-flex align-items-center justify-content-between">
-                        <div class="single-footer-content">
-                            <img src="img/core-img/map.png" alt="">
-                            <a href="#">Blvd Libertad, 34 m05200 Arévalo</a>
-                        </div>
-                        <div class="single-footer-content">
-                            <img src="img/core-img/smartphone.png" alt="">
-                            <a href="#">0034 37483 2445 322</a>
-                        </div>
-                        <div class="single-footer-content">
-                            <img src="img/core-img/envelope-2.png" alt="">
-                            <a href="#">hello@company.com</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <!-- Footer Area End -->
-
-    <!-- jQuery (Necessary for All JavaScript Plugins) -->
-    <script src="js/jquery/jquery-2.2.4.min.js"></script>
-    <script src="js/popper.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/plugins.js"></script>
-    <script src="js/active.js"></script>
-
-    <script>
         let currentArtist = null;
 
         // Get artist ID from URL parameter
@@ -316,12 +172,8 @@
 
             try {
                 showLoading(true);
-                const response = await fetch('/_worker.js', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'get', id: artistId })
-                });
-
+                const response = await fetch(`/api/artists/${artistId}`);
+                
                 if (!response.ok) {
                     throw new Error(`아티스트를 찾을 수 없습니다. (${response.status})`);
                 }
@@ -444,5 +296,150 @@
             loadArtistData();
         });
     </script>
+</head>
+
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="showbox">
+            <div class="loader">
+                <svg class="circular" viewBox="25 25 50 50">
+                    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                </svg>
+            </div>
+        </div>
+        <div class="questions-area text-center">
+            <p>Arclead Entertainment</p>
+            <ul>
+                <li>당신은 동체시력 보유자!!! 축하합니다. (네트웍이 느린거죠? 맞죠? ㅠㅠ)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Header Area Start -->
+    <header class="header-area bg-img" style="background-color: black;">
+        <div class="container-fluid h-100">
+            <div class="row h-100 align-items-center">
+                <div class="col-12 h-100">
+                    <div class="main-menu h-100">
+                        <nav class="navbar h-100 navbar-expand-lg">
+                            <!-- Logo Area -->
+                            <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
+                            <!-- Current Time -->
+                            <div id="current-time"></div>
+
+                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
+
+                            <div class="collapse navbar-collapse" id="studioMenu">
+                                <!-- Menu Area Start -->
+                                <ul class="navbar-nav ml-auto">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="index.html">Company</a>
+                                    </li>
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="artists-all.html">Artists <span class="sr-only">(current)</span></a>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">PR</a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <a class="dropdown-item" href="index.html">Media</a>
+                                            <a class="dropdown-item" href="about-me.html">News</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="audition.html">Audition</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Header Area End -->
+
+    <!-- Loading -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>아티스트 정보를 불러오는 중...</p>
+    </div>
+
+    <!-- Artist Content Area Start -->
+    <section id="artistContent" class="elements-area section_padding_50 mt-50" style="display: none;">
+        <div class="portfolio-menu2">
+            <a class="btn" href="artists-all.html">ALL</a>
+        </div>
+
+        <div class="container artist-profile">
+            <div class="col-12">
+                <div class="artist-title">
+                    <h2 id="artistName">아티스트</h2>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-7 image-area">
+                    <div id="imageCarousel" class="carousel slide" data-ride="carousel">
+                        <div class="carousel-inner" id="carouselInner">
+                            <!-- Images will be loaded here dynamically -->
+                        </div>
+                        <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-5 content-area" id="contentArea">
+                    <!-- Filmography will be loaded here dynamically -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Artist Content Area End -->
+
+    <!-- Footer Area Start -->
+    <footer class="footer-area">
+        <div class="container-fluid h-100">
+            <div class="row h-100">
+                <div class="col-12 h-100">
+                    <div class="footer-content h-100 d-md-flex align-items-center justify-content-between">
+                        <!-- Single Footer Content -->
+                        <div class="single-footer-content">
+                            <img src="/assets/map.png" alt="">
+                            <a href="#">(04782) 서울시 성동구 연무장5가길 25, SK V1 Tower 705호</a>
+                        </div>
+                        <!-- Single Footer Content -->
+                        <div class="single-footer-content">
+                            <img src="/assets/smartphone.png" alt="">
+                            <a href="#">02-123-4567</a>
+                        </div>
+                        <!-- Single Footer Content -->
+                        <div class="single-footer-content">
+                            <img src="/assets/envelope-2.png" alt="">
+                            <a href="#">arclead@arclead.co.kr</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer Area End -->
+
+    <!-- jQuery (Necessary for All JavaScript Plugins) -->
+    <script src="js/jquery/jquery-2.2.4.min.js"></script>
+    <!-- Popper js -->
+    <script src="js/popper.min.js"></script>
+    <!-- Bootstrap js -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- Plugins js -->
+    <script src="js/plugins.js"></script>
+    <!-- Active js -->
+    <script src="js/active.js"></script>
 </body>
 </html> 

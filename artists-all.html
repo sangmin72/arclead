@@ -78,72 +78,6 @@
                 gap: 15px;
             }
         }
-
-        .artist-card {
-            position: relative;
-            margin-bottom: 30px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .artist-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .artist-image {
-            width: 100%;
-            height: 300px;
-            object-fit: contain;
-            background-color: #f8f9fa;
-            display: block;
-        }
-
-        .artist-name-tag {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: rgba(255, 255, 255, 0.95);
-            color: #333;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            z-index: 2;
-            border-left: 4px solid #007bff;
-            backdrop-filter: blur(10px);
-        }
-
-        .artist-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.7));
-            color: white;
-            padding: 20px;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-
-        .artist-card:hover .artist-overlay {
-            transform: translateY(0);
-        }
-
-        .artist-info h4 {
-            margin: 0 0 5px 0;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .artist-info p {
-            margin: 0;
-            font-size: 14px;
-            opacity: 0.9;
-        }
     </style>
 <head>
     <meta charset="UTF-8">
@@ -208,9 +142,6 @@
         </div>
     </div>
 
-    <!-- Gradient Background Overlay -->
-    <div class="gradient-background-overlay"></div>
-
     <!-- Header Area Start -->
     <header class="header-area bg-img" style="background-color: black;">
         <div class="container-fluid h-100">
@@ -221,15 +152,15 @@
                             <!-- Logo Area  -->
                             <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
                             <!-- Current Time -->
-                            <div id="current-time" style="position: absolute; left: 50%; transform: translateX(-50%); color: white; font-size: 1rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); bottom: 10px;"></div>
+                            <div id="current-time"></div>
 
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
 
                             <div class="collapse navbar-collapse" id="studioMenu">
                                 <!-- Menu Area Start  -->
                                 <ul class="navbar-nav ml-auto">
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="index.html">Company</a>
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="index.html">Company <span class="sr-only">(current)</span></a>
                                     </li>
                                     <li class="nav-item active">
                                         <a class="nav-link" href="artists-all.html">Artists <span class="sr-only">(current)</span></a>
@@ -242,7 +173,7 @@
                                         </div>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="audition.html">Audition</a>
+                                        <a class="nav-link" href="audition.html">Auditon</a>
                                     </li>
                                 </ul>
 
@@ -255,34 +186,21 @@
     </header>
     <!-- Header Area End -->
 
-    <!-- Social Sidebar Area Start -->
-    <div class="social-sidebar-area">
-        <!-- Social Area -->
-        <div class="social-info-area">
-            <a href="#" data-toggle="tooltip" data-placement="right" title="YouTube"><i class="fa fa-youtube" aria-hidden="true"></i> <span>YouTube</span></a>
-            <a href="#" data-toggle="tooltip" data-placement="right" title="Instagram"><i class="fa fa-instagram" aria-hidden="true"></i> <span>Instagram</span></a>
+    <section class="elements-area section_padding_50 mt-50">
+        <div class="portfolio-menu2">
+            <a class="btn" href="artists-all.html">ALL</a>
         </div>
-    </div>
-    <!-- Social Sidebar Area End -->
-
-    <!-- Artists List Area Start -->
-    <div class="gallery_area section-padding-100">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="section-heading text-center">
-                        <h2>Our Artists</h2>
-                        <p>Meet our talented photographers</p>
-                    </div>
+        <div class="container">
+            <div class="artist-grid" id="artistsGrid">
+                <!-- Artists will be loaded here dynamically -->
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                    <p>아티스트 정보를 불러오는 중...</p>
                 </div>
             </div>
-
-            <div id="artistsGrid" class="row portfolio-column">
-                <!-- Artists will be loaded here -->
-            </div>
         </div>
-    </div>
-    <!-- Artists List Area End -->
+    </section>
+    <!-- ***** Elements Area End ***** -->
 
     <!-- Footer Area Start -->
     <footer class="footer-area">
@@ -325,83 +243,96 @@
     <script src="js/active.js"></script>
 
     <script>
-        // Load and display artists
+        // Load artists from API
         async function loadArtists() {
             try {
-                const response = await fetch('/_worker.js', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'list' })
-                });
-
-                if (response.ok) {
-                    const artists = await response.json();
-                    console.log('Loaded artists:', artists);
-                    displayArtists(artists);
-                } else {
-                    console.error('Failed to load artists');
-                    document.getElementById('artistsGrid').innerHTML = `
-                        <div class="col-12 text-center">
-                            <p>아티스트 정보를 불러올 수 없습니다.</p>
-                        </div>
-                    `;
-                }
+                const response = await fetch('/api/artists');
+                const artists = await response.json();
+                renderArtists(artists);
             } catch (error) {
                 console.error('Error loading artists:', error);
-                document.getElementById('artistsGrid').innerHTML = `
-                    <div class="col-12 text-center">
-                        <p>오류가 발생했습니다: ${error.message}</p>
-                    </div>
-                `;
+                renderError();
             }
         }
 
-        function displayArtists(artists) {
+        // Render artists grid
+        function renderArtists(artists) {
             const grid = document.getElementById('artistsGrid');
             
-            if (!artists || artists.length === 0) {
+            if (artists.length === 0) {
                 grid.innerHTML = `
-                    <div class="col-12 text-center">
-                        <p>등록된 아티스트가 없습니다.</p>
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
+                        <h3>등록된 아티스트가 없습니다</h3>
+                        <p>관리자 페이지에서 아티스트를 추가해주세요.</p>
                     </div>
                 `;
                 return;
             }
 
             grid.innerHTML = artists.map(artist => {
-                const representativeImage = artist.representativeImages?.artists || 
-                                          (artist.images && artist.images.length > 0 ? artist.images[0] : null);
+                // Get representative image for artists page, fallback to first image, then default
+                let imageUrl = '/assets/logo-icon.png'; // Use logo as default instead
+                let imageSource = 'default logo';
                 
-                const imageUrl = representativeImage ? 
-                    `/assets/artists/${artist.id}/${representativeImage}` : 
-                    '/img/core-img/default-artist.jpg';
-
+                if (artist.representativeImages?.artists) {
+                    imageUrl = `/assets/artists/${artist.id}/${artist.representativeImages.artists}`;
+                    imageSource = `representative: ${artist.representativeImages.artists}`;
+                } else if (artist.images && artist.images.length > 0) {
+                    imageUrl = `/assets/artists/${artist.id}/${artist.images[0]}`;
+                    imageSource = `first image: ${artist.images[0]}`;
+                }
+                
+                console.log(`Artist ${artist.name} (${artist.id}): using ${imageSource} -> ${imageUrl}`);
+                
                 return `
-                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                        <div class="artist-card" onclick="window.location.href='artist.html?id=${artist.id}'">
-                            <img src="${imageUrl}" alt="${artist.name}" class="artist-image"
-                                 onerror="this.src='/img/core-img/default-artist.jpg'">
-                            <div class="artist-name-tag">
-                                ${artist.name}
-                            </div>
-                            <div class="artist-overlay">
-                                <div class="artist-info">
-                                    <h4>${artist.name}</h4>
-                                    ${artist.nameEn ? `<p>${artist.nameEn}</p>` : ''}
-                                    ${artist.profile ? `<p>${artist.profile.substring(0, 60)}...</p>` : ''}
-                                </div>
-                            </div>
+                    <div class="artist-item" onclick="goToArtist('${artist.id}')">
+                        <img src="${imageUrl}" 
+                             alt="${artist.name}" 
+                             onerror="console.error('Failed to load image: ${imageUrl}'); this.src='/assets/logo-icon.png'">
+                        <div class="artist-info">
+                            <p>${artist.name}</p>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
+        // Render error message
+        function renderError() {
+            const grid = document.getElementById('artistsGrid');
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #e74c3c;">
+                    <h3>오류가 발생했습니다</h3>
+                    <p>아티스트 정보를 불러오는데 실패했습니다.</p>
+                    <button onclick="loadArtists()" style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">다시 시도</button>
+                </div>
+            `;
+        }
+
+        // Navigate to artist page
+        function goToArtist(artistId) {
+            window.location.href = `artist.html?id=${artistId}`;
+        }
+
+        // Add spinner animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            .artist-item {
+                cursor: pointer;
+                transition: transform 0.3s ease;
+            }
+            .artist-item:hover {
+                transform: translateY(-5px);
+            }
+        `;
+        document.head.appendChild(style);
+
         // Load artists when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            getTime();
-            loadArtists();
-        });
+        document.addEventListener('DOMContentLoaded', loadArtists);
     </script>
 </body>
 </html>
