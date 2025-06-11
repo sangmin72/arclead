@@ -592,33 +592,43 @@
                         <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px; font-size: 0.9em;">📌 대표 이미지</div>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             ${artist.representativeImages?.home ? `
-                                <div style="text-align: center;">
+                                <div class="representative-image-preview" style="text-align: center;">
                                     <img src="/assets/artists/${artist.id}/${artist.representativeImages.home}" 
                                          style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid #28a745;" 
-                                         alt="홈화면 대표">
-                                    <div style="font-size: 0.7em; color: #28a745; margin-top: 2px;">홈화면</div>
+                                         alt="홈화면 대표"
+                                         title="홈화면 대표 이미지: ${artist.representativeImages.home}"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <div style="display: none; width: 50px; height: 50px; background: #f8d7da; border-radius: 4px; border: 2px solid #dc3545; display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 0.6em; color: #721c24;">로딩실패</span>
+                                    </div>
+                                    <div class="representative-label" style="color: #28a745;">홈화면</div>
                                 </div>
                             ` : `
                                 <div style="text-align: center;">
-                                    <div style="width: 50px; height: 50px; background: #e9ecef; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px dashed #adb5bd;">
+                                    <div class="unset-representative" title="홈화면 대표 이미지가 설정되지 않았습니다">
                                         <span style="font-size: 0.7em; color: #6c757d;">미지정</span>
                                     </div>
-                                    <div style="font-size: 0.7em; color: #6c757d; margin-top: 2px;">홈화면</div>
+                                    <div class="representative-label" style="color: #6c757d;">홈화면</div>
                                 </div>
                             `}
                             ${artist.representativeImages?.artists ? `
-                                <div style="text-align: center;">
+                                <div class="representative-image-preview" style="text-align: center;">
                                     <img src="/assets/artists/${artist.id}/${artist.representativeImages.artists}" 
                                          style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid #007bff;" 
-                                         alt="아티스트 화면 대표">
-                                    <div style="font-size: 0.7em; color: #007bff; margin-top: 2px;">아티스트</div>
+                                         alt="아티스트 화면 대표"
+                                         title="아티스트 화면 대표 이미지: ${artist.representativeImages.artists}"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <div style="display: none; width: 50px; height: 50px; background: #f8d7da; border-radius: 4px; border: 2px solid #dc3545; display: flex; align-items: center; justify-content: center;">
+                                        <span style="font-size: 0.6em; color: #721c24;">로딩실패</span>
+                                    </div>
+                                    <div class="representative-label" style="color: #007bff;">아티스트</div>
                                 </div>
                             ` : `
                                 <div style="text-align: center;">
-                                    <div style="width: 50px; height: 50px; background: #e9ecef; border-radius: 4px; display: flex; align-items: center; justify-content: center; border: 1px dashed #adb5bd;">
+                                    <div class="unset-representative" title="아티스트 화면 대표 이미지가 설정되지 않았습니다">
                                         <span style="font-size: 0.7em; color: #6c757d;">미지정</span>
                                     </div>
-                                    <div style="font-size: 0.7em; color: #6c757d; margin-top: 2px;">아티스트</div>
+                                    <div class="representative-label" style="color: #6c757d;">아티스트</div>
                                 </div>
                             `}
                         </div>
