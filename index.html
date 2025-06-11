@@ -123,7 +123,7 @@
                             <!-- Logo Area  -->
                             <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
                             <!-- Current Time -->
-                            <div id="current-time"></div>
+                            <div id="header-time" style="position: absolute; left: 50%; transform: translateX(-50%); color: white; font-size: 1rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); bottom: 10px;"></div>
 
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
 
@@ -175,10 +175,6 @@
                     <div class="col-12">
                         <!-- Welcome Content -->
                         <div class="welcome-content text-center">
-                            <!-- Clock Widget -->
-                            <div class="clock-widget" style="margin-bottom: 2rem;">
-                                <div id="current-time" style="color: white; font-size: 1.2rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);"></div>
-                            </div>
                             <div class="promo-section">
                                 <h3 class="special-char fadeInUp" data-wow-delay="0.2s">Portfolio</h3>
                                 <h2 class="w-text fadeInUp" data-wow-delay="0.4s">Photography</h2>
@@ -261,11 +257,10 @@
         });
         const dateString = now.toLocaleDateString('ko-KR', {
             year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            weekday: 'long'
+            month: '2-digit',
+            day: '2-digit'
         });
-        document.getElementById('current-time').innerHTML = `${dateString}<br>${timeString}`;
+        document.getElementById('header-time').innerHTML = `${dateString} ${timeString}`;
     }
     
     // Update clock immediately and then every second
