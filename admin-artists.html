@@ -1019,16 +1019,43 @@
             
             const formData = new FormData();
             const newArtistId = document.getElementById('artistId').value.trim();
+            const homeImageValue = document.getElementById('homeImage').value;
+            const artistsImageValue = document.getElementById('artistsImage').value;
+            
             const artistData = {
                 id: newArtistId,
                 name: document.getElementById('artistName').value.trim(),
                 nameEn: document.getElementById('artistNameEn').value.trim(),
                 filmography: collectFilmographyData(),
                 representativeImages: {
-                    home: document.getElementById('homeImage').value,
-                    artists: document.getElementById('artistsImage').value
+                    home: homeImageValue || null,
+                    artists: artistsImageValue || null
                 }
             };
+
+            // Debug log for representative images
+            console.log('Representative images being saved:', {
+                home: homeImageValue,
+                artists: artistsImageValue,
+                editingArtist: editingArtist
+            });
+
+            // If editing, check if representative images actually changed
+            if (editingArtist) {
+                const currentArtist = allArtists.find(a => a.id === editingArtist);
+                if (currentArtist) {
+                    const currentHome = currentArtist.representativeImages?.home || '';
+                    const currentArtists = currentArtist.representativeImages?.artists || '';
+                    console.log('Current representative images:', {
+                        home: currentHome,
+                        artists: currentArtists
+                    });
+                    console.log('Representative images changed:', {
+                        homeChanged: currentHome !== homeImageValue,
+                        artistsChanged: currentArtists !== artistsImageValue
+                    });
+                }
+            }
 
             // Validate ID format
             if (!/^[a-zA-Z0-9\-]+$/.test(artistData.id)) {
@@ -1069,6 +1096,17 @@
                 }
                 
                 const result = await response.json();
+                console.log('Server response:', result);
+                
+                // Update local artist data immediately
+                if (editingArtist) {
+                    const artistIndex = allArtists.findIndex(a => a.id === (isIdChanged ? editingArtist : newArtistId));
+                    if (artistIndex !== -1) {
+                        allArtists[artistIndex] = { ...allArtists[artistIndex], ...artistData };
+                        console.log('Updated local artist data:', allArtists[artistIndex]);
+                    }
+                }
+                
                 showStatus(editingArtist ? '아티스트 정보가 수정되었습니다.' : '새 아티스트가 추가되었습니다.', 'success');
                 
                 // If ID was changed, update the editingArtist reference
@@ -1144,11 +1182,17 @@
                         const homeSelect = document.getElementById('homeImage');
                         const artistsSelect = document.getElementById('artistsImage');
                         
+                        console.log('Setting representative images:', artist.representativeImages);
+                        console.log('Available home options:', Array.from(homeSelect.options).map(o => o.value));
+                        console.log('Available artists options:', Array.from(artistsSelect.options).map(o => o.value));
+                        
                         if (artist.representativeImages.home) {
                             homeSelect.value = artist.representativeImages.home;
+                            console.log('Set home image to:', homeSelect.value);
                         }
                         if (artist.representativeImages.artists) {
                             artistsSelect.value = artist.representativeImages.artists;
+                            console.log('Set artists image to:', artistsSelect.value);
                         }
                     }
                 }, 100);
