@@ -25,6 +25,37 @@
     <link rel="stylesheet" href="css/pretendard.css">
     <link rel="stylesheet" href="css/pretendard-subset.css">
 
+    <style>
+        /* 캐러셀 이미지가 잘리지 않도록 수정 */
+        .carousel-item.bg-img {
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-color: #000 !important; /* 여백을 자연스럽게 처리 */
+        }
+
+        /* 캐러셀 인디케이터 이미지도 잘리지 않도록 수정 */
+        .carousel-indicators li.bg-img {
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-color: #333 !important; /* 작은 이미지 여백 처리 */
+        }
+
+        /* 캐러셀 전체 배경을 어둡게 하여 자연스러운 여백 처리 */
+        .welcome-area {
+            background-color: #000;
+        }
+
+        /* 슬라이드 텍스트가 더 잘 보이도록 배경 추가 */
+        .slide-text {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+    </style>
+
     <!-- R2 Integration Script -->
     <script>
         async function loadSlideData() {
