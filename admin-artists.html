@@ -399,7 +399,7 @@
                 <div class="control-group">
                     <h3>👥 아티스트 관리</h3>
                     <button class="btn btn-primary" onclick="openAddArtistModal()">➕ 새 아티스트 추가</button>
-                    <button class="btn" onclick="refreshArtistsList()">🔄 목록 새로고침</button>
+                    <button class="btn" onclick="manualRefresh()">🔄 목록 새로고침</button>
                 </div>
 
                 <div class="control-group">
@@ -536,20 +536,26 @@
 
         // Load artists list
         async function refreshArtistsList() {
-            setLoading(true);
             try {
+                console.log('Refreshing artists list...');
                 const response = await fetch('/api/artists');
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
                 
-                allArtists = await response.json();
+                const newArtists = await response.json();
+                console.log(`Loaded ${newArtists.length} artists`);
+                
+                allArtists = newArtists;
                 renderArtists(allArtists);
                 updateStats();
-                showStatus(`${allArtists.length}명의 아티스트를 불러왔습니다.`, 'success');
+                
+                return true; // Return success
             } catch (error) {
                 console.error('Error loading artists:', error);
                 showStatus('아티스트 목록을 불러오는데 실패했습니다: ' + error.message, 'error');
+                return false; // Return failure
             }
-            setLoading(false);
         }
 
         // Render artists
@@ -1161,26 +1167,71 @@
         // Delete artist
         async function deleteArtist(artistId) {
             const artist = allArtists.find(a => a.id === artistId);
-            if (!artist) return;
+            if (!artist) {
+                showStatus('아티스트를 찾을 수 없습니다.', 'error');
+                return;
+            }
 
             if (!confirm(`"${artist.name}" 아티스트를 삭제하시겠습니까?\n\n모든 이미지와 정보가 영구적으로 삭제됩니다.`)) return;
 
             setLoading(true);
             try {
+                console.log(`Attempting to delete artist: ${artistId}`);
                 const response = await fetch(`/api/artists/${artistId}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
                 });
 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                console.log(`Delete response status: ${response.status}`);
+                
+                if (!response.ok) {
+                    let errorMessage = `HTTP ${response.status}`;
+                    try {
+                        const errorText = await response.text();
+                        if (errorText) {
+                            errorMessage += `: ${errorText}`;
+                        }
+                    } catch (e) {
+                        console.log('Could not read error response text');
+                    }
+                    throw new Error(errorMessage);
+                }
+                
+                // Try to parse response if there is any content
+                try {
+                    const result = await response.text();
+                    if (result) {
+                        console.log('Delete response:', result);
+                    }
+                } catch (e) {
+                    console.log('No response body or failed to parse');
+                }
                 
                 showStatus(`"${artist.name}" 아티스트가 삭제되었습니다.`, 'success');
-                refreshArtistsList();
+                await refreshArtistsList();
                 
             } catch (error) {
                 console.error('Error deleting artist:', error);
-                showStatus('아티스트 삭제에 실패했습니다: ' + error.message, 'error');
+                
+                // Check for specific error types
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showStatus('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.', 'error');
+                } else if (error.message.includes('404')) {
+                    showStatus('아티스트를 찾을 수 없습니다. 이미 삭제되었을 수 있습니다.', 'error');
+                } else if (error.message.includes('403')) {
+                    showStatus('삭제 권한이 없습니다.', 'error');
+                } else if (error.message.includes('405')) {
+                    showStatus('서버가 DELETE 요청을 지원하지 않습니다. 관리자에게 문의하세요.', 'error');
+                } else if (error.message.includes('500')) {
+                    showStatus('서버 내부 오류가 발생했습니다. 관리자에게 문의하세요.', 'error');
+                } else {
+                    showStatus('아티스트 삭제에 실패했습니다: ' + error.message, 'error');
+                }
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         }
 
         // Export data
@@ -1219,9 +1270,24 @@
             input.value = '';
         }
 
+        // Manual refresh function
+        async function manualRefresh() {
+            setLoading(true);
+            const success = await refreshArtistsList();
+            if (success) {
+                showStatus(`${allArtists.length}명의 아티스트를 새로고침했습니다.`, 'success');
+            }
+            setLoading(false);
+        }
+
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            refreshArtistsList();
+        document.addEventListener('DOMContentLoaded', async () => {
+            setLoading(true);
+            const success = await refreshArtistsList();
+            if (success) {
+                showStatus(`${allArtists.length}명의 아티스트를 불러왔습니다.`, 'success');
+            }
+            setLoading(false);
         });
 
         // Close modal when clicking outside
