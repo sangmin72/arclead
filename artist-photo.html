@@ -145,7 +145,7 @@
             document.getElementById('artistNameEn').textContent = artist.nameEn || '';
             
             // Update back link
-            document.getElementById('backToArtist').href = `artist.html?id=${artist.id}`;
+            document.getElementById('backToArtist').href = `artist.html?id=${encodeURIComponent(artist.id)}`;
             
             // Update photo gallery
             const galleryContainer = document.getElementById('photoGallery');
@@ -158,8 +158,9 @@
                 document.getElementById('photoCount').textContent = `총 ${artist.images.length}장의 사진`;
                 
                 artist.images.forEach((image, index) => {
-                    const imageUrl = `/assets/artists/${artist.id}/${image}`;
-                    console.log(`Image ${index + 1}: ${imageUrl}`);
+                    const encodedArtistId = encodeURIComponent(artist.id);
+                    const encodedImageName = encodeURIComponent(image);
+                    const imageUrl = `/assets/artists/${encodedArtistId}/${encodedImageName}`;
                     
                     const galleryItem = document.createElement('div');
                     galleryItem.className = 'col-12 col-sm-6 col-md-4 col-lg-3 column_single_gallery_item';
@@ -167,7 +168,7 @@
                     galleryItem.innerHTML = `
                         <img src="${imageUrl}" 
                              alt="${artist.name} ${index + 1}" 
-                             onerror="console.error('Failed to load artist image: ${imageUrl}'); this.src='/assets/artists/default.png'">
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.nextElementSibling.style.alignItems='center'; this.nextElementSibling.style.justifyContent='center'; this.nextElementSibling.style.background='linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'; this.nextElementSibling.style.border='2px solid #ffd700'; this.nextElementSibling.style.borderRadius='8px'; this.nextElementSibling.innerHTML='<div style=\\'text-align:center; padding:20px; color:#666;\\'><i class=\\'fa fa-image\\' style=\\'font-size:2em; margin-bottom:10px;\\'></i><br>파일없음</div>';">
                         <div class="hover_overlay">
                             <a class="gallery_img" href="${imageUrl}"><i class="fa fa-eye"></i></a>
                         </div>
@@ -175,6 +176,51 @@
                     
                     galleryContainer.appendChild(galleryItem);
                 });
+                
+                // Wait for all images to load, then initialize isotope
+                const images = galleryContainer.querySelectorAll('img');
+                let loadedImages = 0;
+                const totalImages = images.length;
+                
+                function initializeIsotope() {
+                    if (typeof $.fn.isotope !== 'undefined') {
+                        $('#photoGallery').isotope({
+                            itemSelector: '.column_single_gallery_item',
+                            layoutMode: 'masonry',
+                            masonry: {
+                                columnWidth: '.column_single_gallery_item'
+                            }
+                        });
+                    }
+                }
+                
+                if (totalImages === 0) {
+                    initializeIsotope();
+                } else {
+                    images.forEach(img => {
+                        if (img.complete) {
+                            loadedImages++;
+                        } else {
+                            img.addEventListener('load', () => {
+                                loadedImages++;
+                                if (loadedImages === totalImages) {
+                                    initializeIsotope();
+                                }
+                            });
+                            img.addEventListener('error', () => {
+                                loadedImages++;
+                                if (loadedImages === totalImages) {
+                                    initializeIsotope();
+                                }
+                            });
+                        }
+                    });
+                    
+                    if (loadedImages === totalImages) {
+                        initializeIsotope();
+                    }
+                }
+                
             } else {
                 console.log(`No images found for artist ${artist.name}`);
                 document.getElementById('photoCount').textContent = '등록된 사진 없음';
