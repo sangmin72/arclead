@@ -177,48 +177,19 @@
                     galleryContainer.appendChild(galleryItem);
                 });
                 
-                // Wait for all images to load, then initialize isotope
-                const images = galleryContainer.querySelectorAll('img');
-                let loadedImages = 0;
-                const totalImages = images.length;
-                
-                function initializeIsotope() {
-                    if (typeof $.fn.isotope !== 'undefined') {
+                // Initialize isotope after images are loaded (same as portfolio.html)
+                if (typeof $.fn.imagesLoaded !== 'undefined' && typeof $.fn.isotope !== 'undefined') {
+                    $('#photoGallery').imagesLoaded(function () {
                         $('#photoGallery').isotope({
                             itemSelector: '.column_single_gallery_item',
-                            layoutMode: 'masonry',
+                            percentPosition: true,
                             masonry: {
                                 columnWidth: '.column_single_gallery_item'
                             }
                         });
-                    }
-                }
-                
-                if (totalImages === 0) {
-                    initializeIsotope();
-                } else {
-                    images.forEach(img => {
-                        if (img.complete) {
-                            loadedImages++;
-                        } else {
-                            img.addEventListener('load', () => {
-                                loadedImages++;
-                                if (loadedImages === totalImages) {
-                                    initializeIsotope();
-                                }
-                            });
-                            img.addEventListener('error', () => {
-                                loadedImages++;
-                                if (loadedImages === totalImages) {
-                                    initializeIsotope();
-                                }
-                            });
-                        }
                     });
-                    
-                    if (loadedImages === totalImages) {
-                        initializeIsotope();
-                    }
+                } else {
+                    console.warn('imagesLoaded or isotope plugin not available');
                 }
                 
             } else {
