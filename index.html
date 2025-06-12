@@ -381,7 +381,7 @@
             setTimeout(getTime, 1000);
         }
 
-        // Load artists for homepage
+        // Load artists for homepage - update existing slides instead of replacing them
         async function loadHomeArtists() {
             try {
                 console.log('Loading home artists...');
@@ -404,76 +404,36 @@
                 
                 console.log('Artists with home images:', homeArtists.length);
                 
-                // Update carousel slides
-                const carouselInner = document.querySelector('.carousel-inner');
-                const carouselIndicators = document.querySelector('.carousel-indicators');
-                carouselInner.innerHTML = '';
-                carouselIndicators.innerHTML = '';
+                // Update existing slides with artist data (keep the original 13 slides structure)
+                homeArtists.forEach((artist, index) => {
+                    if (index < 13) { // Only update up to 13 slides
+                        const slideId = `slide${String(index + 1).padStart(2, '0')}`;
+                        const carouselItem = document.getElementById(slideId);
+                        const indicator = document.querySelector(`[data-slide-to="${index}"]`);
+                        
+                        if (carouselItem) {
+                            const imageUrl = `/assets/artists/${artist.id}/${artist.representativeImages.home}`;
+                            
+                            // Update slide background and text
+                            carouselItem.style.backgroundImage = `url('${imageUrl}')`;
+                            const spanElement = carouselItem.querySelector('.slide-text span');
+                            const h2Element = carouselItem.querySelector('.slide-text h2');
+                            if (spanElement && h2Element) {
+                                spanElement.textContent = artist.name;
+                                h2Element.textContent = artist.nameEn || '';
+                            }
+                            
+                            // Update indicator background
+                            if (indicator) {
+                                indicator.style.backgroundImage = `url('${imageUrl}')`;
+                            }
+                        }
+                    }
+                });
                 
-                if (homeArtists.length > 0) {
-                    homeArtists.forEach((artist, index) => {
-                        const isActive = index === 0 ? 'active' : '';
-                        const imageUrl = `/assets/artists/${artist.id}/${artist.representativeImages.home}`;
-                        
-                        // Add slide
-                        carouselInner.innerHTML += `
-                            <div id="slide${String(index + 1).padStart(2, '0')}" class="carousel-item h-100 bg-img ${isActive}" 
-                                 style="background-image: url('${imageUrl}')">
-                                <div class="carousel-content h-100">
-                                    <div class="slide-text">
-                                        <span>${artist.name}</span>
-                                        <h2>${artist.nameEn || ''}</h2>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        
-                        // Add indicator with image
-                        carouselIndicators.innerHTML += `
-                            <li data-target="#welcomeSlider" 
-                                data-slide-to="${index}" 
-                                class="bg-img ${isActive}" 
-                                style="background-image: url('${imageUrl}')">
-                            </li>
-                        `;
-                    });
-                } else {
-                    // If no artists with home images, show default slide
-                    console.log('No artists with home images found, showing default slide');
-                    carouselInner.innerHTML = `
-                        <div class="carousel-item h-100 bg-img active">
-                            <div class="carousel-content h-100">
-                                <div class="slide-text">
-                                    <span>Arclead Entertainment</span>
-                                    <h2>Welcome to Arclead</h2>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    carouselIndicators.innerHTML = `
-                        <li data-target="#welcomeSlider" data-slide-to="0" class="active bg-img"></li>
-                    `;
-                }
             } catch (error) {
                 console.error('Error loading home artists:', error);
-                
-                // Fallback to default slide
-                const carouselInner = document.querySelector('.carousel-inner');
-                const carouselIndicators = document.querySelector('.carousel-indicators');
-                carouselInner.innerHTML = `
-                    <div class="carousel-item h-100 bg-img active">
-                        <div class="carousel-content h-100">
-                            <div class="slide-text">
-                                <span>Arclead Entertainment</span>
-                                <h2>Welcome to Arclead</h2>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                carouselIndicators.innerHTML = `
-                    <li data-target="#welcomeSlider" data-slide-to="0" class="active bg-img"></li>
-                `;
+                // Keep the existing slides as fallback - no need to modify them
             }
         }
 
