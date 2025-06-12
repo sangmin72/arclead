@@ -123,7 +123,7 @@
                             <!-- Logo Area  -->
                             <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
                             <!-- Current Time -->
-                            <div id="current-time"></div>
+                            <div id="current-time" style="color: white; font-size: 14px; margin: 0 20px;"></div>
 
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
 
@@ -363,49 +363,117 @@
     <script src="js/active.js"></script>
 
     <script>
+        // Time function
+        function getTime() {
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = (d.getMonth() + 1).toString().padStart(2, '0');
+            var date = d.getDate().toString().padStart(2, '0');
+            var hours = d.getHours().toString().padStart(2, '0');
+            var minutes = d.getMinutes().toString().padStart(2, '0');
+            var seconds = d.getSeconds().toString().padStart(2, '0');
+
+            var timeBoard = document.getElementById("current-time");
+            if (timeBoard) {
+                var time = year + "년 " + month + "월 " + date + "일 " + hours + ":" + minutes + ":" + seconds;
+                timeBoard.innerHTML = time;
+            }
+            setTimeout(getTime, 1000);
+        }
+
         // Load artists for homepage
         async function loadHomeArtists() {
             try {
+                console.log('Loading home artists...');
                 const response = await fetch('/api/artists');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
                 const artists = await response.json();
+                console.log('Total artists loaded:', artists.length);
                 
                 // Get artists with home representative images
-                const homeArtists = artists.filter(artist => artist.representativeImages?.home);
+                const homeArtists = artists.filter(artist => {
+                    const hasHomeImage = artist.representativeImages?.home;
+                    if (hasHomeImage) {
+                        console.log(`Artist ${artist.name} has home image: ${artist.representativeImages.home}`);
+                    }
+                    return hasHomeImage;
+                });
+                
+                console.log('Artists with home images:', homeArtists.length);
                 
                 // Update carousel slides
                 const carouselInner = document.querySelector('.carousel-inner');
+                const carouselIndicators = document.querySelector('.carousel-indicators');
                 carouselInner.innerHTML = '';
+                carouselIndicators.innerHTML = '';
                 
-                homeArtists.forEach((artist, index) => {
-                    const isActive = index === 0 ? 'active' : '';
-                    carouselInner.innerHTML += `
-                        <div id="slide${index + 1}" class="carousel-item h-100 bg-img ${isActive}" 
-                             style="background-image: url('/assets/artists/${artist.id}/${artist.representativeImages.home}')">
-                            <div class="carousel-content h-100">
-                                <div class="slide-text">
-                                    <h2>${artist.name}</h2>
-                                    ${artist.nameEn ? `<span>${artist.nameEn}</span>` : ''}
+                if (homeArtists.length > 0) {
+                    homeArtists.forEach((artist, index) => {
+                        const isActive = index === 0 ? 'active' : '';
+                        const imageUrl = `/assets/artists/${artist.id}/${artist.representativeImages.home}`;
+                        
+                        // Add slide
+                        carouselInner.innerHTML += `
+                            <div id="slide${String(index + 1).padStart(2, '0')}" class="carousel-item h-100 bg-img ${isActive}" 
+                                 style="background-image: url('${imageUrl}')">
+                                <div class="carousel-content h-100">
+                                    <div class="slide-text">
+                                        <span>${artist.name}</span>
+                                        <h2>${artist.nameEn || ''}</h2>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
-                });
-                
-                // If no artists with home images, show default slide
-                if (homeArtists.length === 0) {
+                        `;
+                        
+                        // Add indicator with image
+                        carouselIndicators.innerHTML += `
+                            <li data-target="#welcomeSlider" 
+                                data-slide-to="${index}" 
+                                class="bg-img ${isActive}" 
+                                style="background-image: url('${imageUrl}')">
+                            </li>
+                        `;
+                    });
+                } else {
+                    // If no artists with home images, show default slide
+                    console.log('No artists with home images found, showing default slide');
                     carouselInner.innerHTML = `
                         <div class="carousel-item h-100 bg-img active">
                             <div class="carousel-content h-100">
                                 <div class="slide-text">
-                                    <h2>Arclead Entertainment</h2>
-                                    <span>Welcome to Arclead</span>
+                                    <span>Arclead Entertainment</span>
+                                    <h2>Welcome to Arclead</h2>
                                 </div>
                             </div>
                         </div>
                     `;
+                    
+                    carouselIndicators.innerHTML = `
+                        <li data-target="#welcomeSlider" data-slide-to="0" class="active bg-img"></li>
+                    `;
                 }
             } catch (error) {
                 console.error('Error loading home artists:', error);
+                
+                // Fallback to default slide
+                const carouselInner = document.querySelector('.carousel-inner');
+                const carouselIndicators = document.querySelector('.carousel-indicators');
+                carouselInner.innerHTML = `
+                    <div class="carousel-item h-100 bg-img active">
+                        <div class="carousel-content h-100">
+                            <div class="slide-text">
+                                <span>Arclead Entertainment</span>
+                                <h2>Welcome to Arclead</h2>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                carouselIndicators.innerHTML = `
+                    <li data-target="#welcomeSlider" data-slide-to="0" class="active bg-img"></li>
+                `;
             }
         }
 
