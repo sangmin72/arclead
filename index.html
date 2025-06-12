@@ -404,14 +404,18 @@
                 
                 console.log('Artists with home images:', homeArtists.length);
                 
-                // Update existing slides with artist data (keep the original 13 slides structure)
-                homeArtists.forEach((artist, index) => {
-                    if (index < 13) { // Only update up to 13 slides
-                        const slideId = `slide${String(index + 1).padStart(2, '0')}`;
-                        const carouselItem = document.getElementById(slideId);
-                        const indicator = document.querySelector(`[data-slide-to="${index}"]`);
+                // Update all 13 slides with artist data (cycle through artists if needed)
+                if (homeArtists.length > 0) {
+                    for (let slideIndex = 0; slideIndex < 13; slideIndex++) {
+                        // Use modulo to cycle through artists
+                        const artistIndex = slideIndex % homeArtists.length;
+                        const artist = homeArtists[artistIndex];
                         
-                        if (carouselItem) {
+                        const slideId = `slide${String(slideIndex + 1).padStart(2, '0')}`;
+                        const carouselItem = document.getElementById(slideId);
+                        const indicator = document.querySelector(`[data-slide-to="${slideIndex}"]`);
+                        
+                        if (carouselItem && artist) {
                             const imageUrl = `/assets/artists/${artist.id}/${artist.representativeImages.home}`;
                             
                             // Update slide background and text
@@ -427,9 +431,11 @@
                             if (indicator) {
                                 indicator.style.backgroundImage = `url('${imageUrl}')`;
                             }
+                            
+                            console.log(`Slide ${slideIndex + 1}: ${artist.name} (artist ${artistIndex + 1}/${homeArtists.length})`);
                         }
                     }
-                });
+                }
                 
             } catch (error) {
                 console.error('Error loading home artists:', error);
