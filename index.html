@@ -54,6 +54,52 @@
             border-radius: 10px;
             backdrop-filter: blur(5px);
         }
+
+        /* 헤더를 사진 위에 오버레이 */
+        .header-area {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        /* 헤더 호버 시 더 진하게 */
+        .header-area:hover {
+            background: rgba(0, 0, 0, 0.6) !important;
+        }
+
+        /* 캐러셀이 전체 화면을 차지하도록 */
+        .welcome-area {
+            height: 100vh !important;
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        /* 로고와 메뉴 텍스트가 더 잘 보이도록 */
+        .navbar-brand img {
+            filter: brightness(1.2);
+        }
+
+        .navbar-nav .nav-link {
+            color: white !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #fff !important;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
+        }
+
+        /* 시계 텍스트도 더 잘 보이도록 */
+        #current-time {
+            color: white !important;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            font-weight: 500;
+        }
     </style>
 
     <!-- R2 Integration Script -->
@@ -145,7 +191,7 @@
     <div class="gradient-background-overlay"></div>
 
     <!-- Header Area Start -->
-    <header class="header-area bg-img" style="background-color: black;">
+    <header class="header-area bg-img">
         <div class="container-fluid h-100">
             <div class="row h-100 align-items-center">
                 <div class="col-12 h-100">
