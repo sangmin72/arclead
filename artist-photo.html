@@ -96,6 +96,8 @@
             text-decoration: none;
             transform: translateY(-2px);
         }
+
+
     </style>
 
     <script type="text/javascript">
@@ -135,7 +137,7 @@
             }
         }
 
-        // Render artist photos
+        // Render artist photos using portfolio.html structure
         function renderArtistPhotos(artist) {
             // Update page title
             document.title = `Arclead Entertainment : ${artist.name} Photos`;
@@ -147,9 +149,8 @@
             // Update back link
             document.getElementById('backToArtist').href = `artist.html?id=${encodeURIComponent(artist.id)}`;
             
-            // Update photo gallery
+            // Update photo gallery using portfolio.html structure
             const galleryContainer = document.getElementById('photoGallery');
-            galleryContainer.innerHTML = '';
             
             if (artist.images && artist.images.length > 0) {
                 console.log(`Loading ${artist.images.length} images for artist ${artist.name}:`, artist.images);
@@ -157,30 +158,31 @@
                 // Update photo count
                 document.getElementById('photoCount').textContent = `총 ${artist.images.length}장의 사진`;
                 
+                // Build gallery HTML string like portfolio.html
+                let galleryHTML = '';
                 artist.images.forEach((image, index) => {
                     const encodedArtistId = encodeURIComponent(artist.id);
                     const encodedImageName = encodeURIComponent(image);
                     const imageUrl = `/assets/artists/${encodedArtistId}/${encodedImageName}`;
                     
-                    const galleryItem = document.createElement('div');
-                    galleryItem.className = 'col-12 col-sm-6 col-md-4 col-lg-3 column_single_gallery_item';
-                    
-                    galleryItem.innerHTML = `
-                        <img src="${imageUrl}" 
-                             alt="${artist.name} ${index + 1}" 
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.nextElementSibling.style.alignItems='center'; this.nextElementSibling.style.justifyContent='center'; this.nextElementSibling.style.background='linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'; this.nextElementSibling.style.border='2px solid #ffd700'; this.nextElementSibling.style.borderRadius='8px'; this.nextElementSibling.innerHTML='<div style=\\'text-align:center; padding:20px; color:#666;\\'><i class=\\'fa fa-image\\' style=\\'font-size:2em; margin-bottom:10px;\\'></i><br>파일없음</div>';">
-                        <div class="hover_overlay">
-                            <a class="gallery_img" href="${imageUrl}"><i class="fa fa-eye"></i></a>
+                    galleryHTML += `
+                        <!-- Single Item -->
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 column_single_gallery_item">
+                            <img src="${imageUrl}" alt="${artist.name} ${index + 1}" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'; this.nextElementSibling.style.alignItems='center'; this.nextElementSibling.style.justifyContent='center'; this.nextElementSibling.style.background='linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'; this.nextElementSibling.style.border='2px solid #ffd700'; this.nextElementSibling.style.borderRadius='8px'; this.nextElementSibling.innerHTML='<div style=\\'text-align:center; padding:20px; color:#666;\\'><i class=\\'fa fa-image\\' style=\\'font-size:2em; margin-bottom:10px;\\'></i><br>파일없음</div>';">
+                            <div class="hover_overlay">
+                                <a class="gallery_img" href="${imageUrl}"><i class="fa fa-eye"></i></a>
+                            </div>
                         </div>
                     `;
-                    
-                    galleryContainer.appendChild(galleryItem);
                 });
                 
-                // Initialize isotope after images are loaded (same as portfolio.html)
+                galleryContainer.innerHTML = galleryHTML;
+                
+                // Use the same isotope initialization as portfolio.html
                 if (typeof $.fn.imagesLoaded !== 'undefined' && typeof $.fn.isotope !== 'undefined') {
                     $('#photoGallery').imagesLoaded(function () {
-                        $('#photoGallery').isotope({
+                        var $grid = $('#photoGallery').isotope({
                             itemSelector: '.column_single_gallery_item',
                             percentPosition: true,
                             masonry: {
@@ -189,7 +191,7 @@
                         });
                     });
                 } else {
-                    console.warn('imagesLoaded or isotope plugin not available');
+                    console.error('imagesLoaded or isotope plugin not available');
                 }
                 
             } else {
