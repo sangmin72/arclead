@@ -568,15 +568,26 @@
             }
 
             console.log('Rendering', artists.length, 'artists');
-            artists.forEach(artist => {
-                if (artist.representativeImages) {
-                    console.log(`Artist ${artist.name} representative images:`, artist.representativeImages);
-                } else {
-                    console.log(`Artist ${artist.name} has no representative images`);
-                }
-            });
+            
+            // Count artists with representative images
+            const withHomeImages = artists.filter(a => a.representativeImages?.home).length;
+            const withArtistImages = artists.filter(a => a.representativeImages?.artists).length;
+            
+            if (withHomeImages > 0 || withArtistImages > 0) {
+                console.log(`대표 이미지 설정 현황: 홈화면 ${withHomeImages}개, 아티스트 ${withArtistImages}개`);
+            } else {
+                console.log('설정된 대표 이미지가 없습니다.');
+            }
 
-            grid.innerHTML = artists.map(artist => `
+            grid.innerHTML = artists.map(artist => {
+                // Safely encode image URLs
+                const safeArtistId = encodeURIComponent(artist.id);
+                const homeImageUrl = artist.representativeImages?.home ? 
+                    `/assets/artists/${safeArtistId}/${encodeURIComponent(artist.representativeImages.home)}` : null;
+                const artistsImageUrl = artist.representativeImages?.artists ? 
+                    `/assets/artists/${safeArtistId}/${encodeURIComponent(artist.representativeImages.artists)}` : null;
+                
+                return `
                 <div class="artist-card">
                     <div class="artist-header">
                         <div class="artist-name">
@@ -606,16 +617,16 @@
                     <div class="representative-images-display" style="margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">
                         <div style="font-weight: bold; color: #2c3e50; margin-bottom: 8px; font-size: 0.9em;">📌 대표 이미지</div>
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            ${artist.representativeImages?.home ? `
+                            ${homeImageUrl ? `
                                 <div class="representative-image-preview" style="text-align: center;">
-                                    <img src="/assets/artists/${artist.id}/${artist.representativeImages.home}" 
+                                    <img src="${homeImageUrl}" 
                                          style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid #28a745;" 
                                          alt="홈화면 대표"
                                          title="홈화면 대표 이미지: ${artist.representativeImages.home}"
-                                         onerror="console.error('Failed to load home rep image: /assets/artists/${artist.id}/${artist.representativeImages.home}'); this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                                         onload="console.log('Successfully loaded home rep image: /assets/artists/${artist.id}/${artist.representativeImages.home}');">
-                                    <div style="display: none; width: 50px; height: 50px; background: #f8d7da; border-radius: 4px; border: 2px solid #dc3545; justify-content: center; align-items: center;">
-                                        <span style="font-size: 0.6em; color: #721c24;">로딩실패</span>
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                         onload="this.style.border='2px solid #28a745';">
+                                    <div style="display: none; width: 50px; height: 50px; background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 4px; border: 2px solid #ffc107; justify-content: center; align-items: center; color: #6c757d; font-size: 0.5em; text-align: center; line-height: 1;">
+                                        파일<br>없음
                                     </div>
                                     <div class="representative-label" style="color: #28a745;">홈화면</div>
                                 </div>
@@ -627,16 +638,16 @@
                                     <div class="representative-label" style="color: #6c757d;">홈화면</div>
                                 </div>
                             `}
-                            ${artist.representativeImages?.artists ? `
+                            ${artistsImageUrl ? `
                                 <div class="representative-image-preview" style="text-align: center;">
-                                    <img src="/assets/artists/${artist.id}/${artist.representativeImages.artists}" 
+                                    <img src="${artistsImageUrl}" 
                                          style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid #007bff;" 
                                          alt="아티스트 화면 대표"
                                          title="아티스트 화면 대표 이미지: ${artist.representativeImages.artists}"
-                                         onerror="console.error('Failed to load artists rep image: /assets/artists/${artist.id}/${artist.representativeImages.artists}'); this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                                         onload="console.log('Successfully loaded artists rep image: /assets/artists/${artist.id}/${artist.representativeImages.artists}');">
-                                    <div style="display: none; width: 50px; height: 50px; background: #f8d7da; border-radius: 4px; border: 2px solid #dc3545; justify-content: center; align-items: center;">
-                                        <span style="font-size: 0.6em; color: #721c24;">로딩실패</span>
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                         onload="this.style.border='2px solid #007bff';">
+                                    <div style="display: none; width: 50px; height: 50px; background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 4px; border: 2px solid #ffc107; justify-content: center; align-items: center; color: #6c757d; font-size: 0.5em; text-align: center; line-height: 1;">
+                                        파일<br>없음
                                     </div>
                                     <div class="representative-label" style="color: #007bff;">아티스트</div>
                                 </div>
@@ -676,14 +687,20 @@
                                     badgeColor = '#007bff';
                                 }
                                 
+                                const imageUrl = `/assets/artists/${safeArtistId}/${encodeURIComponent(img)}`;
+                                
                                 return `<div style="position: relative; display: inline-block; margin: 2px;">
-                                    <img src="/assets/artists/${artist.id}/${img}" 
+                                    <img src="${imageUrl}" 
                                          class="artist-image" 
                                          style="border: 2px solid ${borderColor};" 
                                          alt="${artist.name}"
                                          title="${img}${badgeText ? ' (' + badgeText + ' 대표)' : ''}"
-                                         onerror="console.error('Failed to load artist image: /assets/artists/${artist.id}/${img}'); this.style.border='2px solid #dc3545'; this.alt='이미지 로딩 실패';"
-                                         onload="console.log('Successfully loaded artist image: /assets/artists/${artist.id}/${img}');">
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <div style="display: none; width: 60px; height: 60px; background: linear-gradient(135deg, #f8f9fa, #e9ecef); border: 2px solid #ffc107; border-radius: 5px; justify-content: center; align-items: center; color: #6c757d; font-size: 0.6em; text-align: center; line-height: 1; position: relative;">
+                                        파일없음
+                                        <span style="position: absolute; top: 2px; left: 2px; background: rgba(0,0,0,0.7); color: white; border-radius: 2px; padding: 1px 4px; font-size: 0.7em;">${index + 1}</span>
+                                        ${badgeText ? `<span style="position: absolute; bottom: 2px; right: 2px; background: ${badgeColor}; color: white; border-radius: 2px; padding: 1px 3px; font-size: 0.6em; font-weight: bold;">${badgeText}</span>` : ''}
+                                    </div>
                                     <span style="position: absolute; top: 2px; left: 2px; background: rgba(0,0,0,0.7); color: white; border-radius: 2px; padding: 1px 4px; font-size: 0.7em;">${index + 1}</span>
                                     ${badgeText ? `<span style="position: absolute; bottom: 2px; right: 2px; background: ${badgeColor}; color: white; border-radius: 2px; padding: 1px 3px; font-size: 0.6em; font-weight: bold;">${badgeText}</span>` : ''}
                                 </div>`;
@@ -707,7 +724,8 @@
                         }).join('')}
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         // Update statistics
