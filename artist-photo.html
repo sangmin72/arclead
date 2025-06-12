@@ -179,9 +179,15 @@
                 
                 galleryContainer.innerHTML = galleryHTML;
                 
-                // Use the same isotope initialization as portfolio.html
+                // Destroy existing isotope instance if it exists
+                if ($('#photoGallery').data('isotope')) {
+                    $('#photoGallery').isotope('destroy');
+                }
+                
+                // Use the exact same isotope initialization as active.js
                 if (typeof $.fn.imagesLoaded !== 'undefined' && typeof $.fn.isotope !== 'undefined') {
                     $('#photoGallery').imagesLoaded(function () {
+                        // This is the exact code from active.js
                         var $grid = $('#photoGallery').isotope({
                             itemSelector: '.column_single_gallery_item',
                             percentPosition: true,
@@ -189,6 +195,7 @@
                                 columnWidth: '.column_single_gallery_item'
                             }
                         });
+                        console.log('Isotope initialized successfully for artist photos');
                     });
                 } else {
                     console.error('imagesLoaded or isotope plugin not available');
