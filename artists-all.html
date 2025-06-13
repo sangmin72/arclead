@@ -117,6 +117,10 @@
     <!-- Responsive CSS -->
     <link href="css/responsive.css" rel="stylesheet">
 
+    <!-- Font : Pretendard CSS -->
+    <link rel="stylesheet" href="css/pretendard.css">
+    <link rel="stylesheet" href="css/pretendard-subset.css">
+
     <script type="text/javascript">
         function getTime() {
             var d = new Date(); // 현재 날짜와 시간
@@ -161,7 +165,7 @@
     </div>
 
     <!-- Header Area Start -->
-    <header class="header-area bg-img" style="background-color: black;">
+    <header class="header-area bg-img" style="background-image: url(img/bg-img/14.jpg);">
         <div class="container-fluid h-100">
             <div class="row h-100 align-items-center">
                 <div class="col-12 h-100">
@@ -170,7 +174,7 @@
                             <!-- Logo Area  -->
                             <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
                             <!-- Current Time -->
-                            <div id="current-time"></div>
+                            <div id="current-time" style="color: white; font-size: 14px; margin: 0 20px;"></div>
 
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
 
@@ -194,7 +198,17 @@
                                         <a class="nav-link" href="audition.html">Auditon</a>
                                     </li>
                                 </ul>
-
+                                <!-- Search Form -->
+                                <div class="header-search-form ml-auto">
+                                    <form action="#">
+                                        <input type="search" class="form-control" placeholder="Input your keyword then press enter..." id="search" name="search">
+                                        <input class="d-none" type="submit" value="submit">
+                                    </form>
+                                </div>
+                                <!-- Search btn -->
+                                <div id="searchbtn">
+                                    <img src="img/core-img/search.png" alt="">
+                                </div>
                             </div>
                         </nav>
                     </div>
@@ -204,21 +218,86 @@
     </header>
     <!-- Header Area End -->
 
-    <section class="elements-area section_padding_50 mt-50">
-        <div class="portfolio-menu2">
-            <a class="btn" href="artists-all.html">ALL</a>
+    <!-- Social Sidebar Area Start -->
+    <div class="social-sidebar-area">
+        <!-- Social Area -->
+        <div class="social-info-area">
+            <a href="#" data-toggle="tooltip" data-placement="right" title="YouTube"><i class="fa fa-facebook" aria-hidden="true"></i> <span>YouTube</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Naver Post"><i class="fa fa-twitter" aria-hidden="true"></i> <span>Naver Post</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Naver TV"><i class="fa fa-pinterest" aria-hidden="true"></i> <span>Naver TV</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Instagram"><i class="fa fa-behance" aria-hidden="true"></i> <span>Instagram</span></a>
         </div>
+        <!-- Message Box -->
+        <div class="message-box">
+            <a href="#" data-toggle="modal" data-target=".contact-modal-lg"><img src="/assets/envelope.png" alt=""></a>
+        </div>
+    </div>
+    <!-- Social Sidebar Area End -->
+
+    <section class="elements-area section_padding_100 mt-100">
         <div class="container">
-            <div class="artist-grid" id="artistsGrid">
-                <!-- Artists will be loaded here dynamically -->
-                <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
-                    <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-                    <p>아티스트 정보를 불러오는 중...</p>
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <div class="portfolio-menu2">
+                        <a class="btn" href="artists-all.html">ALL</a>
+                    </div>
+                    <div class="artist-grid" id="artistsGrid">
+                        <!-- Artists will be loaded here dynamically -->
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                            <p>아티스트 정보를 불러오는 중...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
     <!-- ***** Elements Area End ***** -->
+
+    <!-- ***** Contact Area Start ***** -->
+    <div class="contact-popup-form" id="contact-modal-lg">
+        <div class="modal fade contact-modal-lg" tabindex="-1" role="dialog" aria-labelledby="contact-modal-lg" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="contact-heading-text text-center mb-30">
+                                    <span></span>
+                                    <h2>Please get in touch</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Contact Form Area -->
+                    <div class="contact-form-area">
+                        <div class="container-fluid">
+                            <form action="/api/contact" method="post">
+                                <div class="row">
+                                    <div class="col-12 col-md-4">
+                                        <input type="text" class="form-control" name="name" id="name" placeholder="Your Name">
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <input type="email" class="form-control" name="email" id="email" placeholder="Your Email">
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject">
+                                    </div>
+                                    <div class="col-12">
+                                        <textarea name="message" class="form-control" id="message" cols="30" rows="10" placeholder="Message"></textarea>
+                                    </div>
+                                    <div class="col-12 text-center">
+                                        <button type="submit" class="btn studio-btn mt-3"><img src="/assets/logo-icon.png" alt=""> Send</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Contact Area End ***** -->
 
     <!-- Footer Area Start -->
     <footer class="footer-area">
