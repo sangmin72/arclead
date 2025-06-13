@@ -37,32 +37,71 @@
         }
 
         .artist-info {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
             margin: 15px 15px 0 15px;
-            padding: 8px 12px;
+            padding: 12px 16px;
             align-self: flex-start;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .artist-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            pointer-events: none;
+        }
+
+        .artist-info::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #f5576c);
+            border-radius: 14px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .artist-item:hover .artist-info::after {
+            opacity: 1;
         }
         
         .artist-tag-name {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            line-height: 1.3;
+            line-height: 1.2;
+            position: relative;
+            z-index: 1;
         }
 
         .artist-name-ko {
-            font-size: 1.0em;
+            font-size: 1.1em;
             font-weight: 700;
-            color: #343a40;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
         }
 
         .artist-name-en {
-            font-size: 0.8em;
+            font-size: 0.85em;
             font-weight: 500;
-            color: #6c757d;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
         }
 
         @media (max-width: 768px) {
@@ -78,15 +117,16 @@
             
             .artist-info {
                 margin: 10px 10px 0 10px;
-                padding: 6px 10px;
+                padding: 10px 14px;
+                border-radius: 10px;
             }
 
             .artist-name-ko {
-                font-size: 0.9em;
+                font-size: 1.0em;
             }
 
             .artist-name-en {
-                font-size: 0.7em;
+                font-size: 0.75em;
             }
         }
 
@@ -116,10 +156,6 @@
 
     <!-- Responsive CSS -->
     <link href="css/responsive.css" rel="stylesheet">
-
-    <!-- Font : Pretendard CSS -->
-    <link rel="stylesheet" href="css/pretendard.css">
-    <link rel="stylesheet" href="css/pretendard-subset.css">
 
     <script type="text/javascript">
         function getTime() {
@@ -165,7 +201,7 @@
     </div>
 
     <!-- Header Area Start -->
-    <header class="header-area bg-img" style="background-image: url(img/bg-img/14.jpg);">
+    <header class="header-area bg-img" style="background-color: black;">
         <div class="container-fluid h-100">
             <div class="row h-100 align-items-center">
                 <div class="col-12 h-100">
@@ -174,7 +210,7 @@
                             <!-- Logo Area  -->
                             <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
                             <!-- Current Time -->
-                            <div id="current-time" style="color: white; font-size: 14px; margin: 0 20px;"></div>
+                            <div id="current-time"></div>
 
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
 
@@ -198,17 +234,7 @@
                                         <a class="nav-link" href="audition.html">Auditon</a>
                                     </li>
                                 </ul>
-                                <!-- Search Form -->
-                                <div class="header-search-form ml-auto">
-                                    <form action="#">
-                                        <input type="search" class="form-control" placeholder="Input your keyword then press enter..." id="search" name="search">
-                                        <input class="d-none" type="submit" value="submit">
-                                    </form>
-                                </div>
-                                <!-- Search btn -->
-                                <div id="searchbtn">
-                                    <img src="img/core-img/search.png" alt="">
-                                </div>
+
                             </div>
                         </nav>
                     </div>
@@ -218,86 +244,21 @@
     </header>
     <!-- Header Area End -->
 
-    <!-- Social Sidebar Area Start -->
-    <div class="social-sidebar-area">
-        <!-- Social Area -->
-        <div class="social-info-area">
-            <a href="#" data-toggle="tooltip" data-placement="right" title="YouTube"><i class="fa fa-facebook" aria-hidden="true"></i> <span>YouTube</span></a>
-            <a href="#" data-toggle="tooltip" data-placement="right" title="Naver Post"><i class="fa fa-twitter" aria-hidden="true"></i> <span>Naver Post</span></a>
-            <a href="#" data-toggle="tooltip" data-placement="right" title="Naver TV"><i class="fa fa-pinterest" aria-hidden="true"></i> <span>Naver TV</span></a>
-            <a href="#" data-toggle="tooltip" data-placement="right" title="Instagram"><i class="fa fa-behance" aria-hidden="true"></i> <span>Instagram</span></a>
+    <section class="elements-area section_padding_50 mt-50">
+        <div class="portfolio-menu2">
+            <a class="btn" href="artists-all.html">ALL</a>
         </div>
-        <!-- Message Box -->
-        <div class="message-box">
-            <a href="#" data-toggle="modal" data-target=".contact-modal-lg"><img src="/assets/envelope.png" alt=""></a>
-        </div>
-    </div>
-    <!-- Social Sidebar Area End -->
-
-    <section class="elements-area section_padding_100 mt-100">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-10">
-                    <div class="portfolio-menu2">
-                        <a class="btn" href="artists-all.html">ALL</a>
-                    </div>
-                    <div class="artist-grid" id="artistsGrid">
-                        <!-- Artists will be loaded here dynamically -->
-                        <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
-                            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-                            <p>아티스트 정보를 불러오는 중...</p>
-                        </div>
-                    </div>
+            <div class="artist-grid" id="artistsGrid">
+                <!-- Artists will be loaded here dynamically -->
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                    <p>아티스트 정보를 불러오는 중...</p>
                 </div>
             </div>
         </div>
     </section>
     <!-- ***** Elements Area End ***** -->
-
-    <!-- ***** Contact Area Start ***** -->
-    <div class="contact-popup-form" id="contact-modal-lg">
-        <div class="modal fade contact-modal-lg" tabindex="-1" role="dialog" aria-labelledby="contact-modal-lg" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="contact-heading-text text-center mb-30">
-                                    <span></span>
-                                    <h2>Please get in touch</h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Contact Form Area -->
-                    <div class="contact-form-area">
-                        <div class="container-fluid">
-                            <form action="/api/contact" method="post">
-                                <div class="row">
-                                    <div class="col-12 col-md-4">
-                                        <input type="text" class="form-control" name="name" id="name" placeholder="Your Name">
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <input type="email" class="form-control" name="email" id="email" placeholder="Your Email">
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject">
-                                    </div>
-                                    <div class="col-12">
-                                        <textarea name="message" class="form-control" id="message" cols="30" rows="10" placeholder="Message"></textarea>
-                                    </div>
-                                    <div class="col-12 text-center">
-                                        <button type="submit" class="btn studio-btn mt-3"><img src="/assets/logo-icon.png" alt=""> Send</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- ***** Contact Area End ***** -->
 
     <!-- Footer Area Start -->
     <footer class="footer-area">
