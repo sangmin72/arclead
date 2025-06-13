@@ -37,11 +37,8 @@
         }
 
         .artist-info {
-            display: flex;
-            align-items: center;
             background: #f8f9fa;
             border: 1px solid #dee2e6;
-            border-left: 5px solid #667eea;
             border-radius: 8px;
             margin: 15px 15px 0 15px;
             padding: 8px 12px;
@@ -49,14 +46,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         
-        .artist-tag-icon {
-            width: 30px;
-            height: 30px;
-            margin-right: 12px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
         .artist-tag-name {
             display: flex;
             flex-direction: column;
@@ -64,16 +53,16 @@
             line-height: 1.3;
         }
 
-        .artist-name-en {
-            font-size: 0.8em;
-            font-weight: 500;
-            color: #6c757d;
-        }
-
         .artist-name-ko {
             font-size: 1.0em;
             font-weight: 700;
             color: #343a40;
+        }
+
+        .artist-name-en {
+            font-size: 0.8em;
+            font-weight: 500;
+            color: #6c757d;
         }
 
         @media (max-width: 768px) {
@@ -92,12 +81,12 @@
                 padding: 6px 10px;
             }
 
-            .artist-name-en {
-                font-size: 0.7em;
-            }
-
             .artist-name-ko {
                 font-size: 0.9em;
+            }
+
+            .artist-name-en {
+                font-size: 0.7em;
             }
         }
 
@@ -316,10 +305,9 @@
                 return `
                     <div class="artist-item" onclick="goToArtist('${artist.id}')">
                         <div class="artist-info">
-                            <img src="/assets/logo-icon.png" alt="icon" class="artist-tag-icon">
                             <div class="artist-tag-name">
-                                <span class="artist-name-en">${artist.nameEn || ''}</span>
                                 <span class="artist-name-ko">${artist.name}</span>
+                                <span class="artist-name-en">${artist.nameEn || ''}</span>
                             </div>
                         </div>
                         <img src="${imageUrl}" 
