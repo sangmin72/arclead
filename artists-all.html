@@ -15,12 +15,12 @@
         }
 
         .artist-item {
+            position: relative;
             background: #fff;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
-            text-align: center;
         }
 
         .artist-item:hover {
@@ -40,13 +40,21 @@
         }
 
         .artist-info {
-            padding: 20px;
+            position: absolute;
+            top: 20px;
+            left: 0;
+            z-index: 1;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 8px 16px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            color: white;
+            transition: all 0.3s ease;
         }
 
         .artist-info p {
             margin: 0;
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: bold;
             color: white;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
