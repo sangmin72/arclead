@@ -20,6 +20,8 @@
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
 
         .artist-item:hover {
@@ -35,34 +37,43 @@
         }
 
         .artist-info {
-            position: relative;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 10px 15px 10px 35px;
-            margin: 15px;
-            display: inline-block;
-            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 5px solid #667eea;
+            border-radius: 8px;
+            margin: 15px 15px 0 15px;
+            padding: 8px 12px;
             align-self: flex-start;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         
-        .artist-info::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 12px;
-            transform: translateY(-50%);
-            width: 12px;
-            height: 12px;
-            background: #fff;
+        .artist-tag-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 12px;
             border-radius: 50%;
-            border: 2px solid #ddd;
+            object-fit: cover;
         }
 
-        .artist-info p {
-            margin: 0;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        .artist-tag-name {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.3;
+        }
+
+        .artist-name-en {
+            font-size: 0.8em;
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        .artist-name-ko {
+            font-size: 1.0em;
+            font-weight: 700;
+            color: #343a40;
         }
 
         @media (max-width: 768px) {
@@ -77,12 +88,16 @@
             }
             
             .artist-info {
-                margin: 10px;
-                padding: 8px 15px 8px 30px;
+                margin: 10px 10px 0 10px;
+                padding: 6px 10px;
             }
-            
-            .artist-info p {
-                font-size: 1em;
+
+            .artist-name-en {
+                font-size: 0.7em;
+            }
+
+            .artist-name-ko {
+                font-size: 0.9em;
             }
         }
 
@@ -301,7 +316,11 @@
                 return `
                     <div class="artist-item" onclick="goToArtist('${artist.id}')">
                         <div class="artist-info">
-                            <p>${artist.name}</p>
+                            <img src="/assets/logo-icon.png" alt="icon" class="artist-tag-icon">
+                            <div class="artist-tag-name">
+                                <span class="artist-name-en">${artist.nameEn || ''}</span>
+                                <span class="artist-name-ko">${artist.name}</span>
+                            </div>
                         </div>
                         <img src="${imageUrl}" 
                              alt="${artist.name}" 
