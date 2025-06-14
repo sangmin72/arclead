@@ -15,6 +15,15 @@
         position: relative;
         min-height: 100vh;
         overflow: hidden;
+        display: flex;
+        align-items: center;
+    }
+
+    #imageCarousel,
+    #imageCarousel .carousel-inner,
+    #imageCarousel .carousel-item {
+        height: 100%;
+        width: 100%;
     }
 
     .actor-photo {
@@ -41,6 +50,7 @@
             transparent 50%,
             rgba(0, 0, 0, 0.2) 100%
         );
+        pointer-events: none;
     }
 
     /* 오른쪽 정보 영역 */
