@@ -1,111 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
 <style>
+    /* New styles from actor_profile_page.html */
+    .profile-container {
+        display: flex;
+        min-height: 100vh;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* 왼쪽 사진 영역 */
+    .photo-section {
+        flex: 1;
+        position: relative;
+        min-height: 100vh;
+        overflow: hidden;
+    }
+
+    .actor-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: grayscale(100%) contrast(1.1);
+        transition: filter 0.3s ease;
+    }
+
+    .actor-photo:hover {
+        filter: grayscale(70%) contrast(1.2);
+    }
+
+    .photo-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+            45deg,
+            rgba(0, 0, 0, 0.3) 0%,
+            transparent 50%,
+            rgba(0, 0, 0, 0.2) 100%
+        );
+    }
+
+    /* 오른쪽 정보 영역 */
+    .info-section {
+        flex: 1;
+        padding: 60px 50px;
+        background: rgba(26, 26, 26, 0.95);
+        backdrop-filter: blur(10px);
+        position: relative;
+        color: #ffffff;
+        overflow-y: auto;
+    }
+
+    .actor-name {
+        font-size: 3.5rem;
+        font-weight: 300;
+        letter-spacing: 2px;
+        margin-bottom: 50px;
+        color: #ffffff;
+        position: relative;
+    }
+
+    .actor-name::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, #ffffff, transparent);
+    }
+
+    .profile-section {
+        margin-bottom: 40px;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 25px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        letter-spacing: 1px;
+    }
+
+    .work-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .work-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .work-item:hover {
+        padding-left: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 5px;
+    }
+
+    .work-item:last-child {
+        border-bottom: none;
+    }
+
+    .work-title {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: #ffffff;
+        flex: 1;
+    }
+
+    .work-year {
+        font-size: 0.9rem;
+        color: #aaaaaa;
+        padding: 4px 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    /* 반응형 디자인 */
+    @media (max-width: 1024px) {
+        .profile-container {
+            flex-direction: column;
+        }
+
+        .photo-section {
+            min-height: 50vh;
+            flex: none;
+        }
+
+        .info-section {
+            flex: none;
+            padding: 40px 30px;
+        }
+
+        .actor-name {
+            font-size: 2.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .info-section {
+            padding: 30px 20px;
+        }
+
+        .actor-name {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+        }
+
+        .work-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .work-year {
+            align-self: flex-end;
+        }
+    }
+    /* 스크롤바 스타일링 */
+    .info-section::-webkit-scrollbar {
+        width: 6px;
+    }
+    .info-section::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    .info-section::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 3px;
+    }
+    .info-section::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+
+    /* Original styles from artist.html */
     html, body {
         height: 100%;
         overflow: auto !important;
         -webkit-overflow-scrolling: touch !important;
-        background-color: #1a1a1a;
-        color: #f0f0f0;
     }
 
-    .artist-profile-container {
-        display: flex;
-        max-width: 1400px;
-        margin: 50px auto;
-        padding: 0 40px;
-        gap: 50px;
-    }
-
-    .artist-image-section {
-        flex: 1;
-        max-width: 600px;
-    }
-
-    .carousel-item img {
-        width: 100%;
-        height: 80vh;
-        object-fit: contain; /* Prevent cropping */
-        border-radius: 10px;
-        cursor: pointer;
-    }
-
-    .artist-info-section {
-        flex: 1;
-        padding-top: 20px;
-    }
-
-    .artist-header {
-        margin-bottom: 30px;
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .artist-name-container h1 {
-        font-size: 3em;
-        font-weight: bold;
-        color: #ffffff;
-        margin: 0;
-        line-height: 1.2;
-    }
-
-    .artist-name-en {
-        font-size: 1.5em;
-        font-weight: 300;
-        color: #aaa;
-    }
-
-    .artist-social-links a {
-        color: #fff;
-        font-size: 2em;
-        transition: color 0.3s ease;
-    }
-
-    .artist-social-links a:hover {
-        color: #667eea;
-    }
-
-    .filmography-section {
-        background: #252525;
-        padding: 30px;
-        border-radius: 15px;
-    }
-
-    .filmography-category h3 {
-        font-size: 1.5em;
-        font-weight: bold;
-        color: #667eea;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #444;
-        margin-bottom: 20px;
-    }
-
-    .filmography-list-item {
-        margin-bottom: 15px;
-    }
-
-    .filmography-year {
-        font-size: 1.1em;
-        font-weight: bold;
-        color: #ccc;
-        margin-bottom: 5px;
-    }
-
-    .filmography-works {
-        color: #aaa;
-        padding-left: 10px;
-        line-height: 1.7;
-    }
-
-    .loading, .error-message {
+    .loading {
         text-align: center;
-        padding: 80px 20px;
-        color: #fff;
+        padding: 60px 20px;
     }
 
     .spinner {
-        border: 4px solid #444;
+        border: 4px solid #f3f3f3;
         border-top: 4px solid #667eea;
         border-radius: 50%;
         width: 50px;
@@ -125,32 +222,9 @@
         color: #e74c3c;
     }
 
-    @media (max-width: 992px) {
-        .artist-profile-container {
-            flex-direction: column;
-            padding: 0 20px;
-            margin-top: 20px;
-        }
-        .artist-image-section {
-            max-width: 100%;
-        }
-        .carousel-item img {
-            height: 60vh;
-        }
-        .artist-name-container h1 {
-            font-size: 2.5em;
-        }
-    }
-
     @media (max-width: 768px) {
         .carousel-item img {
-            height: 50vh;
-        }
-        .artist-name-container h1 {
-            font-size: 2em;
-        }
-        .artist-social-links a {
-            font-size: 1.8em;
+            height: 300px;
         }
     }
 </style>
@@ -235,27 +309,10 @@
             // Update page title
             document.title = `Arclead Entertainment : ${artist.name}`;
             
-            // Artist Name
-            const artistNameContainer = document.getElementById('artistNameContainer');
-            artistNameContainer.innerHTML = `
-                <h1>
-                    ${artist.name}
-                    ${artist.nameEn ? `<span class="artist-name-en">${artist.nameEn}</span>` : ''}
-                </h1>
-            `;
-
-            // Social Links
-            const socialLinksContainer = document.getElementById('socialLinks');
-            socialLinksContainer.innerHTML = '';
-            if (artist.instagram) {
-                socialLinksContainer.innerHTML = `
-                    <a href="https://instagram.com/${artist.instagram}" target="_blank" title="Instagram">
-                        <i class="fa fa-instagram"></i>
-                    </a>
-                `;
-            }
-
-            // Carousel Images
+            // Update artist name
+            document.getElementById('artistName').textContent = `${artist.name} ${artist.nameEn || ''}`;
+            
+            // Update carousel images
             const carouselInner = document.getElementById('carouselInner');
             carouselInner.innerHTML = '';
             
@@ -268,8 +325,9 @@
                     carouselInner.innerHTML += `
                         <div class="carousel-item ${isActive}">
                             <img src="${imageUrl}" 
-                                 class="d-block w-100" 
+                                 class="actor-photo" 
                                  alt="${artist.name} ${index + 1}" 
+                                 style="cursor: pointer;" 
                                  onclick="openGallery('${artist.id}')"
                                  onerror="console.error('Failed to load artist image: ${imageUrl}'); this.src='/assets/artists/default.png'">
                         </div>
@@ -279,48 +337,61 @@
                 console.log(`No images found for artist ${artist.name}`);
                 carouselInner.innerHTML = `
                     <div class="carousel-item active">
-                        <img src="/assets/artists/default.png" class="d-block w-100" alt="No Image">
+                        <img src="/assets/artists/default.png" class="actor-photo" alt="No Image">
                     </div>
                 `;
             }
             
-            // Filmography
-            const filmographyContainer = document.getElementById('filmographyContainer');
-            filmographyContainer.innerHTML = '';
+            // Update filmography
+            const contentArea = document.getElementById('contentArea');
+            let filmographyHtml = '';
             
-            const filmographyOrder = ['movies', 'dramas', 'commercials'];
-            const categoryKorean = {
-                'movies': 'Movie',
-                'dramas': 'Drama', 
-                'commercials': 'Commercial'
-            };
-
-            let hasFilmography = false;
-
             if (artist.filmography) {
-                filmographyOrder.forEach(category => {
+                ['movies', 'dramas', 'commercials'].forEach(category => {
+                    const categoryName = {
+                        'movies': '영화',
+                        'dramas': '드라마', 
+                        'commercials': '광고'
+                    }[category];
+                    
                     const works = artist.filmography[category];
                     if (works && Object.keys(works).length > 0) {
-                        hasFilmography = true;
-                        filmographyContainer.innerHTML += `
-                            <div class="filmography-category">
-                                <h3>${categoryKorean[category]}</h3>
-                                <div class="filmography-list">
-                                    ${Object.entries(works).sort(([a], [b]) => b.localeCompare(a)).map(([year, workList]) => `
-                                        <div class="filmography-list-item">
-                                            <div class="filmography-year">${year}</div>
-                                            <div class="filmography-works">${Array.isArray(workList) ? workList.join('<br>') : workList}</div>
-                                        </div>
-                                    `).join('')}
+                        filmographyHtml += `
+                            <div class="profile-section">
+                                <h2 class="section-title">${categoryName}</h2>
+                                <ul class="work-list">
+                        `;
+                        
+                        const flatWorkList = [];
+                        Object.entries(works).forEach(([year, workList]) => {
+                            (Array.isArray(workList) ? workList : [workList]).forEach(workTitle => {
+                                flatWorkList.push({ title: workTitle, year: year });
+                            });
+                        });
+                        
+                        flatWorkList.sort((a, b) => b.year.localeCompare(a.year));
+                        
+                        filmographyHtml += flatWorkList.map(work => `
+                            <li class="work-item">
+                                <div>
+                                    <div class="work-title">${work.title}</div>
                                 </div>
+                                <span class="work-year">${work.year}</span>
+                            </li>
+                        `).join('');
+
+                        filmographyHtml += `
+                                </ul>
                             </div>
                         `;
                     }
                 });
             }
             
-            if (!hasFilmography) {
-                filmographyContainer.innerHTML = '<p style="text-align: center; color: #999;">아직 등록된 필모그래피가 없습니다.</p>';
+            contentArea.innerHTML = filmographyHtml;
+
+            if (contentArea.innerHTML.trim() === '') {
+                contentArea.innerHTML = '<p style="text-align: center; color: #ccc;">아직 등록된 필모그래피가 없습니다.</p>';
             }
         }
 
@@ -431,43 +502,31 @@
     </div>
 
     <!-- Artist Content Area Start -->
-    <section id="artistContent" class="elements-area section_padding_50 mt-50" style="display: none;">
-        <div class="container-fluid">
-            <div class="portfolio-menu2">
-                <a class="btn" href="artists-all.html">ALL</a>
-            </div>
-        </div>
-
-        <div class="artist-profile-container">
-            <!-- Left Section: Image -->
-            <div class="artist-image-section">
+    <section id="artistContent" class="elements-area section_padding_50" style="display: none; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);">
+        <div class="profile-container">
+            <!-- 왼쪽 사진 영역 -->
+            <div class="photo-section">
                 <div id="imageCarousel" class="carousel slide" data-ride="carousel">
                     <div class="carousel-inner" id="carouselInner">
-                        <!-- Images will be loaded here -->
+                        <!-- Images will be loaded here dynamically -->
                     </div>
-                    <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
+                    <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev" style="z-index: 10;">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="sr-only">Previous</span>
                     </a>
-                    <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
+                    <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next" style="z-index: 10;">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="sr-only">Next</span>
                     </a>
                 </div>
+                <div class="photo-overlay"></div>
             </div>
 
-            <!-- Right Section: Info -->
-            <div class="artist-info-section">
-                <div class="artist-header">
-                    <div id="artistNameContainer" class="artist-name-container">
-                        <!-- Name will be loaded here -->
-                    </div>
-                    <div id="socialLinks" class="artist-social-links">
-                        <!-- Social links will be loaded here -->
-                    </div>
-                </div>
-                <div id="filmographyContainer" class="filmography-section">
-                    <!-- Filmography will be loaded here -->
+            <!-- 오른쪽 정보 영역 -->
+            <div class="info-section">
+                <h1 class="actor-name" id="artistName"></h1>
+                <div id="contentArea">
+                    <!-- Filmography will be loaded here dynamically -->
                 </div>
             </div>
         </div>
