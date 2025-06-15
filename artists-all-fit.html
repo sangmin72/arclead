@@ -42,12 +42,14 @@
         .artist-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
+            row-gap: 10vh;
+            column-gap: 10px;
             padding: 0;
             max-width: 100%;
             margin: 0 auto;
-            height: calc(100vh - 180px);
+            height: calc(100vh - 180px - 10vh);
             overflow: hidden;
+            padding-bottom: 10vh;
         }
 
         .artist-item {
@@ -58,7 +60,7 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 0;
             height: 100%;
         }
 
@@ -69,12 +71,12 @@
 
         .artist-item img {
             width: 100%;
-            height: calc(100% - 20px);
+            height: 100%;
             object-fit: cover;
             border-radius: 8px;
             filter: grayscale(100%) contrast(1.1);
             transition: all 0.4s ease;
-            margin-top: 20px;
+            margin-top: 0;
         }
 
         .artist-item:hover img {
@@ -89,21 +91,21 @@
             left: 15px;
             background: #ffffff;
             color: #1a1a1a;
-            padding: 4px 8px;
+            padding: 0.3vh 0.6vh;
             border-radius: 4px;
-            font-size: 0.7rem;
+            font-size: calc(0.5rem + 0.3vh);
             font-weight: 500;
             border: 2px solid #333333;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             transition: all 0.3s ease;
             z-index: 2;
-            min-width: 60px;
+            min-width: calc(3rem + 2vh);
             text-align: center;
             white-space: nowrap;
         }
 
         .artist-item:hover .artist-info {
-            transform: translateY(calc(-100% - 3px));
+            transform: translateY(calc(-100% - 2px));
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
         }
         
@@ -115,7 +117,7 @@
         }
 
         .artist-name-ko {
-            font-size: 0.9em;
+            font-size: 1em;
             font-weight: 700;
             color: #1a1a1a;
             letter-spacing: 0.3px;
@@ -123,7 +125,7 @@
         }
 
         .artist-name-en {
-            font-size: 0.65em;
+            font-size: 0.7em;
             font-weight: 500;
             color: #666666;
             letter-spacing: 0.5px;
@@ -159,7 +161,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            padding-bottom: 10px;
+            padding-bottom: 0;
         }
 
         .portfolio-menu2 {
@@ -453,10 +455,11 @@
                 grid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
                 grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
                 
-                // Calculate available height and adjust grid
-                const availableHeight = window.innerHeight - 180; // Account for header and title
-                const rowHeight = (availableHeight - (rows - 1) * 10) / rows; // 10px gap between rows
-                grid.style.height = `${availableHeight}px`;
+                // Calculate available height considering 10vh gaps
+                const availableHeight = window.innerHeight - 180 - (window.innerHeight * 0.1); // 10vh bottom margin
+                const totalRowGaps = (rows - 1) * (window.innerHeight * 0.1); // 10vh between rows
+                const contentHeight = availableHeight - totalRowGaps;
+                grid.style.height = `${contentHeight}px`;
             }
 
             grid.innerHTML = artists.map(artist => {
