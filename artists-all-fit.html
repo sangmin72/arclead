@@ -222,34 +222,38 @@
             html, body {
                 overflow: hidden !important;
             }
-            body {
-                display: flex;
-                flex-direction: column;
-                height: 100vh;
-            }
+
             .elements-area {
-                flex: 1;
+                height: 100vh;
                 display: flex;
                 flex-direction: column;
-                padding-top: 120px;
+                padding-top: 120px; /* Adjust for header */
                 padding-bottom: 20px;
-                min-height: 0;
             }
+
             .elements-area > .container {
-                flex: 1;
+                flex-grow: 1;
                 display: flex;
                 flex-direction: column;
+                max-width: 100%;
+                width: 100%;
+                padding-left: 30px;
+                padding-right: 30px;
             }
+
             .artist-grid {
                 flex-grow: 1;
                 gap: 20px;
-                align-content: center;
+                padding: 0;
             }
+
             .artist-item {
+                aspect-ratio: unset;
                 margin-top: 0;
             }
-            .footer-area {
-                flex-shrink: 0;
+
+            .artist-item img {
+                object-fit: contain;
             }
         }
     </style>
@@ -444,14 +448,6 @@
                 return;
             }
 
-            if (window.matchMedia("(min-width: 1025px)").matches) {
-                const count = artists.length;
-                const rows = Math.ceil(Math.sqrt(count));
-                const cols = Math.ceil(count / rows);
-                grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-                grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-            }
-
             grid.innerHTML = artists.map(artist => {
                 // Get representative image for artists page, fallback to first image, then default
                 let imageUrl = '/assets/logo-icon.png'; // Use logo as default instead
@@ -482,6 +478,31 @@
                     </div>
                 `;
             }).join('');
+
+            function adjustGrid() {
+                if (!grid) return;
+                const count = artists.length;
+                if(count === 0) return;
+
+                const gridContainer = grid.parentElement;
+                const screenRatio = gridContainer.offsetWidth / gridContainer.offsetHeight;
+                
+                let cols = Math.ceil(Math.sqrt(count * screenRatio));
+                if (cols > count) cols = count;
+                if (cols === 0) cols = 1;
+                
+                let rows = Math.ceil(count / cols);
+
+                grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+            }
+
+            if (window.matchMedia("(min-width: 1025px)").matches) {
+                setTimeout(() => {
+                    adjustGrid();
+                    window.addEventListener('resize', adjustGrid);
+                }, 100);
+            }
         }
 
         // Render error message
