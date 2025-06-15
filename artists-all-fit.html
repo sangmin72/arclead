@@ -42,11 +42,11 @@
         .artist-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            gap: 10px;
             padding: 0;
             max-width: 100%;
             margin: 0 auto;
-            height: calc(100vh - 190px);
+            height: calc(100vh - 180px);
             overflow: hidden;
         }
 
@@ -59,7 +59,7 @@
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer;
             margin-top: 20px;
-            max-height: calc((100vh - 190px) / 3 - 15px);
+            height: 100%;
         }
 
         .artist-item:hover {
@@ -69,11 +69,12 @@
 
         .artist-item img {
             width: 100%;
-            height: 100%;
+            height: calc(100% - 20px);
             object-fit: cover;
             border-radius: 8px;
             filter: grayscale(100%) contrast(1.1);
             transition: all 0.4s ease;
+            margin-top: 20px;
         }
 
         .artist-item:hover img {
@@ -158,7 +159,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            padding-bottom: 15px;
+            padding-bottom: 10px;
         }
 
         .portfolio-menu2 {
@@ -427,7 +428,7 @@
                 const artistCount = artists.length;
                 let columns, rows;
                 
-                // Calculate optimal grid dimensions
+                // Calculate optimal grid dimensions to fill screen
                 if (artistCount <= 4) {
                     columns = artistCount;
                     rows = 1;
@@ -440,14 +441,22 @@
                 } else if (artistCount <= 16) {
                     columns = 4;
                     rows = 4;
-                } else {
+                } else if (artistCount <= 20) {
                     columns = 5;
-                    rows = Math.ceil(artistCount / 5);
+                    rows = 4;
+                } else {
+                    columns = 6;
+                    rows = Math.ceil(artistCount / 6);
                 }
                 
-                // Adjust grid template
+                // Adjust grid template to fill available space
                 grid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
                 grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+                
+                // Calculate available height and adjust grid
+                const availableHeight = window.innerHeight - 180; // Account for header and title
+                const rowHeight = (availableHeight - (rows - 1) * 10) / rows; // 10px gap between rows
+                grid.style.height = `${availableHeight}px`;
             }
 
             grid.innerHTML = artists.map(artist => {
