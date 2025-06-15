@@ -1,0 +1,380 @@
+/* Artists All Fit Page Styles */
+/* Modern responsive design with CSS Grid and clamp-based scaling */
+
+/* ===== BASE STYLES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #ffffff;
+    overflow-x: hidden;
+}
+
+/* ===== DYNAMIC CONTAINER SYSTEM ===== */
+.dynamic-container {
+    /* Responsive width with minimum and maximum constraints */
+    width: clamp(320px, 95vw, 1400px);
+    margin: 0 auto;
+    padding: clamp(10px, 2vw, 30px);
+    
+    /* Dynamic height that adapts to viewport */
+    min-height: calc(100vh - 180px);
+    
+    /* Container scaling for proportional reduction */
+    transform-origin: center top;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Scale container based on viewport size while maintaining aspect ratio */
+@media (max-width: 1200px) {
+    .dynamic-container {
+        transform: scale(clamp(0.7, 1vw, 1));
+    }
+}
+
+@media (max-width: 768px) {
+    .dynamic-container {
+        transform: scale(1); /* Reset scaling for mobile */
+        width: 100%;
+        padding: clamp(5px, 3vw, 20px);
+    }
+}
+
+/* ===== HEADER ADJUSTMENTS ===== */
+.header-area {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: transparent !important;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.header-area:hover {
+    background: rgba(0, 0, 0, 0.1) !important;
+}
+
+.navbar-nav .nav-link {
+    color: white !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #fff !important;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
+    transform: translateY(-1px);
+}
+
+#current-time {
+    color: white !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    font-weight: 500;
+    font-size: clamp(12px, 1.2vw, 16px);
+    margin: 0 clamp(10px, 2vw, 30px);
+}
+
+/* ===== MAIN CONTENT AREA ===== */
+.elements-area {
+    padding-top: clamp(120px, 15vh, 180px);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== PAGE TITLE ===== */
+.page-title {
+    text-align: center;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 300;
+    letter-spacing: clamp(1px, 0.3vw, 4px);
+    margin-bottom: clamp(20px, 3vh, 40px);
+    color: #ffffff;
+    text-transform: uppercase;
+    position: relative;
+}
+
+.page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: clamp(40px, 8vw, 80px);
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffffff, transparent);
+}
+
+/* ===== PORTFOLIO MENU ===== */
+.portfolio-menu2 {
+    margin-bottom: clamp(15px, 2vh, 25px);
+    text-align: center;
+}
+
+.portfolio-menu2 .btn {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
+    color: white;
+    padding: clamp(8px, 1vh, 12px) clamp(16px, 2vw, 24px);
+    border-radius: 25px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.portfolio-menu2 .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* ===== DYNAMIC ARTIST GRID ===== */
+.artist-grid {
+    /* CSS Grid with dynamic columns and aspect ratio preservation */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(150px, 20vw, 250px), 1fr));
+    gap: clamp(15px, 3vh, 30px);
+    
+    /* Auto-adjusting height based on content */
+    grid-auto-rows: minmax(200px, auto);
+    
+    /* Maintain aspect ratio across different screen sizes */
+    align-items: stretch;
+    justify-items: center;
+    
+    /* Container bounds */
+    width: 100%;
+    max-width: none;
+    
+    /* Padding for visual breathing room */
+    padding: clamp(10px, 2vh, 20px) 0;
+}
+
+/* Dynamic grid adjustments based on viewport */
+@media (min-width: 1400px) {
+    .artist-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+}
+
+/* Support for CSS custom properties in modern browsers */
+.artist-grid[style*="--grid-columns"] {
+    grid-template-columns: repeat(var(--grid-columns), 1fr) !important;
+}
+
+@media (max-width: 768px) {
+    .artist-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: clamp(10px, 2vh, 20px);
+        padding: clamp(5px, 1vh, 15px) 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .artist-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: clamp(8px, 1.5vh, 15px);
+    }
+}
+
+/* ===== ARTIST ITEM CARDS ===== */
+.artist-item {
+    /* Maintain consistent aspect ratio */
+    aspect-ratio: 3/4;
+    width: 100%;
+    max-width: 280px;
+    
+    position: relative;
+    overflow: visible;
+    border-radius: clamp(6px, 1vw, 12px);
+    box-shadow: 0 clamp(8px, 1.5vh, 15px) clamp(20px, 3vh, 35px) rgba(0, 0, 0, 0.5);
+    
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    
+    /* Ensure proper scaling */
+    transform-origin: center;
+}
+
+.artist-item:hover {
+    transform: translateY(clamp(-3px, -0.5vh, -8px)) scale(1.02);
+    box-shadow: 0 clamp(12px, 2vh, 20px) clamp(30px, 4vh, 45px) rgba(0, 0, 0, 0.7);
+}
+
+.artist-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: clamp(6px, 1vw, 12px);
+    filter: grayscale(100%) contrast(1.1);
+    transition: all 0.4s ease;
+}
+
+.artist-item:hover img {
+    filter: grayscale(80%) contrast(1.2);
+}
+
+/* ===== ARTIST INFO TAGS ===== */
+.artist-info {
+    position: absolute;
+    top: 0;
+    transform: translateY(-100%);
+    left: clamp(8px, 2vw, 20px);
+    
+    background: #ffffff;
+    color: #1a1a1a;
+    padding: clamp(4px, 0.8vh, 8px) clamp(8px, 1.2vw, 16px);
+    border-radius: clamp(3px, 0.5vw, 6px);
+    
+    font-size: clamp(0.6rem, 1.2vw, 0.9rem);
+    font-weight: 500;
+    
+    border: 2px solid #333333;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+    z-index: 2;
+    
+    min-width: clamp(60px, 8vw, 100px);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.artist-item:hover .artist-info {
+    transform: translateY(calc(-100% - 2px));
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.artist-tag-name {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.1;
+}
+
+.artist-name-ko {
+    font-size: 1em;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.3px;
+    margin-bottom: 1px;
+}
+
+.artist-name-en {
+    font-size: 0.7em;
+    font-weight: 500;
+    color: #666666;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* ===== OVERLAY EFFECTS ===== */
+.artist-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    height: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 0 0 clamp(6px, 1vw, 12px) clamp(6px, 1vw, 12px);
+}
+
+.artist-item:hover .artist-overlay {
+    opacity: 1;
+}
+
+/* ===== LOADING AND ERROR STATES ===== */
+.loading-container, .error-container {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: clamp(30px, 5vh, 60px);
+    color: #ffffff;
+}
+
+.loading-container p, .error-container p {
+    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+    margin-top: clamp(10px, 2vh, 20px);
+    opacity: 0.8;
+}
+
+.error-container h3 {
+    color: #e74c3c;
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
+    margin-bottom: clamp(10px, 1.5vh, 15px);
+}
+
+.retry-button {
+    margin-top: clamp(10px, 2vh, 20px);
+    padding: clamp(8px, 1.2vh, 15px) clamp(16px, 2.5vw, 30px);
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.retry-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* ===== ACCESSIBILITY AND PERFORMANCE ===== */
+@media (prefers-reduced-motion: reduce) {
+    .artist-item,
+    .artist-info,
+    .artist-overlay,
+    .dynamic-container {
+        transition: none;
+    }
+    
+    .artist-item:hover {
+        transform: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .artist-info {
+        border-width: 3px;
+        background: #ffffff;
+        color: #000000;
+    }
+    
+    .page-title::after {
+        background: #ffffff;
+    }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    .header-area,
+    .portfolio-menu2 {
+        display: none;
+    }
+    
+    .artist-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    
+    .artist-item {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+} 
