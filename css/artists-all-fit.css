@@ -13,7 +13,7 @@ html, body {
     font-family: 'Arial', sans-serif;
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
     color: #ffffff;
-    overflow-x: hidden;
+    overflow: hidden; /* 스크롤 완전 차단 */
 }
 
 /* ===== DYNAMIC CONTAINER SYSTEM ===== */
@@ -21,14 +21,19 @@ html, body {
     /* Responsive width with minimum and maximum constraints */
     width: clamp(320px, 95vw, 1400px);
     margin: 0 auto;
-    padding: clamp(10px, 2vw, 30px);
+    padding: clamp(5px, 1vw, 20px);
     
-    /* Dynamic height that adapts to viewport */
-    min-height: calc(100vh - 180px);
+    /* Fixed height that never exceeds viewport */
+    height: calc(100vh - clamp(120px, 15vh, 180px));
     
     /* Container scaling for proportional reduction */
     transform-origin: center top;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Flex layout to ensure proper content fitting */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 /* Scale container based on viewport size while maintaining aspect ratio */
@@ -85,21 +90,23 @@ html, body {
 /* ===== MAIN CONTENT AREA ===== */
 .elements-area {
     padding-top: clamp(120px, 15vh, 180px);
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 /* ===== PAGE TITLE ===== */
 .page-title {
     text-align: center;
-    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
     font-weight: 300;
-    letter-spacing: clamp(1px, 0.3vw, 4px);
-    margin-bottom: clamp(20px, 3vh, 40px);
+    letter-spacing: clamp(1px, 0.3vw, 3px);
+    margin-bottom: clamp(10px, 2vh, 25px);
     color: #ffffff;
     text-transform: uppercase;
     position: relative;
+    flex-shrink: 0; /* 타이틀 크기 고정 */
 }
 
 .page-title::after {
@@ -113,38 +120,21 @@ html, body {
     background: linear-gradient(90deg, transparent, #ffffff, transparent);
 }
 
-/* ===== PORTFOLIO MENU ===== */
-.portfolio-menu2 {
-    margin-bottom: clamp(15px, 2vh, 25px);
-    text-align: center;
-}
 
-.portfolio-menu2 .btn {
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    border: none;
-    color: white;
-    padding: clamp(8px, 1vh, 12px) clamp(16px, 2vw, 24px);
-    border-radius: 25px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.portfolio-menu2 .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
 
 /* ===== DYNAMIC ARTIST GRID ===== */
 .artist-grid {
     /* CSS Grid with dynamic columns and aspect ratio preservation */
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(clamp(150px, 20vw, 250px), 1fr));
-    gap: clamp(15px, 3vh, 30px);
+    grid-template-columns: repeat(auto-fit, minmax(clamp(120px, 15vw, 200px), 1fr));
+    gap: clamp(8px, 1.5vh, 20px);
     
-    /* Auto-adjusting height based on content */
-    grid-auto-rows: minmax(200px, auto);
+    /* Fixed height to fit in container */
+    flex: 1;
+    height: 100%;
+    
+    /* Auto-adjusting rows to fit available space */
+    grid-auto-rows: minmax(0, 1fr);
     
     /* Maintain aspect ratio across different screen sizes */
     align-items: stretch;
@@ -154,8 +144,9 @@ html, body {
     width: 100%;
     max-width: none;
     
-    /* Padding for visual breathing room */
-    padding: clamp(10px, 2vh, 20px) 0;
+    /* Remove padding to maximize space usage */
+    padding: 0;
+    overflow: hidden;
 }
 
 /* Dynamic grid adjustments based on viewport */
@@ -192,12 +183,13 @@ html, body {
     /* Maintain consistent aspect ratio */
     aspect-ratio: 3/4;
     width: 100%;
-    max-width: 280px;
+    max-width: 100%;
+    height: 100%;
     
     position: relative;
     overflow: visible;
-    border-radius: clamp(6px, 1vw, 12px);
-    box-shadow: 0 clamp(8px, 1.5vh, 15px) clamp(20px, 3vh, 35px) rgba(0, 0, 0, 0.5);
+    border-radius: clamp(4px, 0.8vw, 10px);
+    box-shadow: 0 clamp(6px, 1vh, 12px) clamp(15px, 2vh, 25px) rgba(0, 0, 0, 0.5);
     
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     cursor: pointer;
@@ -361,8 +353,7 @@ html, body {
 
 /* ===== PRINT STYLES ===== */
 @media print {
-    .header-area,
-    .portfolio-menu2 {
+    .header-area {
         display: none;
     }
     

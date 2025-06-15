@@ -188,10 +188,44 @@ class ArtistsPage {
     optimizeLayout() {
         if (!this.gridContainer) return;
 
-        // Apply CSS custom properties for dynamic sizing if needed
         const artistItems = this.gridContainer.querySelectorAll('.artist-item');
         const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
         
+        // Calculate available space
+        const headerHeight = Math.max(120, Math.min(viewportHeight * 0.15, 180));
+        const titleHeight = 60; // Approximate title height
+        const availableHeight = viewportHeight - headerHeight - titleHeight;
+        
+        // Determine optimal grid layout to fit screen
+        const artistCount = this.artists.length;
+        if (artistCount > 0) {
+            let columns, rows;
+            
+            // Calculate grid dimensions based on screen size and artist count
+            if (viewportWidth > 1200) {
+                columns = Math.min(artistCount, Math.floor(viewportWidth / 180));
+                rows = Math.ceil(artistCount / columns);
+            } else if (viewportWidth > 768) {
+                columns = Math.min(artistCount, Math.floor(viewportWidth / 150));
+                rows = Math.ceil(artistCount / columns);
+            } else {
+                columns = Math.min(artistCount, 2);
+                rows = Math.ceil(artistCount / columns);
+            }
+            
+            // Ensure grid fits in available height
+            const maxRows = Math.floor(availableHeight / 160); // Minimum item height
+            if (rows > maxRows && maxRows > 0) {
+                rows = maxRows;
+                columns = Math.ceil(artistCount / rows);
+            }
+            
+            // Apply calculated grid layout
+            this.gridContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+            this.gridContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+        }
+
         // Dynamic adjustments based on content and viewport
         if (viewportWidth > 1400 && this.artists.length <= 4) {
             this.gridContainer.style.setProperty('--grid-columns', this.artists.length.toString());
