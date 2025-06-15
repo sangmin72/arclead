@@ -29,46 +29,7 @@ function renderArtists(artists) {
         return;
     }
 
-    // Calculate optimal grid layout for desktop
-    if (window.innerWidth > 768) {
-        const artistCount = artists.length;
-        let columns, rows;
-        
-        // Calculate optimal grid dimensions to fill screen
-        if (artistCount <= 4) {
-            columns = artistCount;
-            rows = 1;
-        } else if (artistCount <= 8) {
-            columns = 4;
-            rows = 2;
-        } else if (artistCount <= 12) {
-            columns = 4;
-            rows = 3;
-        } else if (artistCount <= 16) {
-            columns = 4;
-            rows = 4;
-        } else if (artistCount <= 20) {
-            columns = 5;
-            rows = 4;
-        } else {
-            columns = 6;
-            rows = Math.ceil(artistCount / 6);
-        }
-        
-        // Adjust grid template to fill available space
-        grid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-        grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-        
-        // Calculate available height more accurately
-        const headerHeight = 180; // Fixed header space
-        const bottomMargin = window.innerHeight * 0.1; // 10vh bottom margin
-        const totalRowGaps = (rows - 1) * (window.innerHeight * 0.1); // 10vh between rows
-        const availableHeight = window.innerHeight - headerHeight - bottomMargin - totalRowGaps;
-        
-        // Set the grid height to fit content properly
-        grid.style.height = `${availableHeight}px`;
-        grid.style.paddingBottom = `${bottomMargin}px`;
-    }
+    // CSS가 자동으로 레이아웃을 처리하므로 JavaScript에서는 건드리지 않음
 
     grid.innerHTML = artists.map(artist => {
         // Get representative image for artists page, fallback to first image, then default
