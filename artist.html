@@ -83,6 +83,11 @@
         background: linear-gradient(90deg, #ffffff, transparent);
     }
 
+    .actor-name .artist-name-en {
+        font-size: 0.5em;
+        vertical-align: middle;
+    }
+
     .profile-section {
         margin-bottom: 40px;
     }
@@ -320,7 +325,9 @@
             document.title = `Arclead Entertainment : ${artist.name}`;
             
             // Update artist name
-            document.getElementById('artistName').textContent = `${artist.name} ${artist.nameEn || ''}`;
+            const artistNameElement = document.getElementById('artistName');
+            const nameEnHtml = artist.nameEn ? ` <span class="artist-name-en">${artist.nameEn}</span>` : '';
+            artistNameElement.innerHTML = `${artist.name}${nameEnHtml}`;
             
             // Update carousel images
             const carouselInner = document.getElementById('carouselInner');
