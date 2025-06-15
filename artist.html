@@ -416,26 +416,37 @@
                                 <ul class="work-list">
                         `;
                         
-                        const flatWorkList = [];
-                        Object.entries(works).forEach(([year, workList]) => {
+                        // Sort years in descending order
+                        const sortedYears = Object.keys(works).sort((a, b) => b.localeCompare(a));
+                        
+                        sortedYears.forEach(year => {
+                            const workList = works[year];
                             console.log(`Year ${year}:`, workList);
-                            (Array.isArray(workList) ? workList : [workList]).forEach(workTitle => {
-                                flatWorkList.push({ title: workTitle, year: year });
-                            });
+                            
+                            if (Array.isArray(workList)) {
+                                // Multiple works in the same year - group them together
+                                filmographyHtml += `
+                                    <li class="work-item" style="align-items: flex-start;">
+                                        <div>
+                                            <div class="work-title">
+                                                ${workList.map((work, index) => `<div style="margin-bottom: ${index < workList.length - 1 ? '8px' : '0'}; line-height: 1.4;">${work}</div>`).join('')}
+                                            </div>
+                                        </div>
+                                        <span class="work-year" style="margin-top: 2px;">${year}</span>
+                                    </li>
+                                `;
+                            } else {
+                                // Single work in the year
+                                filmographyHtml += `
+                                    <li class="work-item">
+                                        <div>
+                                            <div class="work-title">${workList}</div>
+                                        </div>
+                                        <span class="work-year">${year}</span>
+                                    </li>
+                                `;
+                            }
                         });
-                        
-                        console.log(`Flat work list for ${category}:`, flatWorkList);
-                        
-                        flatWorkList.sort((a, b) => b.year.localeCompare(a.year));
-                        
-                        filmographyHtml += flatWorkList.map(work => `
-                            <li class="work-item">
-                                <div>
-                                    <div class="work-title">${work.title}</div>
-                                </div>
-                                <span class="work-year">${work.year}</span>
-                            </li>
-                        `).join('');
 
                         filmographyHtml += `
                                 </ul>
