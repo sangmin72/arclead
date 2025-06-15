@@ -9,7 +9,7 @@
 
         html, body {
             height: 100%;
-            overflow: auto !important;
+            overflow: hidden !important;
             -webkit-overflow-scrolling: touch !important;
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
@@ -19,10 +19,10 @@
 
         .page-title {
             text-align: center;
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: 300;
             letter-spacing: 3px;
-            margin-bottom: 60px;
+            margin-bottom: 30px;
             color: #ffffff;
             text-transform: uppercase;
             position: relative;
@@ -31,21 +31,23 @@
         .page-title::after {
             content: '';
             position: absolute;
-            bottom: -10px;
+            bottom: -5px;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
+            width: 60px;
             height: 2px;
             background: linear-gradient(90deg, transparent, #ffffff, transparent);
         }
 
         .artist-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-            padding: 30px 0;
-            max-width: 1200px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 0;
+            max-width: 100%;
             margin: 0 auto;
+            height: calc(100vh - 250px);
+            overflow: hidden;
         }
 
         .artist-item {
@@ -53,15 +55,16 @@
             aspect-ratio: 3/4;
             overflow: visible;
             border-radius: 8px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 15px;
+            max-height: calc((100vh - 250px) / 3 - 20px);
         }
 
         .artist-item:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
         }
 
         .artist-item img {
@@ -75,25 +78,25 @@
 
         .artist-item:hover img {
             filter: grayscale(80%) contrast(1.2);
-            transform: scale(1.05);
+            transform: scale(1.02);
         }
 
         .artist-info {
             position: absolute;
             top: 0;
             transform: translateY(-100%);
-            left: 20px;
+            left: 15px;
             background: #ffffff;
             color: #1a1a1a;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
             font-weight: 500;
             border: 2px solid #333333;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             transition: all 0.3s ease;
             z-index: 2;
-            min-width: 80px;
+            min-width: 60px;
             text-align: center;
             white-space: nowrap;
         }
@@ -107,22 +110,22 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         .artist-name-ko {
-            font-size: 1.0em;
+            font-size: 0.9em;
             font-weight: 700;
             color: #1a1a1a;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
+            letter-spacing: 0.3px;
+            margin-bottom: 1px;
         }
 
         .artist-name-en {
-            font-size: 0.75em;
+            font-size: 0.65em;
             font-weight: 500;
             color: #666666;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
         }
 
@@ -142,38 +145,76 @@
             opacity: 1;
         }
 
+        .elements-area {
+            padding-top: 120px;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .portfolio-menu2 {
+            margin-bottom: 20px;
+        }
+
+        /* Responsive adjustments for mobile */
         @media (max-width: 768px) {
+            html, body {
+                overflow: auto !important;
+            }
+            
             .artist-grid {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 30px;
-                padding: 20px 0;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
+                height: auto;
+                overflow: visible;
             }
             
             .page-title {
-                font-size: 2rem;
-                margin-bottom: 40px;
+                font-size: 1.8rem;
+                margin-bottom: 20px;
             }
             
             .artist-info {
-                font-size: 0.7rem;
-                left: 15px;
-                min-width: 70px;
-                padding: 4px 8px;
+                font-size: 0.6rem;
+                left: 10px;
+                min-width: 50px;
+                padding: 3px 6px;
             }
 
             .artist-name-ko {
-                font-size: 0.9em;
+                font-size: 0.8em;
             }
 
             .artist-name-en {
-                font-size: 0.7em;
+                font-size: 0.6em;
+            }
+
+            .elements-area {
+                height: auto;
+                overflow: visible;
+            }
+
+            .container {
+                overflow: visible;
+            }
+
+            .artist-item {
+                max-height: none;
             }
         }
 
         @media (max-width: 480px) {
             .artist-grid {
-                grid-template-columns: 1fr;
-                gap: 25px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
             }
             
             .page-title {
@@ -216,45 +257,6 @@
 
         .elements-area {
             padding-top: 150px; /* Adjust for fixed header */
-        }
-
-        @media (min-width: 1025px) {
-            html, body {
-                overflow: hidden !important;
-            }
-
-            .elements-area {
-                height: 100vh;
-                display: flex;
-                flex-direction: column;
-                padding-top: 120px; /* Adjust for header */
-                padding-bottom: 20px;
-            }
-
-            .elements-area > .container {
-                flex-grow: 1;
-                display: flex;
-                flex-direction: column;
-                max-width: 100%;
-                width: 100%;
-                padding-left: 30px;
-                padding-right: 30px;
-            }
-
-            .artist-grid {
-                flex-grow: 1;
-                gap: 20px;
-                padding: 0;
-            }
-
-            .artist-item {
-                aspect-ratio: unset;
-                margin-top: 0;
-            }
-
-            .artist-item img {
-                object-fit: contain;
-            }
         }
     </style>
 <head>
@@ -419,6 +421,34 @@
                 return;
             }
 
+            // Calculate optimal grid layout for desktop
+            if (window.innerWidth > 768) {
+                const artistCount = artists.length;
+                let columns, rows;
+                
+                // Calculate optimal grid dimensions
+                if (artistCount <= 4) {
+                    columns = artistCount;
+                    rows = 1;
+                } else if (artistCount <= 8) {
+                    columns = 4;
+                    rows = 2;
+                } else if (artistCount <= 12) {
+                    columns = 4;
+                    rows = 3;
+                } else if (artistCount <= 16) {
+                    columns = 4;
+                    rows = 4;
+                } else {
+                    columns = 5;
+                    rows = Math.ceil(artistCount / 5);
+                }
+                
+                // Adjust grid template
+                grid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+                grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+            }
+
             grid.innerHTML = artists.map(artist => {
                 // Get representative image for artists page, fallback to first image, then default
                 let imageUrl = '/assets/logo-icon.png'; // Use logo as default instead
@@ -449,31 +479,6 @@
                     </div>
                 `;
             }).join('');
-
-            function adjustGrid() {
-                if (!grid) return;
-                const count = artists.length;
-                if(count === 0) return;
-
-                const gridContainer = grid.parentElement;
-                const screenRatio = gridContainer.offsetWidth / gridContainer.offsetHeight;
-                
-                let cols = Math.ceil(Math.sqrt(count * screenRatio));
-                if (cols > count) cols = count;
-                if (cols === 0) cols = 1;
-                
-                let rows = Math.ceil(count / cols);
-
-                grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-                grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-            }
-
-            if (window.matchMedia("(min-width: 1025px)").matches) {
-                setTimeout(() => {
-                    adjustGrid();
-                    window.addEventListener('resize', adjustGrid);
-                }, 100);
-            }
         }
 
         // Render error message
