@@ -3,321 +3,121 @@
  * Simplified and optimized layout management
  */
 
-class ArtistsPage {
-    constructor() {
-        this.artists = [];
-        this.isLoading = false;
-        this.gridContainer = null;
-        this.init();
+// Load artists from API
+async function loadArtists() {
+    try {
+        const response = await fetch('/api/artists');
+        const artists = await response.json();
+        renderArtists(artists);
+    } catch (error) {
+        console.error('Error loading artists:', error);
+        renderError();
     }
+}
 
-    init() {
-        document.addEventListener('DOMContentLoaded', () => {
-            this.gridContainer = document.getElementById('artistsGrid');
-            this.loadArtists();
-            this.setupResponsiveHandlers();
-        });
-    }
-
-    /**
-     * Load artists from API with error handling
-     */
-    async loadArtists() {
-        if (this.isLoading) return;
-        
-        this.isLoading = true;
-        this.showLoading();
-
-        try {
-            const response = await fetch('/api/artists');
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            this.artists = await response.json();
-            this.renderArtists();
-            
-        } catch (error) {
-            console.error('Failed to load artists:', error);
-            this.showError(error.message);
-        } finally {
-            this.isLoading = false;
-        }
-    }
-
-    /**
-     * Render artists grid with optimized layout
-     */
-    renderArtists() {
-        if (!this.gridContainer) return;
-
-        if (this.artists.length === 0) {
-            this.showEmptyState();
-            return;
-        }
-
-        // Generate artist cards HTML
-        const artistsHTML = this.artists.map(artist => this.createArtistCard(artist)).join('');
-        this.gridContainer.innerHTML = artistsHTML;
-
-        // Apply any post-render optimizations
-        this.optimizeLayout();
-    }
-
-    /**
-     * Create individual artist card HTML
-     */
-    createArtistCard(artist) {
-        const imageUrl = this.getArtistImageUrl(artist);
-        const imageAlt = `${artist.name} ${artist.nameEn || ''}`.trim();
-        
-        return `
-            <div class="artist-item" onclick="artistsPage.navigateToArtist('${artist.id}')" role="button" tabindex="0" aria-label="View ${artist.name} profile">
-                <div class="artist-info">
-                    <div class="artist-tag-name">
-                        <span class="artist-name-ko">${this.escapeHtml(artist.name)}</span>
-                        ${artist.nameEn ? `<span class="artist-name-en">${this.escapeHtml(artist.nameEn)}</span>` : ''}
-                    </div>
-                </div>
-                <img src="${imageUrl}" 
-                     alt="${this.escapeHtml(imageAlt)}" 
-                     loading="lazy"
-                     onerror="this.src='/assets/logo-icon.png'; this.onerror=null;">
-                <div class="artist-overlay"></div>
-            </div>
-        `;
-    }
-
-    /**
-     * Get appropriate image URL for artist
-     */
-    getArtistImageUrl(artist) {
-        // Priority: representative image > first image > default logo
-        if (artist.representativeImages?.artists) {
-            return `/assets/artists/${artist.id}/${artist.representativeImages.artists}`;
-        }
-        
-        if (artist.images && artist.images.length > 0) {
-            return `/assets/artists/${artist.id}/${artist.images[0]}`;
-        }
-        
-        return '/assets/logo-icon.png';
-    }
-
-    /**
-     * Navigate to individual artist page
-     */
-    navigateToArtist(artistId) {
-        if (!artistId) return;
-        window.location.href = `artist.html?id=${encodeURIComponent(artistId)}`;
-    }
-
-    /**
-     * Show loading state
-     */
-    showLoading() {
-        if (!this.gridContainer) return;
-        
-        this.gridContainer.innerHTML = `
-            <div class="loading-container">
-                <div class="loading-spinner" aria-hidden="true"></div>
-                <p>아티스트 정보를 불러오는 중...</p>
-            </div>
-        `;
-    }
-
-    /**
-     * Show error state with retry option
-     */
-    showError(errorMessage = '알 수 없는 오류가 발생했습니다') {
-        if (!this.gridContainer) return;
-        
-        this.gridContainer.innerHTML = `
-            <div class="error-container">
-                <h3>오류가 발생했습니다</h3>
-                <p>아티스트 정보를 불러오는데 실패했습니다.</p>
-                <p class="error-detail">${this.escapeHtml(errorMessage)}</p>
-                <button class="retry-button" onclick="artistsPage.loadArtists()">다시 시도</button>
-            </div>
-        `;
-    }
-
-    /**
-     * Show empty state when no artists are available
-     */
-    showEmptyState() {
-        if (!this.gridContainer) return;
-        
-        this.gridContainer.innerHTML = `
-            <div class="error-container">
+// Render artists grid
+function renderArtists(artists) {
+    const grid = document.getElementById('artistsGrid');
+    
+    if (artists.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
                 <h3>등록된 아티스트가 없습니다</h3>
                 <p>관리자 페이지에서 아티스트를 추가해주세요.</p>
             </div>
         `;
+        return;
     }
 
-    /**
-     * Setup responsive behavior handlers
-     */
-    setupResponsiveHandlers() {
-        // Debounced resize handler
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                this.optimizeLayout();
-            }, 150);
-        });
-
-        // Keyboard navigation support
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-                const focusedElement = document.activeElement;
-                if (focusedElement && focusedElement.classList.contains('artist-item')) {
-                    event.preventDefault();
-                    focusedElement.click();
-                }
-            }
-        });
-    }
-
-    /**
-     * Post-render layout optimizations
-     */
-    optimizeLayout() {
-        if (!this.gridContainer) return;
-
-        const artistItems = this.gridContainer.querySelectorAll('.artist-item');
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
+    // Calculate optimal grid layout for desktop
+    if (window.innerWidth > 768) {
+        const artistCount = artists.length;
+        let columns, rows;
         
-        // Calculate available space
-        const headerHeight = Math.max(120, Math.min(viewportHeight * 0.15, 180));
-        const titleHeight = 60; // Approximate title height
-        const availableHeight = viewportHeight - headerHeight - titleHeight;
-        
-        // Determine optimal grid layout to fit screen
-        const artistCount = this.artists.length;
-        if (artistCount > 0) {
-            let columns, rows;
-            
-            // Calculate grid dimensions based on screen size and artist count
-            if (viewportWidth > 1200) {
-                columns = Math.min(artistCount, Math.floor(viewportWidth / 180));
-                rows = Math.ceil(artistCount / columns);
-            } else if (viewportWidth > 768) {
-                columns = Math.min(artistCount, Math.floor(viewportWidth / 150));
-                rows = Math.ceil(artistCount / columns);
-            } else {
-                columns = Math.min(artistCount, 2);
-                rows = Math.ceil(artistCount / columns);
-            }
-            
-            // Ensure grid fits in available height
-            const maxRows = Math.floor(availableHeight / 160); // Minimum item height
-            if (rows > maxRows && maxRows > 0) {
-                rows = maxRows;
-                columns = Math.ceil(artistCount / rows);
-            }
-            
-            // Apply calculated grid layout
-            this.gridContainer.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-            this.gridContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-        }
-
-        // Dynamic adjustments based on content and viewport
-        if (viewportWidth > 1400 && this.artists.length <= 4) {
-            this.gridContainer.style.setProperty('--grid-columns', this.artists.length.toString());
+        // Calculate optimal grid dimensions to fill screen
+        if (artistCount <= 4) {
+            columns = artistCount;
+            rows = 1;
+        } else if (artistCount <= 8) {
+            columns = 4;
+            rows = 2;
+        } else if (artistCount <= 12) {
+            columns = 4;
+            rows = 3;
+        } else if (artistCount <= 16) {
+            columns = 4;
+            rows = 4;
+        } else if (artistCount <= 20) {
+            columns = 5;
+            rows = 4;
         } else {
-            this.gridContainer.style.removeProperty('--grid-columns');
+            columns = 6;
+            rows = Math.ceil(artistCount / 6);
         }
-
-        // Ensure images are properly loaded
-        artistItems.forEach(item => {
-            const img = item.querySelector('img');
-            if (img && !img.complete) {
-                img.addEventListener('load', () => {
-                    item.classList.add('loaded');
-                }, { once: true });
-            } else if (img) {
-                item.classList.add('loaded');
-            }
-        });
+        
+        // Adjust grid template to fill available space
+        grid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+        grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+        
+        // Calculate available height more accurately
+        const headerHeight = 180; // Fixed header space
+        const bottomMargin = window.innerHeight * 0.1; // 10vh bottom margin
+        const totalRowGaps = (rows - 1) * (window.innerHeight * 0.1); // 10vh between rows
+        const availableHeight = window.innerHeight - headerHeight - bottomMargin - totalRowGaps;
+        
+        // Set the grid height to fit content properly
+        grid.style.height = `${availableHeight}px`;
+        grid.style.paddingBottom = `${bottomMargin}px`;
     }
 
-    /**
-     * Utility function to escape HTML
-     */
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    /**
-     * Public method to refresh the page
-     */
-    refresh() {
-        this.loadArtists();
-    }
+    grid.innerHTML = artists.map(artist => {
+        // Get representative image for artists page, fallback to first image, then default
+        let imageUrl = '/assets/logo-icon.png'; // Use logo as default instead
+        let imageSource = 'default logo';
+        
+        if (artist.representativeImages?.artists) {
+            imageUrl = `/assets/artists/${artist.id}/${artist.representativeImages.artists}`;
+            imageSource = `representative: ${artist.representativeImages.artists}`;
+        } else if (artist.images && artist.images.length > 0) {
+            imageUrl = `/assets/artists/${artist.id}/${artist.images[0]}`;
+            imageSource = `first image: ${artist.images[0]}`;
+        }
+        
+        console.log(`Artist ${artist.name} (${artist.id}): using ${imageSource} -> ${imageUrl}`);
+        
+        return `
+            <div class="artist-item" onclick="goToArtist('${artist.id}')">
+                <div class="artist-info">
+                    <div class="artist-tag-name">
+                        <span class="artist-name-ko">${artist.name}</span>
+                        <span class="artist-name-en">${artist.nameEn || ''}</span>
+                    </div>
+                </div>
+                <img src="${imageUrl}" 
+                     alt="${artist.name}" 
+                     onerror="console.error('Failed to load image: ${imageUrl}'); this.src='/assets/logo-icon.png'">
+                <div class="artist-overlay"></div>
+            </div>
+        `;
+    }).join('');
 }
 
-// Initialize the artists page
-const artistsPage = new ArtistsPage();
+// Render error message
+function renderError() {
+    const grid = document.getElementById('artistsGrid');
+    grid.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #e74c3c;">
+            <h3>오류가 발생했습니다</h3>
+            <p>아티스트 정보를 불러오는데 실패했습니다.</p>
+            <button onclick="loadArtists()" style="margin-top: 15px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">다시 시도</button>
+        </div>
+    `;
+}
 
-// Add CSS for loading spinner
-const loadingStyles = `
-    .loading-spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #333;
-        border-top: 4px solid #667eea;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 20px;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    .artist-item {
-        opacity: 0;
-        transform: translateY(20px);
-        animation: fadeInUp 0.6s ease forwards;
-    }
-    
-    .artist-item:nth-child(odd) {
-        animation-delay: 0.1s;
-    }
-    
-    .artist-item:nth-child(even) {
-        animation-delay: 0.2s;
-    }
-    
-    @keyframes fadeInUp {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .artist-item.loaded img {
-        opacity: 1;
-        transition: opacity 0.3s ease;
-    }
-    
-    .error-detail {
-        font-size: 0.8em;
-        color: #999;
-        margin-top: 10px;
-        font-style: italic;
-    }
-`;
+// Navigate to artist page
+function goToArtist(artistId) {
+    window.location.href = `artist.html?id=${artistId}`;
+}
 
-// Inject loading styles
-const styleSheet = document.createElement('style');
-styleSheet.textContent = loadingStyles;
-document.head.appendChild(styleSheet); 
+// Load artists when page loads
+document.addEventListener('DOMContentLoaded', loadArtists); 

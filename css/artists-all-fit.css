@@ -1,5 +1,5 @@
 /* Artists All Fit Page Styles */
-/* Modern responsive design with CSS Grid and clamp-based scaling */
+/* 원래 작동하던 방식을 기반으로 단순하게 구현 */
 
 /* ===== BASE STYLES ===== */
 * {
@@ -10,48 +10,15 @@
 
 html, body {
     height: 100%;
+    overflow: hidden !important; /* 스크롤 차단 - 원래 있던 방식 */
+    -webkit-overflow-scrolling: touch !important;
     font-family: 'Arial', sans-serif;
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
     color: #ffffff;
-    overflow: hidden; /* 스크롤 완전 차단 */
+    min-height: 100vh;
 }
 
-/* ===== DYNAMIC CONTAINER SYSTEM ===== */
-.dynamic-container {
-    /* Responsive width with minimum and maximum constraints */
-    width: clamp(320px, 95vw, 1400px);
-    margin: 0 auto;
-    padding: clamp(5px, 1vw, 20px);
-    
-    /* Fixed height that never exceeds viewport */
-    height: calc(100vh - clamp(120px, 15vh, 180px));
-    
-    /* Container scaling for proportional reduction */
-    transform-origin: center top;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Flex layout to ensure proper content fitting */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* Scale container based on viewport size while maintaining aspect ratio */
-@media (max-width: 1200px) {
-    .dynamic-container {
-        transform: scale(clamp(0.7, 1vw, 1));
-    }
-}
-
-@media (max-width: 768px) {
-    .dynamic-container {
-        transform: scale(1); /* Reset scaling for mobile */
-        width: 100%;
-        padding: clamp(5px, 3vw, 20px);
-    }
-}
-
-/* ===== HEADER ADJUSTMENTS ===== */
+/* ===== HEADER STYLES ===== */
 .header-area {
     position: fixed !important;
     top: 0;
@@ -60,53 +27,60 @@ html, body {
     z-index: 1000;
     background: transparent !important;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
 }
 
 .header-area:hover {
-    background: rgba(0, 0, 0, 0.1) !important;
+    background: transparent !important;
 }
 
 .navbar-nav .nav-link {
     color: white !important;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    transition: all 0.3s ease;
 }
 
 .navbar-nav .nav-link:hover {
     color: #fff !important;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
-    transform: translateY(-1px);
 }
 
 #current-time {
     color: white !important;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
     font-weight: 500;
-    font-size: clamp(12px, 1.2vw, 16px);
-    margin: 0 clamp(10px, 2vw, 30px);
+    font-size: 14px;
+    margin: 0 20px;
 }
 
 /* ===== MAIN CONTENT AREA ===== */
 .elements-area {
-    padding-top: clamp(120px, 15vh, 180px);
+    padding-top: 110px;
     height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.dynamic-container {
+    flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    padding-bottom: 0;
+    max-width: 960px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 /* ===== PAGE TITLE ===== */
 .page-title {
     text-align: center;
-    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-size: 2.5rem;
     font-weight: 300;
-    letter-spacing: clamp(1px, 0.3vw, 3px);
-    margin-bottom: clamp(10px, 2vh, 25px);
+    letter-spacing: 3px;
+    margin-bottom: 25px;
     color: #ffffff;
     text-transform: uppercase;
     position: relative;
-    flex-shrink: 0; /* 타이틀 크기 고정 */
 }
 
 .page-title::after {
@@ -115,105 +89,57 @@ html, body {
     bottom: -5px;
     left: 50%;
     transform: translateX(-50%);
-    width: clamp(40px, 8vw, 80px);
+    width: 60px;
     height: 2px;
     background: linear-gradient(90deg, transparent, #ffffff, transparent);
 }
 
-
-
-/* ===== DYNAMIC ARTIST GRID ===== */
+/* ===== ARTIST GRID - 원래 방식 기반 ===== */
 .artist-grid {
-    /* CSS Grid with dynamic columns and aspect ratio preservation */
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(clamp(120px, 15vw, 200px), 1fr));
-    gap: clamp(8px, 1.5vh, 20px);
-    
-    /* Fixed height to fit in container */
-    flex: 1;
-    height: 100%;
-    
-    /* Auto-adjusting rows to fit available space */
-    grid-auto-rows: minmax(0, 1fr);
-    
-    /* Maintain aspect ratio across different screen sizes */
-    align-items: stretch;
-    justify-items: center;
-    
-    /* Container bounds */
-    width: 100%;
-    max-width: none;
-    
-    /* Remove padding to maximize space usage */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    row-gap: 10vh;
+    column-gap: 10px;
     padding: 0;
-    overflow: hidden;
-}
-
-/* Dynamic grid adjustments based on viewport */
-@media (min-width: 1400px) {
-    .artist-grid {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-}
-
-/* Support for CSS custom properties in modern browsers */
-.artist-grid[style*="--grid-columns"] {
-    grid-template-columns: repeat(var(--grid-columns), 1fr) !important;
-}
-
-@media (max-width: 768px) {
-    .artist-grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: clamp(10px, 2vh, 20px);
-        padding: clamp(5px, 1vh, 15px) 0;
-    }
-}
-
-@media (max-width: 480px) {
-    .artist-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: clamp(8px, 1.5vh, 15px);
-    }
-}
-
-/* ===== ARTIST ITEM CARDS ===== */
-.artist-item {
-    /* Maintain consistent aspect ratio */
-    aspect-ratio: 3/4;
-    width: 100%;
     max-width: 100%;
-    height: 100%;
-    
+    margin: 0 auto;
+    height: calc(100vh - 180px);
+    overflow: hidden;
+    padding-bottom: 10vh;
+    box-sizing: border-box;
+}
+
+/* ===== ARTIST ITEMS ===== */
+.artist-item {
     position: relative;
+    aspect-ratio: 3/4;
     overflow: visible;
-    border-radius: clamp(4px, 0.8vw, 10px);
-    box-shadow: 0 clamp(6px, 1vh, 12px) clamp(15px, 2vh, 25px) rgba(0, 0, 0, 0.5);
-    
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     cursor: pointer;
-    
-    /* Ensure proper scaling */
-    transform-origin: center;
+    margin-top: 0;
+    height: 100%;
 }
 
 .artist-item:hover {
-    transform: translateY(clamp(-3px, -0.5vh, -8px)) scale(1.02);
-    box-shadow: 0 clamp(12px, 2vh, 20px) clamp(30px, 4vh, 45px) rgba(0, 0, 0, 0.7);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
 }
 
 .artist-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: clamp(6px, 1vw, 12px);
+    border-radius: 8px;
     filter: grayscale(100%) contrast(1.1);
     transition: all 0.4s ease;
+    margin-top: 0;
 }
 
 .artist-item:hover img {
     filter: grayscale(80%) contrast(1.2);
+    transform: scale(1.02);
 }
 
 /* ===== ARTIST INFO TAGS ===== */
@@ -221,22 +147,18 @@ html, body {
     position: absolute;
     top: 0;
     transform: translateY(-100%);
-    left: clamp(8px, 2vw, 20px);
-    
+    left: 15px;
     background: #ffffff;
     color: #1a1a1a;
-    padding: clamp(4px, 0.8vh, 8px) clamp(8px, 1.2vw, 16px);
-    border-radius: clamp(3px, 0.5vw, 6px);
-    
-    font-size: clamp(0.6rem, 1.2vw, 0.9rem);
+    padding: 0.3vh 0.6vh;
+    border-radius: 4px;
+    font-size: calc(0.5rem + 0.3vh);
     font-weight: 500;
-    
     border: 2px solid #333333;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
     z-index: 2;
-    
-    min-width: clamp(60px, 8vw, 100px);
+    min-width: calc(3rem + 2vh);
     text-align: center;
     white-space: nowrap;
 }
@@ -279,7 +201,7 @@ html, body {
     height: 50%;
     opacity: 0;
     transition: opacity 0.3s ease;
-    border-radius: 0 0 clamp(6px, 1vw, 12px) clamp(6px, 1vw, 12px);
+    border-radius: 0 0 8px 8px;
 }
 
 .artist-item:hover .artist-overlay {
@@ -290,82 +212,101 @@ html, body {
 .loading-container, .error-container {
     grid-column: 1/-1;
     text-align: center;
-    padding: clamp(30px, 5vh, 60px);
+    padding: 40px;
     color: #ffffff;
 }
 
-.loading-container p, .error-container p {
-    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
-    margin-top: clamp(10px, 2vh, 20px);
-    opacity: 0.8;
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #333;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .error-container h3 {
     color: #e74c3c;
-    font-size: clamp(1.2rem, 2vw, 1.6rem);
-    margin-bottom: clamp(10px, 1.5vh, 15px);
+    margin-bottom: 15px;
 }
 
 .retry-button {
-    margin-top: clamp(10px, 2vh, 20px);
-    padding: clamp(8px, 1.2vh, 15px) clamp(16px, 2.5vw, 30px);
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #667eea;
     color: white;
     border: none;
-    border-radius: 25px;
+    border-radius: 5px;
     cursor: pointer;
-    font-weight: 500;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .retry-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    background: #5a6fd8;
+    transform: translateY(-1px);
 }
 
-/* ===== ACCESSIBILITY AND PERFORMANCE ===== */
-@media (prefers-reduced-motion: reduce) {
-    .artist-item,
-    .artist-info,
-    .artist-overlay,
-    .dynamic-container {
-        transition: none;
-    }
-    
-    .artist-item:hover {
-        transform: none;
-    }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-    .artist-info {
-        border-width: 3px;
-        background: #ffffff;
-        color: #000000;
-    }
-    
-    .page-title::after {
-        background: #ffffff;
-    }
-}
-
-/* ===== PRINT STYLES ===== */
-@media print {
-    .header-area {
-        display: none;
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+/* 모바일에서만 스크롤 허용하고 레이아웃 조정 */
+@media (max-width: 768px) {
+    html, body {
+        overflow: auto !important;
     }
     
     .artist-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        height: auto;
+        overflow: visible;
     }
     
+    .page-title {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+    
+    .artist-info {
+        font-size: 0.6rem;
+        left: 10px;
+        min-width: 50px;
+        padding: 3px 6px;
+    }
+
+    .artist-name-ko {
+        font-size: 0.8em;
+    }
+
+    .artist-name-en {
+        font-size: 0.6em;
+    }
+
+    .elements-area {
+        height: auto;
+        overflow: visible;
+    }
+
+    .dynamic-container {
+        overflow: visible;
+    }
+
     .artist-item {
-        break-inside: avoid;
-        box-shadow: none;
-        border: 1px solid #ccc;
+        max-height: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .artist-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
     }
 } 
