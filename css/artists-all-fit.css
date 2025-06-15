@@ -65,7 +65,7 @@ html, body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    padding: 10px 20px 20px 20px; /* 위쪽은 적게, 아래쪽은 여유있게 */
+    padding: 60px 20px 20px 20px; /* 위쪽 많이 확보해서 이름표 잘림 방지 */
     max-width: 960px;
     margin: 0 auto;
     width: 100%;
@@ -101,7 +101,7 @@ html, body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     grid-template-rows: repeat(auto-fit, 1fr);
-    gap: clamp(10px, 2vh, 20px);
+    gap: clamp(15px, 4vh, 40px) clamp(10px, 2vw, 20px); /* 세로 간격 크게, 가로 간격 적당히 */
     
     /* 남은 공간을 모두 사용하되 넘치지 않게 */
     flex: 1;
@@ -161,7 +161,7 @@ html, body {
     border: 2px solid #333333;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
-    z-index: 2;
+    z-index: 100; /* 매우 높은 z-index로 겹침 완전 방지 */
     min-width: calc(3rem + 2vh);
     text-align: center;
     white-space: nowrap;
