@@ -242,6 +242,14 @@
             height: 300px;
         }
     }
+
+    #current-time {
+        color: white !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        font-weight: 500;
+        font-size: 14px;
+        margin: 0 20px;
+    }
 </style>
 <head>
     <meta charset="UTF-8">
@@ -302,13 +310,31 @@
 
             try {
                 showLoading(true);
-                const response = await fetch(`/api/artists/${artistId}`);
+                
+                // Add cache-busting parameter and detailed logging
+                const timestamp = new Date().getTime();
+                const url = `/api/artists/${artistId}?_t=${timestamp}`;
+                console.log(`Loading artist data from: ${url}`);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                
+                console.log(`Response status: ${response.status}`);
                 
                 if (!response.ok) {
                     throw new Error(`아티스트를 찾을 수 없습니다. (${response.status})`);
                 }
                 
                 currentArtist = await response.json();
+                console.log('Loaded artist data:', currentArtist);
+                console.log('Artist filmography:', currentArtist.filmography);
+                
                 renderArtistData(currentArtist);
                 
             } catch (error) {
@@ -321,6 +347,9 @@
 
         // Render artist data
         function renderArtistData(artist) {
+            console.log('=== Rendering artist data ===');
+            console.log('Artist object:', artist);
+            
             // Update page title
             document.title = `Arclead Entertainment : ${artist.name}`;
             
@@ -328,6 +357,7 @@
             const artistNameElement = document.getElementById('artistName');
             const nameEnHtml = artist.nameEn ? ` <span class="artist-name-en">${artist.nameEn}</span>` : '';
             artistNameElement.innerHTML = `${artist.name}${nameEnHtml}`;
+            console.log(`Artist name set to: ${artist.name}${artist.nameEn ? ' (' + artist.nameEn + ')' : ''}`);
             
             // Update carousel images
             const carouselInner = document.getElementById('carouselInner');
@@ -363,6 +393,9 @@
             const contentArea = document.getElementById('contentArea');
             let filmographyHtml = '';
             
+            console.log('=== Processing filmography ===');
+            console.log('Filmography data:', artist.filmography);
+            
             if (artist.filmography) {
                 ['movies', 'dramas', 'commercials'].forEach(category => {
                     const categoryName = {
@@ -372,7 +405,11 @@
                     }[category];
                     
                     const works = artist.filmography[category];
+                    console.log(`Processing ${category} (${categoryName}):`, works);
+                    
                     if (works && Object.keys(works).length > 0) {
+                        console.log(`Found ${Object.keys(works).length} years for ${category}`);
+                        
                         filmographyHtml += `
                             <div class="profile-section">
                                 <h2 class="section-title">${categoryName}</h2>
@@ -381,10 +418,13 @@
                         
                         const flatWorkList = [];
                         Object.entries(works).forEach(([year, workList]) => {
+                            console.log(`Year ${year}:`, workList);
                             (Array.isArray(workList) ? workList : [workList]).forEach(workTitle => {
                                 flatWorkList.push({ title: workTitle, year: year });
                             });
                         });
+                        
+                        console.log(`Flat work list for ${category}:`, flatWorkList);
                         
                         flatWorkList.sort((a, b) => b.year.localeCompare(a.year));
                         
@@ -401,15 +441,25 @@
                                 </ul>
                             </div>
                         `;
+                    } else {
+                        console.log(`No works found for ${category}`);
                     }
                 });
+            } else {
+                console.log('No filmography data found');
             }
             
+            console.log('Generated filmography HTML length:', filmographyHtml.length);
             contentArea.innerHTML = filmographyHtml;
 
             if (contentArea.innerHTML.trim() === '') {
+                console.log('No filmography content, showing placeholder');
                 contentArea.innerHTML = '<p style="text-align: center; color: #ccc;">아직 등록된 필모그래피가 없습니다.</p>';
+            } else {
+                console.log('Filmography content rendered successfully');
             }
+            
+            console.log('=== Artist rendering complete ===');
         }
 
         // Show loading state
@@ -442,6 +492,12 @@
         // Open gallery page
         function openGallery(artistId) {
             window.location.href = `artist-photo.html?id=${artistId}`;
+        }
+
+        // Refresh artist data manually
+        function refreshArtistData() {
+            console.log('Manual refresh triggered');
+            loadArtistData();
         }
 
         document.addEventListener("DOMContentLoaded", function() {
@@ -541,7 +597,10 @@
 
             <!-- 오른쪽 정보 영역 -->
             <div class="info-section">
-                <h1 class="actor-name" id="artistName"></h1>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h1 class="actor-name" id="artistName" style="margin-bottom: 0;"></h1>
+                    <button onclick="refreshArtistData()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">🔄 새로고침</button>
+                </div>
                 <div id="contentArea">
                     <!-- Filmography will be loaded here dynamically -->
                 </div>

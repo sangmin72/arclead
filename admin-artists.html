@@ -785,21 +785,30 @@
                 const container = document.getElementById(containerId);
                 const yearWorksElements = container.querySelectorAll('.year-works');
                 
+                console.log(`Collecting ${category} data from ${yearWorksElements.length} year-works elements`);
+                
                 filmography[category] = {};
                 
-                yearWorksElements.forEach(element => {
+                yearWorksElements.forEach((element, index) => {
                     const yearInput = element.querySelector('.year-input');
                     const worksInput = element.querySelector('.works-input');
                     
                     const year = yearInput.value.trim();
                     const works = worksInput.value.trim();
                     
+                    console.log(`${category} element ${index + 1}: year="${year}", works="${works}"`);
+                    
                     if (year && works) {
-                        filmography[category][year] = works.split('\n').map(w => w.trim()).filter(w => w);
+                        const workList = works.split('\n').map(w => w.trim()).filter(w => w);
+                        filmography[category][year] = workList;
+                        console.log(`Added to ${category}[${year}]:`, workList);
                     }
                 });
+                
+                console.log(`Final ${category} data:`, filmography[category]);
             });
             
+            console.log('Complete filmography data:', filmography);
             return filmography;
         }
 
@@ -1022,23 +1031,31 @@
             const homeImageValue = document.getElementById('homeImage').value;
             const artistsImageValue = document.getElementById('artistsImage').value;
             
+            const filmographyData = collectFilmographyData();
+            
             const artistData = {
                 id: newArtistId,
                 name: document.getElementById('artistName').value.trim(),
                 nameEn: document.getElementById('artistNameEn').value.trim(),
-                filmography: collectFilmographyData(),
+                filmography: filmographyData,
                 representativeImages: {
                     home: homeImageValue || null,
                     artists: artistsImageValue || null
                 }
             };
 
-            // Debug log for representative images
-            console.log('Representative images being saved:', {
+            // Debug log for all data being saved
+            console.log('=== Saving artist data ===');
+            console.log('Artist ID:', newArtistId);
+            console.log('Artist Name:', artistData.name);
+            console.log('Artist Name EN:', artistData.nameEn);
+            console.log('Filmography data:', filmographyData);
+            console.log('Representative images:', {
                 home: homeImageValue,
                 artists: artistsImageValue,
                 editingArtist: editingArtist
             });
+            console.log('Complete artist data:', artistData);
 
             // If editing, check if representative images actually changed
             if (editingArtist) {
@@ -1096,15 +1113,26 @@
                 }
                 
                 const result = await response.json();
-                console.log('Server response:', result);
+                console.log('=== Server response ===');
+                console.log('Response:', result);
+                console.log('Saved artist:', result.artist);
                 
                 // Update local artist data immediately
                 if (editingArtist) {
                     const artistIndex = allArtists.findIndex(a => a.id === (isIdChanged ? editingArtist : newArtistId));
                     if (artistIndex !== -1) {
+                        const oldData = { ...allArtists[artistIndex] };
                         allArtists[artistIndex] = { ...allArtists[artistIndex], ...artistData };
-                        console.log('Updated local artist data:', allArtists[artistIndex]);
+                        console.log('=== Local data update ===');
+                        console.log('Old data:', oldData);
+                        console.log('New data:', allArtists[artistIndex]);
+                        console.log('Filmography comparison:');
+                        console.log('Old filmography:', oldData.filmography);
+                        console.log('New filmography:', allArtists[artistIndex].filmography);
                     }
+                } else {
+                    console.log('=== New artist created ===');
+                    console.log('Artist data:', result.artist);
                 }
                 
                 showStatus(editingArtist ? '아티스트 정보가 수정되었습니다.' : '새 아티스트가 추가되었습니다.', 'success');
