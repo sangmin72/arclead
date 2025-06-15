@@ -47,9 +47,10 @@
             padding: 0;
             max-width: 100%;
             margin: 0 auto;
-            height: calc(100vh - 180px - 10vh);
+            height: calc(100vh - 180px);
             overflow: hidden;
             padding-bottom: 10vh;
+            box-sizing: border-box;
         }
 
         .artist-item {
@@ -455,11 +456,15 @@
                 grid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
                 grid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
                 
-                // Calculate available height considering 10vh gaps
-                const availableHeight = window.innerHeight - 180 - (window.innerHeight * 0.1); // 10vh bottom margin
+                // Calculate available height more accurately
+                const headerHeight = 180; // Fixed header space
+                const bottomMargin = window.innerHeight * 0.1; // 10vh bottom margin
                 const totalRowGaps = (rows - 1) * (window.innerHeight * 0.1); // 10vh between rows
-                const contentHeight = availableHeight - totalRowGaps;
-                grid.style.height = `${contentHeight}px`;
+                const availableHeight = window.innerHeight - headerHeight - bottomMargin - totalRowGaps;
+                
+                // Set the grid height to fit content properly
+                grid.style.height = `${availableHeight}px`;
+                grid.style.paddingBottom = `${bottomMargin}px`;
             }
 
             grid.innerHTML = artists.map(artist => {
