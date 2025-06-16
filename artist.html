@@ -4,7 +4,7 @@
     /* New styles from actor_profile_page.html */
     .profile-container {
         display: flex;
-        min-height: 100vh;
+        height: calc(100vh - 80px); /* 헤더 높이 제외 */
         max-width: 1400px;
         margin: 0 auto;
     }
@@ -13,7 +13,7 @@
     .photo-section {
         flex: 1;
         position: relative;
-        min-height: 100vh;
+        height: 100%;
         overflow: hidden;
         display: flex;
         align-items: center;
@@ -62,6 +62,7 @@
         position: relative;
         color: #ffffff;
         overflow-y: auto;
+        height: 100%;
     }
 
     .actor-name {
@@ -145,22 +146,33 @@
 
     /* 반응형 디자인 */
     @media (max-width: 1024px) {
+        html, body {
+            overflow: auto !important; /* 모바일에서는 스크롤 허용 */
+        }
+        
         .profile-container {
             flex-direction: column;
+            height: auto;
         }
 
         .photo-section {
-            min-height: 50vh;
+            height: 50vh;
             flex: none;
         }
 
         .info-section {
             flex: none;
             padding: 40px 30px;
+            height: auto;
         }
 
         .actor-name {
             font-size: 2.5rem;
+        }
+        
+        #artistContent {
+            height: auto !important;
+            margin-top: 80px;
         }
     }
 
@@ -187,6 +199,10 @@
         .work-year {
             align-self: flex-end;
         }
+        
+        .photo-section {
+            height: 40vh;
+        }
     }
     /* 스크롤바 스타일링 */
     .info-section::-webkit-scrollbar {
@@ -207,7 +223,7 @@
     /* Original styles from artist.html */
     html, body {
         height: 100%;
-        overflow: auto !important;
+        overflow: hidden !important; /* 전체 스크롤 제거 */
         -webkit-overflow-scrolling: touch !important;
     }
 
@@ -586,7 +602,7 @@
     </div>
 
     <!-- Artist Content Area Start -->
-    <section id="artistContent" class="elements-area section_padding_50" style="display: none; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);">
+    <section id="artistContent" class="elements-area" style="display: none; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); padding: 0; margin-top: 80px; height: calc(100vh - 80px);">
         <div class="profile-container">
             <!-- 왼쪽 사진 영역 -->
             <div class="photo-section">
@@ -620,33 +636,7 @@
     </section>
     <!-- Artist Content Area End -->
 
-    <!-- Footer Area Start -->
-    <footer class="footer-area">
-        <div class="container-fluid h-100">
-            <div class="row h-100">
-                <div class="col-12 h-100">
-                    <div class="footer-content h-100 d-md-flex align-items-center justify-content-between">
-                        <!-- Single Footer Content -->
-                        <div class="single-footer-content">
-                            <img src="/assets/map.png" alt="">
-                            <a href="#">(04782) 서울시 성동구 연무장5가길 25, SK V1 Tower 705호</a>
-                        </div>
-                        <!-- Single Footer Content -->
-                        <div class="single-footer-content">
-                            <img src="/assets/smartphone.png" alt="">
-                            <a href="#">02-123-4567</a>
-                        </div>
-                        <!-- Single Footer Content -->
-                        <div class="single-footer-content">
-                            <img src="/assets/envelope-2.png" alt="">
-                            <a href="#">arclead@arclead.co.kr</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <!-- Footer Area End -->
+
 
     <!-- jQuery (Necessary for All JavaScript Plugins) -->
     <script src="js/jquery/jquery-2.2.4.min.js"></script>
@@ -659,4 +649,4 @@
     <!-- Active js -->
     <script src="js/active.js"></script>
 </body>
-</html> 
+</html>
