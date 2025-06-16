@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>김서연 - Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .profile-container {
+            display: flex;
+            min-height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 왼쪽 사진 영역 */
+        .photo-section {
+            flex: 1;
+            position: relative;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .actor-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) contrast(1.1);
+            transition: filter 0.3s ease;
+        }
+
+        .actor-photo:hover {
+            filter: grayscale(70%) contrast(1.2);
+        }
+
+        .photo-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                45deg,
+                rgba(0, 0, 0, 0.3) 0%,
+                transparent 50%,
+                rgba(0, 0, 0, 0.2) 100%
+            );
+        }
+
+        /* 오른쪽 정보 영역 */
+        .info-section {
+            flex: 1;
+            padding: 60px 50px;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .actor-name {
+            font-size: 3.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: #ffffff;
+            position: relative;
+        }
+
+        .actor-name::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, #ffffff, transparent);
+        }
+
+        .instagram-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #cccccc;
+            text-decoration: none;
+            font-size: 1rem;
+            margin-bottom: 50px;
+            padding: 12px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .instagram-link:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .instagram-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .profile-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            letter-spacing: 1px;
+        }
+
+        .work-list {
+            list-style: none;
+        }
+
+        .work-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .work-item:hover {
+            padding-left: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        .work-item:last-child {
+            border-bottom: none;
+        }
+
+        .work-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #ffffff;
+            flex: 1;
+        }
+
+        .work-year {
+            font-size: 0.9rem;
+            color: #aaaaaa;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .work-role {
+            font-size: 0.85rem;
+            color: #cccccc;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 1024px) {
+            .profile-container {
+                flex-direction: column;
+            }
+
+            .photo-section {
+                min-height: 50vh;
+                flex: none;
+            }
+
+            .info-section {
+                flex: none;
+                padding: 40px 30px;
+            }
+
+            .actor-name {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .info-section {
+                padding: 30px 20px;
+            }
+
+            .actor-name {
+                font-size: 2rem;
+                margin-bottom: 15px;
+            }
+
+            .section-title {
+                font-size: 1.4rem;
+            }
+
+            .work-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .work-year {
+                align-self: flex-end;
+            }
+        }
+
+        /* 스크롤바 스타일링 */
+        .info-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .info-section::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .info-section::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .info-section::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <!-- 왼쪽 사진 영역 -->
+        <div class="photo-section">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=1200&fit=crop&crop=face" alt="김서연" class="actor-photo">
+            <div class="photo-overlay"></div>
+        </div>
+
+        <!-- 오른쪽 정보 영역 -->
+        <div class="info-section">
+            <h1 class="actor-name">김서연</h1>
+            
+            <a href="https://instagram.com" class="instagram-link" target="_blank">
+                <svg class="instagram-icon" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+                @kimseoyeon_official
+            </a>
+
+            <!-- 영화 섹션 -->
+            <div class="profile-section">
+                <h2 class="section-title">영화</h2>
+                <ul class="work-list">
+                    <li class="work-item">
+                        <div>
+                            <div class="work-title">더 글로리: 어둠의 끝</div>
+                            <div class="work-role">주연 - 문동은 역</div>
+                        </div>
+                        <span class="work-year">2024</span>
+                    </li>
+                    <li class="work-item">
+                        <div>
+                            <div class="work-title">미드나이트</div>
+                            <div class="work-role">조연 - 지수 역</div>
+                        </div>
+                        <span class="work-year">2023</span>
+                    </li>
+                    <li class="work-item">
+                        <div>
+                            <div class="work-title">소년의 바다</div>
+                            <div class="work-role">주연 - 혜진 역</div>
+                        </div>
+                        <span class="work-year">2022</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 드라마 섹션 -->
+            <div class="profile-section">
+                <h2 class="section-title">드라마</h2>
+                <ul class="work-list">
+                    <li class="work-item">
+                        <div>
+                            <div class="work-title">킹더랜드</div>
+                            <div class="work-role">주연 - 구원 역</div>
+                        </div>
+                        <span class="work-year">2024</span>
+                    </li>
+                    <li class="work-item">
+                        <div>
+                            <div class="work-title">시크릿 로맨스</div>
+                            <div class="work-role">주연 - 서연 역</div>
+                        </div>
+                        <span class="work-year">2023</span>
+                    </li>
+                    <li class="work-item">
+                        <div>
+                            <div class="work-title">청춘시대</div>
+                            <div class="work-role">조연 - 민지 역</div>
+                        </div>
+                        <span class="work-year">2022</span>
+                    </li>
+                    <li class="work-item">
+                        <div>
+                            <div class="work-title">사랑의 온도</div>
+                            <div class="work-role">특별출연</div>
+                        </div>
+                        <span class="work-year">2021</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 광고 섹션 -->
+            <div class="profile-section">
+                <h2 class="section-title">광고</h2>
+                <ul class="work-list">
+                    <li class="work-item">
+                        <div>
+                            <div class="work-title">삼성 갤럭시</div>
+                            <div class="work-role">단독 모델</div>
+                        </div>
+                        <span class="work-year">2024</span>
+                    </li>
+                    <li class="work-item">
+                        <div>
+                            <div class="work-title">네이버 웹툰</div>
+                            <div class="work-role">브랜드 앰버서더</div>
+                        </div>
+                        <span class="work-year">2023</span>
+                    </li>
+                    <li class="work-item">
+                        <div>
+                            <div class="work-title">아모레퍼시픽</div>
+                            <div class="work-role">뷰티 모델</div>
+                        </div>
+                        <span class="work-year">2023</span>
+                    </li>
+                    <li class="work-item">
+                        <div>
+                            <div class="work-title">현대자동차</div>
+                            <div class="work-role">캠페인 모델</div>
+                        </div>
+                        <span class="work-year">2022</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

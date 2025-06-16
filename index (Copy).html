@@ -12,7 +12,7 @@
     <title>Arclead</title>
 
     <!-- Favicon  -->
-    <link rel="icon" href="/assets/favicon-arclead.ico">
+    <link rel="icon" href="img/core-img/favicon-arclead.ico">
 
     <!-- Core Style CSS -->
     <link rel="stylesheet" href="css/core-style.css">
@@ -25,144 +25,78 @@
     <link rel="stylesheet" href="css/pretendard.css">
     <link rel="stylesheet" href="css/pretendard-subset.css">
 
-    <style>
-        /* 캐러셀 이미지가 잘리지 않도록 수정 */
-        .carousel-item.bg-img {
-            background-size: contain !important;
-            background-repeat: no-repeat !important;
-            background-position: center !important;
-            background-color: #000 !important; /* 여백을 자연스럽게 처리 */
-        }
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+        import { getStorage, ref as storageRef, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
 
-        /* 캐러셀 인디케이터 이미지도 잘리지 않도록 수정 */
-        .carousel-indicators li.bg-img {
-            background-size: contain !important;
-            background-repeat: no-repeat !important;
-            background-position: center !important;
-            background-color: #333 !important; /* 작은 이미지 여백 처리 */
-        }
+        const firebaseConfig = {
+          apiKey: "AIzaSyBx4LERmFRvoa1lYtROUMOqDH8Cde6ds",
+          authDomain: "arclead-80bfe.firebaseapp.com",
+          projectId: "arclead-80bfe",
+          storageBucket: "arclead-80bfe.appspot.com",
+          messagingSenderId: "105179842006",
+          appId: "1:105179842006:web:eeb3b2df1fd8d430f19077",
+          databaseURL: "https://arclead-80bfe-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
 
-        /* 캐러셀 전체 배경을 어둡게 하여 자연스러운 여백 처리 */
-        .welcome-area {
-            background-color: #000;
-        }
-
-        /* 슬라이드 텍스트가 더 잘 보이도록 배경 추가 */
-        .slide-text {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
-        }
-
-        /* 헤더를 사진 위에 오버레이 */
-        .header-area {
-            position: fixed !important;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: transparent !important;
-            transition: all 0.3s ease;
-        }
-
-        /* 헤더 호버 시에도 투명 유지 */
-        .header-area:hover {
-            background: transparent !important;
-        }
-
-        /* 캐러셀이 전체 화면을 차지하도록 */
-        .welcome-area {
-            height: 100vh !important;
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-        }
-
-        /* 로고와 메뉴 텍스트가 더 잘 보이도록 */
-        .navbar-brand img {
-            filter: brightness(1.2);
-        }
-
-        .navbar-nav .nav-link {
-            color: white !important;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-        }
-
-        .navbar-nav .nav-link:hover {
-            color: #fff !important;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
-        }
-
-        /* 시계 텍스트도 더 잘 보이도록 */
-        #current-time {
-            color: white !important;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-            font-weight: 500;
-        }
-    </style>
-
-    <!-- R2 Integration Script -->
-    <script>
-        async function loadSlideData() {
-            try {
-                const response = await fetch('/api/slides');
-                const data = await response.json();
-                
-                console.log('Loaded slide data:', data);
-                
-                // Update carousel items with slide data
-                data.slides.forEach((slide, index) => {
-                    const slideId = `slide${String(index + 1).padStart(2, '0')}`;
-                    const carouselItem = document.getElementById(slideId);
-                    if (carouselItem) {
-                        const spanElement = carouselItem.querySelector('.slide-text span');
-                        const h2Element = carouselItem.querySelector('.slide-text h2');
-                        if (spanElement && h2Element) {
-                            spanElement.innerText = slide.text_big || "";
-                            h2Element.innerText = slide.text_small || "";
-                        }
-                        
-                        // Set background image if artist has representative image
-                        if (slide.image) {
-                            console.log(`Setting slide ${index + 1} background to: ${slide.image}`);
-                            carouselItem.style.backgroundImage = `url(${slide.image})`;
-                        } else {
-                            // Use default slide image
-                            const imageUrl = `/assets/slides/${index + 1}.png`;
-                            console.log(`Setting slide ${index + 1} to default: ${imageUrl}`);
-                            carouselItem.style.backgroundImage = `url(${imageUrl})`;
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Error loading slide data:', error);
-                // Fallback to default images
-                setImageSources();
-            }
-        }
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const storage = getStorage(app);
 
         function setImageSources() {
-            // Set carousel background images from R2 via Worker (fallback)
             const carouselItems = document.querySelectorAll('.carousel-item');
             carouselItems.forEach((item, index) => {
-                // Only set default image if no background image is already set
-                if (!item.style.backgroundImage) {
-                    const imageUrl = `/assets/slides/${index + 1}.png`;
-                    item.style.backgroundImage = `url(${imageUrl})`;
-                }
+                const imgRef = storageRef(storage, `${index + 1}.png`);
+                getDownloadURL(imgRef)
+                    .then((url) => {
+                        item.style.backgroundImage = `url(${url})`;
+                    })
+                    .catch((error) => {
+                        console.error(`Error loading image ${index + 1}.png:`, error);
+                    });
             });
 
-            // Set carousel indicator background images from R2 via Worker
             const carouselIndicators = document.querySelectorAll('.carousel-indicators li');
             carouselIndicators.forEach((indicator, index) => {
-                const imageUrl = `/assets/slides/${index + 1}.png`;
-                indicator.style.backgroundImage = `url(${imageUrl})`;
+                const imgRef = storageRef(storage, `${index + 1}.png`);
+                getDownloadURL(imgRef)
+                    .then((url) => {
+                        indicator.style.backgroundImage = `url(${url})`;
+                    })
+                    .catch((error) => {
+                        console.error(`Error loading indicator image ${index + 1}.png:`, error);
+                    });
+            });
+        }
+
+        function readData() {
+            const dbRef = ref(database, 'main');
+            onValue(dbRef, (snapshot) => {
+                const data = snapshot.val();
+                for (const slideId in data) {
+                    if (data.hasOwnProperty(slideId)) {
+                        const textBig = data[slideId].text_big || "";
+                        const textSmall = data[slideId].text_small || "";
+
+                        const carouselItem = document.getElementById(slideId);
+                        if (carouselItem) {
+                            const spanElement = carouselItem.querySelector('.slide-text span');
+                            const h2Element = carouselItem.querySelector('.slide-text h2');
+                            if (spanElement && h2Element) {
+                                spanElement.innerText = textBig;
+                                h2Element.innerText = textSmall;
+                            }
+                        }
+                    }
+                }
             });
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Load slide data first, then set default images as fallback
-            loadSlideData();
+            setImageSources();
+            readData();
         });
     </script>
 
@@ -190,16 +124,16 @@
     <div class="gradient-background-overlay"></div>
 
     <!-- Header Area Start -->
-    <header class="header-area bg-img">
+    <header class="header-area bg-img" style="background-color: black;">
         <div class="container-fluid h-100">
             <div class="row h-100 align-items-center">
                 <div class="col-12 h-100">
                     <div class="main-menu h-100">
                         <nav class="navbar h-100 navbar-expand-lg">
                             <!-- Logo Area  -->
-                            <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
+                            <a class="navbar-brand" href="index.html"><img src="img/core-img/logo-horizon-arclead.png" alt="Logo"></a>
                             <!-- Current Time -->
-                            <div id="current-time" style="color: white; font-size: 14px; margin: 0 20px;"></div>
+                            <div id="current-time"></div>
 
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
 
@@ -244,7 +178,7 @@
         </div>
         <!-- Message Box -->
         <div class="message-box">
-            <a href="#" data-toggle="modal" data-target=".contact-modal-lg"><img src="/assets/envelope.png" alt=""></a>
+            <a href="#" data-toggle="modal" data-target=".contact-modal-lg"><img src="img/core-img/envelope.png" alt=""></a>
         </div>
     </div>
     <!-- Social Sidebar Area End -->
@@ -399,7 +333,7 @@
                     <!-- Contact Form Area -->
                     <div class="contact-form-area">
                         <div class="container-fluid">
-                            <form action="/api/contact" method="post">
+                            <form action="#" method="post">
                                 <div class="row">
                                     <div class="col-12 col-md-4">
                                         <input type="text" class="form-control" name="name" id="name" placeholder="Your Name">
@@ -414,7 +348,7 @@
                                         <textarea name="message" class="form-control" id="message" cols="30" rows="10" placeholder="Message"></textarea>
                                     </div>
                                     <div class="col-12 text-center">
-                                        <button type="submit" class="btn studio-btn mt-3"><img src="/assets/logo-icon.png" alt=""> Send</button>
+                                        <button type="submit" class="btn studio-btn mt-3"><img src="img/core-img/logo-icon.png" alt=""> Send</button>
                                     </div>
                                 </div>
                             </form>
@@ -437,93 +371,6 @@
     <script src="js/plugins.js"></script>
     <!-- Active js -->
     <script src="js/active.js"></script>
-
-    <script>
-        // Time function
-        function getTime() {
-            var d = new Date();
-            var year = d.getFullYear();
-            var month = (d.getMonth() + 1).toString().padStart(2, '0');
-            var date = d.getDate().toString().padStart(2, '0');
-            var hours = d.getHours().toString().padStart(2, '0');
-            var minutes = d.getMinutes().toString().padStart(2, '0');
-            var seconds = d.getSeconds().toString().padStart(2, '0');
-
-            var timeBoard = document.getElementById("current-time");
-            if (timeBoard) {
-                var time = year + "년 " + month + "월 " + date + "일 " + hours + ":" + minutes + ":" + seconds;
-                timeBoard.innerHTML = time;
-            }
-            setTimeout(getTime, 1000);
-        }
-
-        // Load artists for homepage - update existing slides instead of replacing them
-        async function loadHomeArtists() {
-            try {
-                console.log('Loading home artists...');
-                const response = await fetch('/api/artists');
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const artists = await response.json();
-                console.log('Total artists loaded:', artists.length);
-                
-                // Get artists with home representative images
-                const homeArtists = artists.filter(artist => {
-                    const hasHomeImage = artist.representativeImages?.home;
-                    if (hasHomeImage) {
-                        console.log(`Artist ${artist.name} has home image: ${artist.representativeImages.home}`);
-                    }
-                    return hasHomeImage;
-                });
-                
-                console.log('Artists with home images:', homeArtists.length);
-                
-                // Update all 13 slides with artist data (cycle through artists if needed)
-                if (homeArtists.length > 0) {
-                    for (let slideIndex = 0; slideIndex < 13; slideIndex++) {
-                        // Use modulo to cycle through artists
-                        const artistIndex = slideIndex % homeArtists.length;
-                        const artist = homeArtists[artistIndex];
-                        
-                        const slideId = `slide${String(slideIndex + 1).padStart(2, '0')}`;
-                        const carouselItem = document.getElementById(slideId);
-                        const indicator = document.querySelector(`[data-slide-to="${slideIndex}"]`);
-                        
-                        if (carouselItem && artist) {
-                            const imageUrl = `/assets/artists/${artist.id}/${artist.representativeImages.home}`;
-                            
-                            // Update slide background and text
-                            carouselItem.style.backgroundImage = `url('${imageUrl}')`;
-                            const spanElement = carouselItem.querySelector('.slide-text span');
-                            const h2Element = carouselItem.querySelector('.slide-text h2');
-                            if (spanElement && h2Element) {
-                                spanElement.textContent = artist.name;
-                                h2Element.textContent = artist.nameEn || '';
-                            }
-                            
-                            // Update indicator background
-                            if (indicator) {
-                                indicator.style.backgroundImage = `url('${imageUrl}')`;
-                            }
-                            
-                            console.log(`Slide ${slideIndex + 1}: ${artist.name} (artist ${artistIndex + 1}/${homeArtists.length})`);
-                        }
-                    }
-                }
-                
-            } catch (error) {
-                console.error('Error loading home artists:', error);
-                // Keep the existing slides as fallback - no need to modify them
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            getTime();
-            loadHomeArtists();
-        });
-    </script>
 
 </body>
 
