@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        height: 100%;
+        overflow: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        font-family: 'Arial', sans-serif;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        color: #ffffff;
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 30px;
+    }
+
+    /* Top Section: About & Values */
+    .top-section {
+        padding: 100px 0 80px 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    }
+
+    .section-title {
+        font-size: 4rem;
+        font-weight: 300;
+        letter-spacing: 4px;
+        margin-bottom: 40px;
+        color: #ffffff;
+        text-transform: uppercase;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #ffffff, transparent);
+    }
+
+    .section-subtitle {
+        font-size: 1.5rem;
+        font-weight: 300;
+        color: #cccccc;
+        margin-bottom: 60px;
+        line-height: 1.6;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .company-description {
+        font-size: 1.2rem;
+        line-height: 1.8;
+        color: #ffffff;
+        max-width: 900px;
+        margin: 0 auto 80px auto;
+        text-align: left;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 60px;
+        margin-top: 60px;
+    }
+
+    .value-item {
+        text-align: center;
+        padding: 40px 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        aspect-ratio: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.4s ease;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .value-item:hover {
+        transform: translateY(-10px);
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .value-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .value-item:hover::before {
+        opacity: 1;
+    }
+
+    .value-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        color: #ffffff;
+    }
+
+    .value-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 15px;
+        letter-spacing: 1px;
+    }
+
+    .value-description {
+        font-size: 0.9rem;
+        color: #cccccc;
+        line-height: 1.5;
+        text-align: center;
+    }
+
+    /* Bottom Section: Map & Info */
+    .bottom-section {
+        padding: 80px 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    }
+
+    .info-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: start;
+    }
+
+    .map-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        height: 100%;
+    }
+
+    .map-placeholder {
+        width: 100%;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: #cccccc;
+        margin-bottom: 20px;
+    }
+
+    .company-info {
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        height: 100%;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #ffffff;
+        min-width: 120px;
+        margin-right: 20px;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        color: #cccccc;
+        line-height: 1.5;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .values-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+        
+        .info-content {
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+        
+        .section-title {
+            font-size: 3rem;
+        }
+
+        .bottom-section {
+            min-height: auto;
+        }
+
+        .map-placeholder {
+            height: 300px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .top-section {
+            padding: 80px 0 60px 0;
+            min-height: auto;
+        }
+        
+        .bottom-section {
+            padding: 60px 0;
+            min-height: auto;
+        }
+        
+        .container {
+            padding: 0 20px;
+        }
+        
+        .values-grid {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        .value-item {
+            aspect-ratio: auto;
+            border-radius: 15px;
+            padding: 30px 20px;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+        
+        .section-subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .company-description {
+            font-size: 1rem;
+            padding: 30px 20px;
+            margin-bottom: 50px;
+        }
+
+        .map-placeholder {
+            height: 250px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .section-subtitle {
+            font-size: 1rem;
+        }
+        
+        .company-description {
+            padding: 20px 15px;
+        }
+
+        .map-placeholder {
+            height: 200px;
+        }
+    }
+
+    #current-time {
+        color: white !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        font-weight: 500;
+        font-size: 14px;
+        margin: 0 20px;
+    }
+</style>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Title -->
+    <title>Arclead Entertainment : Company</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="/assets/favicon-arclead.ico">
+
+    <!-- Core Style CSS -->
+    <link rel="stylesheet" href="css/core-style.css">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Responsive CSS -->
+    <link href="css/responsive.css" rel="stylesheet">
+
+    <!-- Font : Pretendard CSS -->
+    <link rel="stylesheet" href="css/pretendard.css">
+    <link rel="stylesheet" href="css/pretendard-subset.css">
+
+    <script type="text/javascript">
+        function getTime() {
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = (d.getMonth() + 1).toString().padStart(2, '0');
+            var date = d.getDate().toString().padStart(2, '0');
+            var hours = d.getHours().toString().padStart(2, '0');
+            var minutes = d.getMinutes().toString().padStart(2, '0');
+            var seconds = d.getSeconds().toString().padStart(2, '0');
+
+            var timeBoard = document.getElementById("current-time");
+            if (timeBoard) {
+                var time = year + "년 " + month + "월 " + date + "일 " + hours + ":" + minutes + ":" + seconds;
+                timeBoard.innerHTML = time;
+            }
+            setTimeout(getTime, 1000);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            getTime();
+        });
+    </script>
+</head>
+
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="showbox">
+            <div class="loader">
+                <svg class="circular" viewBox="25 25 50 50">
+                    <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                </svg>
+            </div>
+        </div>
+        <div class="questions-area text-center">
+            <p>Arclead Entertainment</p>
+            <ul>
+                <li>당신은 동체시력 보유자!!! 축하합니다. (네트웍이 느린거죠? 맞죠? ㅠㅠ)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Header Area Start -->
+    <header class="header-area bg-img" style="background-color: black; position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
+        <div class="container-fluid h-100">
+            <div class="row h-100 align-items-center">
+                <div class="col-12 h-100">
+                    <div class="main-menu h-100">
+                        <nav class="navbar h-100 navbar-expand-lg">
+                            <!-- Logo Area -->
+                            <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
+                            <!-- Current Time -->
+                            <div id="current-time"></div>
+
+                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
+
+                            <div class="collapse navbar-collapse" id="studioMenu">
+                                <!-- Menu Area Start -->
+                                <ul class="navbar-nav ml-auto">
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="company.html">Company <span class="sr-only">(current)</span></a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="artists-all-fit.html">Artists</a>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">PR</a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <a class="dropdown-item" href="index.html">Media</a>
+                                            <a class="dropdown-item" href="about-me.html">News</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="audition.html">Audition</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Header Area End -->
+
+    <!-- Top Section: About Arclead & Our Values -->
+    <section id="about" class="top-section" style="margin-top: 80px;">
+        <div class="container">
+            <h1 class="section-title">About Arclead</h1>
+            <p class="section-subtitle">
+                아크리드는 배우 매니지먼트를 전문으로 하는<br>
+                대한민국 엔터테인먼트 회사입니다
+            </p>
+            <div class="company-description">
+                <p>아크리드 엔터테인먼트는 탁월한 재능을 가진 배우들을 발굴하고 육성하여, 한국 엔터테인먼트 산업의 새로운 지평을 열어가는 전문 매니지먼트 회사입니다.</p>
+                <br>
+                <p>우리는 각 아티스트의 독창적인 매력과 개성을 존중하며, 그들이 최고의 퍼포먼스를 발휘할 수 있도록 체계적이고 전문적인 매니지먼트 서비스를 제공합니다.</p>
+                <br>
+                <p>영화, 드라마, 광고 등 다양한 장르에서 활동하는 아티스트들과 함께 창조적이고 혁신적인 콘텐츠를 만들어가며, 글로벌 무대로의 진출을 적극 지원하고 있습니다.</p>
+            </div>
+
+            <h2 class="section-title" style="font-size: 3rem; margin-top: 60px; margin-bottom: 40px;">Our Values</h2>
+            <div class="values-grid">
+                <div class="value-item">
+                    <div class="value-icon">🎭</div>
+                    <h3 class="value-title">아티스트 발굴</h3>
+                    <p class="value-description">독창적인 매력과 뛰어난 연기력을 갖춘 신인 배우들을 발굴합니다</p>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon">🎨</div>
+                    <h3 class="value-title">예술성 극대화</h3>
+                    <p class="value-description">각 아티스트의 고유한 예술적 감성을 최대한 발휘할 수 있도록 지원합니다</p>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon">👥</div>
+                    <h3 class="value-title">예술가 비전 & 조화</h3>
+                    <p class="value-description">아티스트의 비전과 회사의 목표가 조화롭게 발전할 수 있도록 합니다</p>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon">🌟</div>
+                    <h3 class="value-title">세계를 아끄는 매니지먼트</h3>
+                    <p class="value-description">글로벌 무대에서 통할 수 있는 전문적인 매니지먼트를 제공합니다</p>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 80px; color: #cccccc; font-size: 1.1rem; line-height: 1.8;">
+                <p>아크리드 엔터테인먼트는 열정 넘치고 창의적인 아티스트들과 함께 아티스트의 예술적 극대화 될 수 있도록 최선을 다해 지원합니다.</p>
+                <br>
+                <p>또한 예술과 비즈니스의 조화를 통해 새로운 도전을 시도하며 문화 예술의 힘을 통해 세계를 이끄는 메니지먼트사로 거듭나도록 노력하겠습니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Section: Map & Company Information -->
+    <section id="info" class="bottom-section">
+        <div class="container">
+            <div class="info-content">
+                <!-- Left: Google Map -->
+                <div class="map-container">
+                    <div class="map-placeholder">
+                        📍 서울특별시 성동구 연무장5가길 25<br>
+                        SK V1 Tower 705호<br><br>
+                        <small style="color: #999;">* 지도 서비스 준비중</small>
+                    </div>
+                    <p style="color: #cccccc; font-size: 0.9rem; margin-top: 15px;">
+                        지하철 2호선 뚝섬역 1번 출구에서 도보 5분<br>
+                        주차 공간이 제한적이니 대중교통 이용을 권합니다.
+                    </p>
+                </div>
+                
+                <!-- Right: Company Information -->
+                <div class="company-info">
+                    <h2 style="color: #ffffff; font-size: 2rem; margin-bottom: 30px; text-align: center;">Company Information</h2>
+                    <div class="info-item">
+                        <span class="info-label">회사명</span>
+                        <span class="info-value">ARCLEAD ENTERTAINMENT Co.,Ltd.</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">국가</span>
+                        <span class="info-value">대한민국</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">설립일</span>
+                        <span class="info-value">2023. 05. 16</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">업종명</span>
+                        <span class="info-value">배우 매니지먼트</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">대표자</span>
+                        <span class="info-value">김용호, 박현화</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">주소</span>
+                        <span class="info-value">(04782) 서울 성동구 연무장5가길 25 SK V1 Tower 705호</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">전화</span>
+                        <span class="info-value">+82-2-6951-4120</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">팩스</span>
+                        <span class="info-value">+82-504-388-7134</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">이메일</span>
+                        <span class="info-value">arclead-ent@naver.com</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- jQuery (Necessary for All JavaScript Plugins) -->
+    <script src="js/jquery/jquery-2.2.4.min.js"></script>
+    <!-- Popper js -->
+    <script src="js/popper.min.js"></script>
+    <!-- Bootstrap js -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- Plugins js -->
+    <script src="js/plugins.js"></script>
+    <!-- Active js -->
+    <script src="js/active.js"></script>
+
+    <script>
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add animation on scroll
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.value-item, .company-info, .map-container');
+            
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        }
+
+        // Initialize animations
+        document.querySelectorAll('.value-item, .company-info, .map-container').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+            element.style.transition = 'all 0.6s ease';
+        });
+
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('load', animateOnScroll);
+    </script>
+</body>
+</html>
