@@ -25,8 +25,8 @@
 
     /* Top Section: About & Values */
     .top-section {
-        padding: 100px 0 80px 0;
-        min-height: 100vh;
+        padding: 60px 0 40px 0;
+        min-height: auto;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -38,7 +38,7 @@
         font-size: 4rem;
         font-weight: 300;
         letter-spacing: 4px;
-        margin-bottom: 40px;
+        margin-bottom: 20px;
         color: #ffffff;
         text-transform: uppercase;
         position: relative;
@@ -59,21 +59,21 @@
         font-size: 1.5rem;
         font-weight: 300;
         color: #cccccc;
-        margin-bottom: 60px;
-        line-height: 1.6;
+        margin-bottom: 30px;
+        line-height: 1.4;
         max-width: 800px;
         margin-left: auto;
         margin-right: auto;
     }
 
     .company-description {
-        font-size: 1.2rem;
-        line-height: 1.8;
+        font-size: 1.1rem;
+        line-height: 1.3;
         color: #ffffff;
         max-width: 900px;
-        margin: 0 auto 80px auto;
+        margin: 0 auto 40px auto;
         text-align: left;
-        padding: 40px;
+        padding: 25px;
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
         backdrop-filter: blur(10px);
@@ -83,8 +83,8 @@
     .values-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 60px;
-        margin-top: 60px;
+        gap: 30px;
+        margin-top: 30px;
     }
 
     .value-item {
@@ -149,8 +149,8 @@
 
     /* Bottom Section: Map & Info */
     .bottom-section {
-        padding: 80px 0;
-        min-height: 100vh;
+        padding: 40px 0;
+        min-height: 400px;
         display: flex;
         align-items: center;
         background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
@@ -159,7 +159,7 @@
     .info-content {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 80px;
+        gap: 40px;
         align-items: start;
     }
 
@@ -186,7 +186,7 @@
     }
 
     .company-info {
-        padding: 40px;
+        padding: 25px;
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
         backdrop-filter: blur(10px);
@@ -197,8 +197,8 @@
     .info-item {
         display: flex;
         align-items: center;
-        margin-bottom: 25px;
-        padding: 15px 0;
+        margin-bottom: 8px;
+        padding: 8px 0;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
@@ -224,35 +224,36 @@
     @media (max-width: 1024px) {
         .values-grid {
             grid-template-columns: repeat(2, 1fr);
-            gap: 40px;
+            gap: 20px;
         }
         
         .info-content {
             grid-template-columns: 1fr;
-            gap: 40px;
+            gap: 20px;
         }
         
         .section-title {
-            font-size: 3rem;
+            font-size: 2.5rem;
         }
 
         .bottom-section {
             min-height: auto;
+            padding: 30px 0;
         }
 
         .map-placeholder {
-            height: 300px;
+            height: 250px;
         }
     }
 
     @media (max-width: 768px) {
         .top-section {
-            padding: 80px 0 60px 0;
+            padding: 40px 0 30px 0;
             min-height: auto;
         }
         
         .bottom-section {
-            padding: 60px 0;
+            padding: 30px 0;
             min-height: auto;
         }
         
@@ -262,32 +263,33 @@
         
         .values-grid {
             grid-template-columns: 1fr;
-            gap: 30px;
+            gap: 15px;
         }
         
         .value-item {
             aspect-ratio: auto;
             border-radius: 15px;
-            padding: 30px 20px;
+            padding: 20px 15px;
         }
         
         .section-title {
-            font-size: 2.5rem;
-            margin-bottom: 30px;
+            font-size: 2rem;
+            margin-bottom: 15px;
         }
         
         .section-subtitle {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
         }
         
         .company-description {
             font-size: 1rem;
-            padding: 30px 20px;
-            margin-bottom: 50px;
+            padding: 20px 15px;
+            margin-bottom: 25px;
         }
 
         .map-placeholder {
-            height: 250px;
+            height: 200px;
         }
     }
 
@@ -436,13 +438,11 @@
             </p>
             <div class="company-description">
                 <p>아크리드 엔터테인먼트는 탁월한 재능을 가진 배우들을 발굴하고 육성하여, 한국 엔터테인먼트 산업의 새로운 지평을 열어가는 전문 매니지먼트 회사입니다.</p>
-                <br>
-                <p>우리는 각 아티스트의 독창적인 매력과 개성을 존중하며, 그들이 최고의 퍼포먼스를 발휘할 수 있도록 체계적이고 전문적인 매니지먼트 서비스를 제공합니다.</p>
-                <br>
-                <p>영화, 드라마, 광고 등 다양한 장르에서 활동하는 아티스트들과 함께 창조적이고 혁신적인 콘텐츠를 만들어가며, 글로벌 무대로의 진출을 적극 지원하고 있습니다.</p>
+                <p style="margin-top: 10px;">우리는 각 아티스트의 독창적인 매력과 개성을 존중하며, 그들이 최고의 퍼포먼스를 발휘할 수 있도록 체계적이고 전문적인 매니지먼트 서비스를 제공합니다.</p>
+                <p style="margin-top: 10px;">영화, 드라마, 광고 등 다양한 장르에서 활동하는 아티스트들과 함께 창조적이고 혁신적인 콘텐츠를 만들어가며, 글로벌 무대로의 진출을 적극 지원하고 있습니다.</p>
             </div>
 
-            <h2 class="section-title" style="font-size: 3rem; margin-top: 60px; margin-bottom: 40px;">Our Values</h2>
+            <h2 class="section-title" style="font-size: 3rem; margin-top: 30px; margin-bottom: 20px;">Our Values</h2>
             <div class="values-grid">
                 <div class="value-item">
                     <div class="value-icon">🎭</div>
@@ -465,10 +465,9 @@
                     <p class="value-description">글로벌 무대에서 통할 수 있는 전문적인 매니지먼트를 제공합니다</p>
                 </div>
             </div>
-            <div style="text-align: center; margin-top: 80px; color: #cccccc; font-size: 1.1rem; line-height: 1.8;">
+            <div style="text-align: center; margin-top: 30px; color: #cccccc; font-size: 1rem; line-height: 1.2;">
                 <p>아크리드 엔터테인먼트는 열정 넘치고 창의적인 아티스트들과 함께 아티스트의 예술적 극대화 될 수 있도록 최선을 다해 지원합니다.</p>
-                <br>
-                <p>또한 예술과 비즈니스의 조화를 통해 새로운 도전을 시도하며 문화 예술의 힘을 통해 세계를 이끄는 메니지먼트사로 거듭나도록 노력하겠습니다.</p>
+                <p style="margin-top: 8px;">또한 예술과 비즈니스의 조화를 통해 새로운 도전을 시도하며 문화 예술의 힘을 통해 세계를 이끄는 메니지먼트사로 거듭나도록 노력하겠습니다.</p>
             </div>
         </div>
     </section>
@@ -479,12 +478,17 @@
             <div class="info-content">
                 <!-- Left: Google Map -->
                 <div class="map-container">
-                    <div class="map-placeholder">
-                        📍 서울특별시 성동구 연무장5가길 25<br>
-                        SK V1 Tower 705호<br><br>
-                        <small style="color: #999;">* 지도 서비스 준비중</small>
-                    </div>
+                    <iframe 
+                        src="https://maps.google.com/maps?width=100%25&amp;height=400&amp;hl=ko&amp;q=서울특별시%20성동구%20연무장5가길%2025%20SK%20V1%20Tower+(아크리드%20엔터테인먼트)&amp;t=&amp;z=16&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
+                        width="100%" 
+                        height="400" 
+                        style="border:0; border-radius: 10px;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
                     <p style="color: #cccccc; font-size: 0.9rem; margin-top: 15px;">
+                        📍 서울특별시 성동구 연무장5가길 25, SK V1 Tower 705호<br>
                         지하철 2호선 뚝섬역 1번 출구에서 도보 5분<br>
                         주차 공간이 제한적이니 대중교통 이용을 권합니다.
                     </p>
@@ -492,7 +496,7 @@
                 
                 <!-- Right: Company Information -->
                 <div class="company-info">
-                    <h2 style="color: #ffffff; font-size: 2rem; margin-bottom: 30px; text-align: center;">Company Information</h2>
+                    <h2 style="color: #ffffff; font-size: 1.8rem; margin-bottom: 15px; text-align: center;">Company Information</h2>
                     <div class="info-item">
                         <span class="info-label">회사명</span>
                         <span class="info-value">ARCLEAD ENTERTAINMENT Co.,Ltd.</span>
@@ -560,9 +564,9 @@
             });
         });
 
-        // Add animation on scroll
+        // Add animation on scroll - only for value items
         function animateOnScroll() {
-            const elements = document.querySelectorAll('.value-item, .company-info, .map-container');
+            const elements = document.querySelectorAll('.value-item');
             
             elements.forEach(element => {
                 const elementTop = element.getBoundingClientRect().top;
@@ -575,15 +579,21 @@
             });
         }
 
-        // Initialize animations
+        // Make all elements visible immediately
         document.querySelectorAll('.value-item, .company-info, .map-container').forEach(element => {
-            element.style.opacity = '0';
-            element.style.transform = 'translateY(30px)';
-            element.style.transition = 'all 0.6s ease';
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
         });
 
-        window.addEventListener('scroll', animateOnScroll);
-        window.addEventListener('load', animateOnScroll);
+        // Optional: Add subtle hover animations for value items
+        document.querySelectorAll('.value-item').forEach(element => {
+            element.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+            element.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
     </script>
 </body>
 </html>
