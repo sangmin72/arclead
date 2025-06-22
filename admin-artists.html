@@ -1030,7 +1030,7 @@
             updateSelectionUI();
         }
 
-        // Delete selected images
+        // Delete selected images - Simplified version that updates artist data directly
         async function deleteSelectedImages() {
             if (selectedImages.size === 0) {
                 showStatus('삭제할 이미지를 선택해주세요.', 'error');
@@ -1038,64 +1038,135 @@
             }
 
             const imageNames = Array.from(selectedImages);
-            const confirmMsg = `선택된 ${imageNames.length}개의 이미지를 삭제하시겠습니까?\n\n${imageNames.join('\n')}`;
+            const confirmMsg = `선택된 ${imageNames.length}개의 이미지를 삭제하시겠습니까?\n\n${imageNames.join('\n')}\n\n⚠️ 이 작업은 되돌릴 수 없습니다.`;
             
             if (!confirm(confirmMsg)) return;
 
             setLoading(true);
-            let successCount = 0;
-            let failCount = 0;
 
-            for (const imageName of imageNames) {
-                try {
-                    const response = await fetch(`/admin/files/artists/${currentEditingArtist}/${imageName}`, {
-                        method: 'DELETE'
-                    });
+            try {
+                console.log('Starting image deletion process...');
+                console.log('Images to delete:', imageNames);
+                
+                // Get current artist data
+                const artist = allArtists.find(a => a.id === currentEditingArtist);
+                if (!artist) {
+                    throw new Error('Artist not found in local data');
+                }
 
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    successCount++;
+                // Remove deleted images from artist's image list
+                const originalImageCount = artist.images ? artist.images.length : 0;
+                const updatedImages = artist.images ? 
+                    artist.images.filter(img => !imageNames.includes(img)) : [];
+                
+                console.log(`Original images: ${originalImageCount}, After deletion: ${updatedImages.length}`);
 
-                    // Remove from UI
+                // Check if representative images need to be updated
+                let representativeImages = { ...artist.representativeImages };
+                let repImageUpdated = false;
+
+                if (representativeImages?.home && imageNames.includes(representativeImages.home)) {
+                    console.log(`Removing home representative image: ${representativeImages.home}`);
+                    representativeImages.home = null;
+                    repImageUpdated = true;
+                }
+
+                if (representativeImages?.artists && imageNames.includes(representativeImages.artists)) {
+                    console.log(`Removing artists representative image: ${representativeImages.artists}`);
+                    representativeImages.artists = null;
+                    repImageUpdated = true;
+                }
+
+                // Prepare updated artist data
+                const updatedArtistData = {
+                    id: artist.id,
+                    name: artist.name,
+                    nameEn: artist.nameEn || '',
+                    filmography: artist.filmography || {},
+                    representativeImages: representativeImages
+                };
+
+                console.log('Sending comprehensive update to server...', {
+                    artistData: updatedArtistData,
+                    deletedImages: imageNames,
+                    remainingImages: updatedImages
+                });
+
+                // Create FormData for the update - let server handle both data update and file deletion
+                const formData = new FormData();
+                formData.append('artistData', JSON.stringify(updatedArtistData));
+                formData.append('deletedImages', JSON.stringify(imageNames));
+
+                // Send update to server - this will handle both R2 deletion and data update
+                const response = await fetch(`/api/artists/${currentEditingArtist}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server response error:', errorText);
+                    throw new Error(`서버 오류: HTTP ${response.status} - ${errorText}`);
+                }
+
+                const result = await response.json();
+                console.log('Server response:', result);
+
+                // Update local data
+                artist.images = updatedImages;
+                artist.representativeImages = representativeImages;
+
+                // Update UI
+                imageNames.forEach(imageName => {
                     const container = document.querySelector(`input[value="${imageName}"]`)?.closest('.image-preview-container');
                     if (container) {
                         container.remove();
                     }
+                });
 
-                    // Update the artist data locally
-                    const artist = allArtists.find(a => a.id === currentEditingArtist);
-                    if (artist && artist.images) {
-                        artist.images = artist.images.filter(img => img !== imageName);
-                    }
-
-                } catch (error) {
-                    console.error(`Error deleting image ${imageName}:`, error);
-                    failCount++;
+                // Update representative image selects if needed
+                if (repImageUpdated) {
+                    updateImageSelectsWithExisting(updatedImages);
+                    
+                    // Update select values
+                    const homeSelect = document.getElementById('homeImage');
+                    const artistsSelect = document.getElementById('artistsImage');
+                    homeSelect.value = representativeImages.home || '';
+                    artistsSelect.value = representativeImages.artists || '';
                 }
-            }
 
-            // Clear selection
-            selectedImages.clear();
-            updateSelectionUI();
+                // Clear selection and update UI
+                selectedImages.clear();
+                updateSelectionUI();
 
-            // Update total images count
-            const totalImages = document.querySelectorAll('.image-checkbox').length;
-            document.getElementById('totalImages').textContent = totalImages;
+                // Update total images count
+                const totalImages = document.querySelectorAll('.image-checkbox').length;
+                document.getElementById('totalImages').textContent = totalImages;
 
-            // Update image selects for representative images
-            if (currentEditingArtist) {
-                const artist = allArtists.find(a => a.id === currentEditingArtist);
-                const existingImages = artist && artist.images ? artist.images : [];
-                updateImageSelectsWithExisting(existingImages);
-            }
+                setLoading(false);
 
-            setLoading(false);
+                let successMsg = `${imageNames.length}개의 이미지가 완전히 삭제되었습니다.`;
+                if (repImageUpdated) {
+                    successMsg += ' 대표 이미지 설정도 함께 업데이트되었습니다.';
+                }
+                showStatus(successMsg, 'success');
 
-            if (successCount > 0 && failCount === 0) {
-                showStatus(`${successCount}개의 이미지가 삭제되었습니다.`, 'success');
-            } else if (successCount > 0 && failCount > 0) {
-                showStatus(`${successCount}개 삭제 성공, ${failCount}개 삭제 실패`, 'warning');
-            } else {
-                showStatus('이미지 삭제에 실패했습니다.', 'error');
+                console.log('Image deletion completed successfully');
+
+            } catch (error) {
+                console.error('Error during image deletion:', error);
+                setLoading(false);
+                
+                showStatus(`이미지 삭제에 실패했습니다: ${error.message}`, 'error');
+                
+                // Force refresh to get the correct state from server
+                console.log('Forcing refresh due to error...');
+                await refreshArtistsList();
+                
+                // Re-open the edit modal to show current state
+                if (currentEditingArtist) {
+                    setTimeout(() => editArtist(currentEditingArtist), 100);
+                }
             }
         }
 

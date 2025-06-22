@@ -748,6 +748,7 @@ async function handleUpdateArtist(request, env, artistId, corsHeaders) {
     console.log(`Updating artist: ${artistId}`);
     const formData = await request.formData();
     const artistDataStr = formData.get('artistData');
+    const deletedImagesStr = formData.get('deletedImages');
     
     if (!artistDataStr) {
       return new Response(JSON.stringify({ error: 'Artist data is required' }), {
@@ -757,6 +758,7 @@ async function handleUpdateArtist(request, env, artistId, corsHeaders) {
     }
 
     const artistData = JSON.parse(artistDataStr);
+    const deletedImages = deletedImagesStr ? JSON.parse(deletedImagesStr) : [];
 
     // Get existing artists
     const artists = await loadExistingArtists(env);
@@ -771,6 +773,30 @@ async function handleUpdateArtist(request, env, artistId, corsHeaders) {
 
     const existingArtist = artists[artistIndex];
     const newArtistId = artistData.id;
+
+    // Handle deleted images
+    if (deletedImages && deletedImages.length > 0) {
+      console.log(`Processing ${deletedImages.length} deleted images:`, deletedImages);
+      
+      // Remove deleted images from existing artist's image list
+      if (existingArtist.images) {
+        const originalCount = existingArtist.images.length;
+        existingArtist.images = existingArtist.images.filter(img => !deletedImages.includes(img));
+        console.log(`Updated artist images: ${originalCount} -> ${existingArtist.images.length}`);
+      }
+
+      // Clean up representative images if they were deleted
+      if (existingArtist.representativeImages) {
+        if (existingArtist.representativeImages.home && deletedImages.includes(existingArtist.representativeImages.home)) {
+          console.log(`Removing home representative image: ${existingArtist.representativeImages.home}`);
+          existingArtist.representativeImages.home = null;
+        }
+        if (existingArtist.representativeImages.artists && deletedImages.includes(existingArtist.representativeImages.artists)) {
+          console.log(`Removing artists representative image: ${existingArtist.representativeImages.artists}`);
+          existingArtist.representativeImages.artists = null;
+        }
+      }
+    }
 
     // Check if ID is changing and if new ID already exists
     if (newArtistId !== artistId) {
@@ -823,9 +849,11 @@ async function handleUpdateArtist(request, env, artistId, corsHeaders) {
       ...existingArtist,
       ...artistData,
       id: newArtistId, // Use the new ID
-      images: [...(existingArtist.images || []), ...newImages],
+      images: [...(existingArtist.images || []), ...newImages], // existingArtist.images already has deleted images removed
       updatedAt: new Date().toISOString()
     };
+
+    console.log(`Final artist data - Images: ${updatedArtist.images.length}, Representative:`, updatedArtist.representativeImages);
 
     // Update in artists array
     artists[artistIndex] = updatedArtist;
