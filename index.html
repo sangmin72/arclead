@@ -21,12 +21,8 @@
     <!-- Responsive CSS -->
     <link href="css/responsive.css" rel="stylesheet">
 
-    <!-- Font : Pretendard CSS -->
-    <link rel="stylesheet" href="css/pretendard.css">
-    <link rel="stylesheet" href="css/pretendard-subset.css">
-
     <style>
-        /* 캐러셀 이미지가 잘리지 않도록 수정 */
+        /* 캐러셀 이미지 화질 최적화 - 이미지가 잘리지 않도록 수정 */
         .carousel-item.bg-img {
             background-size: contain !important;
             background-repeat: no-repeat !important;
@@ -42,62 +38,17 @@
             background-color: #333 !important; /* 작은 이미지 여백 처리 */
         }
 
+        /* 이미지 렌더링 품질 최적화 */
+        .bg-img {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+
         /* 캐러셀 전체 배경을 어둡게 하여 자연스러운 여백 처리 */
         .welcome-area {
             background-color: #000;
-        }
-
-        /* 슬라이드 텍스트가 더 잘 보이도록 배경 추가 */
-        .slide-text {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
-        }
-
-        /* 헤더를 사진 위에 오버레이 */
-        .header-area {
-            position: fixed !important;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: transparent !important;
-            transition: all 0.3s ease;
-        }
-
-        /* 헤더 호버 시에도 투명 유지 */
-        .header-area:hover {
-            background: transparent !important;
-        }
-
-        /* 캐러셀이 전체 화면을 차지하도록 */
-        .welcome-area {
-            height: 100vh !important;
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-        }
-
-        /* 로고와 메뉴 텍스트가 더 잘 보이도록 */
-        .navbar-brand img {
-            filter: brightness(1.2);
-        }
-
-        .navbar-nav .nav-link {
-            color: white !important;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-        }
-
-        .navbar-nav .nav-link:hover {
-            color: #fff !important;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
-        }
-
-        /* 시계 텍스트도 더 잘 보이도록 */
-        #current-time {
-            color: white !important;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-            font-weight: 500;
         }
     </style>
 
@@ -179,9 +130,13 @@
             </div>
         </div>
         <div class="questions-area text-center">
-            <p>Arclead Entertainment</p>
+            <p>Did you know?</p>
             <ul>
-                <li>당신은 동체시력 보유자!!! 축하합니다. (네트웍이 느린거죠? 맞죠? ㅠㅠ)</li>
+                <li>The largest photography competition is 353,768 entries.</li>
+                <li>Photography is the toughest profession in the world.</li>
+                <li>The world's largest photo album by dimensions was 13 ft 11.5 in x 17 ft.</li>
+                <li>The world's largest photo mosaic featured 176,175 pictures.</li>
+                <li>The world's largest camera lens was a 5200mm lens attached to a canon.</li>
             </ul>
         </div>
     </div>
@@ -190,7 +145,7 @@
     <div class="gradient-background-overlay"></div>
 
     <!-- Header Area Start -->
-    <header class="header-area bg-img">
+    <header class="header-area">
         <div class="container-fluid h-100">
             <div class="row h-100 align-items-center">
                 <div class="col-12 h-100">
@@ -198,8 +153,6 @@
                         <nav class="navbar h-100 navbar-expand-lg">
                             <!-- Logo Area  -->
                             <a class="navbar-brand" href="index.html"><img src="/assets/logo-horizon-arclead.png" alt="Logo"></a>
-                            <!-- Current Time -->
-                            <div id="current-time" style="color: white; font-size: 14px; margin: 0 20px; transform: translateY(16px);"></div>
 
                             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#studioMenu" aria-controls="studioMenu" aria-expanded="false" aria-label="Toggle navigation"><i class="fa fa-bars"></i> Menu</button>
 
@@ -207,23 +160,43 @@
                                 <!-- Menu Area Start  -->
                                 <ul class="navbar-nav ml-auto">
                                     <li class="nav-item active">
-                                        <a class="nav-link" href="index.html">Company <span class="sr-only">(current)</span></a>
-                                    </li>
-                                    <li class="nav-item active">
-                                        <a class="nav-link" href="artists-all-fit.html">Artists <span class="sr-only">(current)</span></a>
+                                        <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
                                     </li>
                                     <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">PR</a>
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Pages</a>
                                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                            <a class="dropdown-item" href="index.html">Media</a>
-                                            <a class="dropdown-item" href="about-me.html">News</a>
+                                            <a class="dropdown-item" href="index.html">Home</a>
+                                            <a class="dropdown-item" href="about-me.html">About</a>
+                                            <a class="dropdown-item" href="portfolio.html">Portfolio</a>
+                                            <a class="dropdown-item" href="blog.html">Blog</a>
+                                            <a class="dropdown-item" href="contact.html">Contact</a>
+                                            <a class="dropdown-item" href="elements.html">Elements</a>
                                         </div>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="audition.html">Auditon</a>
+                                        <a class="nav-link" href="about-me.html">About</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="portfolio.html">Portfolio</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="blog.html">Blog</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="contact.html">contact</a>
                                     </li>
                                 </ul>
-
+                                <!-- Search Form -->
+                                <div class="header-search-form ml-auto">
+                                    <form action="#">
+                                        <input type="search" class="form-control" placeholder="Input your keyword then press enter..." id="search" name="search">
+                                        <input class="d-none" type="submit" value="submit">
+                                    </form>
+                                </div>
+                                <!-- Search btn -->
+                                <div id="searchbtn">
+                                    <img src="/assets/search.png" alt="">
+                                </div>
                             </div>
                         </nav>
                     </div>
@@ -237,10 +210,10 @@
     <div class="social-sidebar-area bg-white">
         <!-- Social Area -->
         <div class="social-info-area">
-            <a href="#" data-toggle="tooltip" data-placement="right" title="YouTube"><i class="fa fa-facebook" aria-hidden="true"></i> <span>YouTube</span></a>
-            <a href="#" data-toggle="tooltip" data-placement="right" title="Naver Post"><i class="fa fa-twitter" aria-hidden="true"></i> <span>Naver Post</span></a>
-            <a href="#" data-toggle="tooltip" data-placement="right" title="Naver TV"><i class="fa fa-pinterest" aria-hidden="true"></i> <span>Naver TV</span></a>
-            <a href="#" data-toggle="tooltip" data-placement="right" title="Instagram"><i class="fa fa-behance" aria-hidden="true"></i> <span>Instagram</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Facebook"><i class="fa fa-facebook" aria-hidden="true"></i> <span>Facebook</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i> <span>Twitter</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Pinterest"><i class="fa fa-pinterest" aria-hidden="true"></i> <span>Pinterest</span></a>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Behance"><i class="fa fa-behance" aria-hidden="true"></i> <span>Behance</span></a>
         </div>
         <!-- Message Box -->
         <div class="message-box">
@@ -258,8 +231,8 @@
                 <div id="slide01" class="carousel-item h-100 bg-img active">
                     <div class="carousel-content h-100">
                         <div class="slide-text">
-                            <span>김시경</span>
-                            <h2>KIM SIGYEONG</h2>
+                            <span>01.</span>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -268,7 +241,7 @@
                     <div class="carousel-content h-100">
                         <div class="slide-text">
                             <span>02.</span>
-                            <h2>Believe you can fly</h2>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -276,7 +249,7 @@
                     <div class="carousel-content h-100">
                         <div class="slide-text">
                             <span>03.</span>
-                            <h2>Believe you can fly</h2>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -284,7 +257,7 @@
                     <div class="carousel-content h-100">
                         <div class="slide-text">
                             <span>04.</span>
-                            <h2>Believe you can fly</h2>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -292,7 +265,7 @@
                     <div class="carousel-content h-100">
                         <div class="slide-text">
                             <span>05.</span>
-                            <h2>Believe you can fly</h2>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -300,7 +273,7 @@
                     <div class="carousel-content h-100">
                         <div class="slide-text">
                             <span>06.</span>
-                            <h2>Believe you can fly</h2>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -308,7 +281,7 @@
                     <div class="carousel-content h-100">
                         <div class="slide-text">
                             <span>07.</span>
-                            <h2>Believe you can fly</h2>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -316,7 +289,7 @@
                     <div class="carousel-content h-100">
                         <div class="slide-text">
                             <span>08.</span>
-                            <h2>Believe you can fly</h2>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -324,7 +297,7 @@
                     <div class="carousel-content h-100">
                         <div class="slide-text">
                             <span>09.</span>
-                            <h2>Believe you can fly</h2>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -332,7 +305,7 @@
                     <div class="carousel-content h-100">
                         <div class="slide-text">
                             <span>10.</span>
-                            <h2>Believe you can fly</h2>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -340,7 +313,7 @@
                     <div class="carousel-content h-100">
                         <div class="slide-text">
                             <span>11.</span>
-                            <h2>Believe you can fly</h2>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -348,7 +321,7 @@
                     <div class="carousel-content h-100">
                         <div class="slide-text">
                             <span>12.</span>
-                            <h2>Believe you can fly</h2>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -356,7 +329,7 @@
                     <div class="carousel-content h-100">
                         <div class="slide-text">
                             <span>13.</span>
-                            <h2>Believe you can fly</h2>
+                            <h2> Believe you can fly</h2>
                         </div>
                     </div>
                 </div>
@@ -427,6 +400,10 @@
     <!-- ***** Contact Area End ***** -->
 
 
+    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+<p>Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a></p>
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+
     <!-- jQuery (Necessary for All JavaScript Plugins) -->
     <script src="js/jquery/jquery-2.2.4.min.js"></script>
     <!-- Popper js -->
@@ -439,24 +416,6 @@
     <script src="js/active.js"></script>
 
     <script>
-        // Time function
-        function getTime() {
-            var d = new Date();
-            var year = d.getFullYear();
-            var month = (d.getMonth() + 1).toString().padStart(2, '0');
-            var date = d.getDate().toString().padStart(2, '0');
-            var hours = d.getHours().toString().padStart(2, '0');
-            var minutes = d.getMinutes().toString().padStart(2, '0');
-            var seconds = d.getSeconds().toString().padStart(2, '0');
-
-            var timeBoard = document.getElementById("current-time");
-            if (timeBoard) {
-                var time = year + "년 " + month + "월 " + date + "일 " + hours + ":" + minutes + ":" + seconds;
-                timeBoard.innerHTML = time;
-            }
-            setTimeout(getTime, 1000);
-        }
-
         // Load artists for homepage - update existing slides instead of replacing them
         async function loadHomeArtists() {
             try {
@@ -520,7 +479,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            getTime();
             loadHomeArtists();
         });
     </script>
