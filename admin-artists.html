@@ -555,7 +555,7 @@
                 <div class="form-group">
                     <label for="artistImages">새 이미지 파일 업로드</label>
                     <input type="file" id="artistImages" class="form-control" multiple accept="image/*" onchange="handleImageSelection(this)">
-                    <small>여러 이미지를 선택할 수 있습니다. (각 파일 최대 50MB, 원본 품질 유지, 5MB 이상 파일만 최소 압축)</small>
+                    <small>여러 이미지를 선택할 수 있습니다. (각 파일 최대 50MB, 원본 해상도 및 품질 완전 보존 - 어떤 수정도 하지 않음)</small>
                     <div id="imagePreview" style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
                 </div>
 
@@ -1214,16 +1214,9 @@
                         continue;
                     }
 
-                    // 원본 품질 보존 - 리사이즈 없이 직접 사용하거나 최소한의 압축만 적용
-                    let processedFile;
-                    if (file.size > 5 * 1024 * 1024) { // 5MB 이상인 경우만 압축
-                        console.log(`Large file detected (${(file.size / 1024 / 1024).toFixed(1)}MB): ${file.name}, applying minimal compression`);
-                        processedFile = await resizeImage(file, 2048, 2048, 0.95); // 고해상도, 고품질 유지
-                    } else {
-                        console.log(`Using original file: ${file.name} (${(file.size / 1024).toFixed(1)}KB)`);
-                        processedFile = file; // 원본 파일 그대로 사용
-                    }
-                    processedImages.push(processedFile);
+                    // 원본 해상도 완전 보존 - 절대 리사이즈하지 않음
+                    console.log(`Using original file without any modification: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB)`);
+                    processedImages.push(file); // 원본 파일을 그대로 사용, 어떤 처리도 하지 않음
 
                     // Create preview
                     const previewDiv = document.createElement('div');
@@ -1231,7 +1224,7 @@
                     previewDiv.setAttribute('data-new-image', 'true'); // Mark as new image
                     
                     const img = document.createElement('img');
-                    img.src = URL.createObjectURL(processedFile);
+                    img.src = URL.createObjectURL(file); // 원본 파일 직접 사용
                     img.style.cssText = 'max-width: 100px; max-height: 80px; object-fit: contain; border-radius: 5px; border: 2px solid #28a745; background: #f8f9fa;'; // Green border for new images
                     
                     // Calculate image number (existing images + new images)
@@ -1244,7 +1237,7 @@
                     numberLabel.style.cssText = 'position: absolute; top: 2px; left: 2px; background: rgba(40,167,69,0.9); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;';
                     
                     const sizeSpan = document.createElement('span');
-                    sizeSpan.textContent = `${(processedFile.size / 1024).toFixed(1)}KB`;
+                    sizeSpan.textContent = `${(file.size / 1024 / 1024).toFixed(1)}MB`; // 원본 파일 크기 표시
                     sizeSpan.style.cssText = 'position: absolute; bottom: -15px; left: 0; font-size: 10px; color: #666;';
                     
                     previewDiv.appendChild(img);
@@ -1420,12 +1413,12 @@
 
             formData.append('artistData', JSON.stringify(artistData));
             
-            // Add processed images instead of original files
+            // Add original files without any modification
             if (processedImages.length > 0) {
                 for (let i = 0; i < processedImages.length; i++) {
                     formData.append('images', processedImages[i]);
                 }
-                console.log(`Uploading ${processedImages.length} processed images`);
+                console.log(`Uploading ${processedImages.length} original images (no processing applied)`);
             }
 
             setLoading(true);
