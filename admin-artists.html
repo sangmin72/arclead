@@ -555,7 +555,7 @@
                 <div class="form-group">
                     <label for="artistImages">새 이미지 파일 업로드</label>
                     <input type="file" id="artistImages" class="form-control" multiple accept="image/*" onchange="handleImageSelection(this)">
-                    <small>여러 이미지를 선택할 수 있습니다. (각 파일 최대 50MB, 자동 리사이즈됩니다)</small>
+                    <small>여러 이미지를 선택할 수 있습니다. (각 파일 최대 50MB, 원본 품질 유지, 5MB 이상 파일만 최소 압축)</small>
                     <div id="imagePreview" style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
                 </div>
 
@@ -1214,7 +1214,15 @@
                         continue;
                     }
 
-                    const processedFile = await resizeImage(file, 800, 600, 0.8);
+                    // 원본 품질 보존 - 리사이즈 없이 직접 사용하거나 최소한의 압축만 적용
+                    let processedFile;
+                    if (file.size > 5 * 1024 * 1024) { // 5MB 이상인 경우만 압축
+                        console.log(`Large file detected (${(file.size / 1024 / 1024).toFixed(1)}MB): ${file.name}, applying minimal compression`);
+                        processedFile = await resizeImage(file, 2048, 2048, 0.95); // 고해상도, 고품질 유지
+                    } else {
+                        console.log(`Using original file: ${file.name} (${(file.size / 1024).toFixed(1)}KB)`);
+                        processedFile = file; // 원본 파일 그대로 사용
+                    }
                     processedImages.push(processedFile);
 
                     // Create preview
@@ -1259,44 +1267,84 @@
             }
         }
 
-        // Resize image function
+        // 고품질 이미지 처리 함수 - 원본 형식과 품질 최대한 보존
         function resizeImage(file, maxWidth, maxHeight, quality) {
             return new Promise((resolve, reject) => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 const img = new Image();
 
+                // 원본 파일의 MIME 타입 확인
+                const originalType = file.type;
+                const isJPEG = originalType.includes('jpeg') || originalType.includes('jpg');
+                const isPNG = originalType.includes('png');
+                const isWebP = originalType.includes('webp');
+
+                console.log(`Processing image: ${file.name}, Type: ${originalType}, Size: ${(file.size / 1024).toFixed(1)}KB`);
+
                 img.onload = function() {
-                    // Calculate new dimensions
                     let { width, height } = img;
+                    const originalWidth = width;
+                    const originalHeight = height;
                     
-                    if (width > maxWidth || height > maxHeight) {
+                    // 리사이즈가 필요한지 확인
+                    const needsResize = width > maxWidth || height > maxHeight;
+                    
+                    if (needsResize) {
                         const ratio = Math.min(maxWidth / width, maxHeight / height);
                         width *= ratio;
                         height *= ratio;
+                        console.log(`Resizing from ${originalWidth}x${originalHeight} to ${Math.round(width)}x${Math.round(height)}`);
+                    } else {
+                        console.log(`No resize needed: ${width}x${height} fits within ${maxWidth}x${maxHeight}`);
                     }
 
                     canvas.width = width;
                     canvas.height = height;
 
-                    // Draw and compress
+                    // 고품질 렌더링 설정
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    
+                    // 이미지 그리기
                     ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // 원본 형식 유지하되, 품질 설정
+                    let outputType = originalType;
+                    let outputQuality = quality;
+
+                    // PNG는 무손실이므로 품질 설정 불필요
+                    if (isPNG) {
+                        outputType = 'image/png';
+                        outputQuality = undefined; // PNG는 quality 파라미터 무시
+                        console.log('Maintaining PNG format (lossless)');
+                    } else if (isWebP) {
+                        outputType = 'image/webp';
+                        console.log(`Maintaining WebP format with quality ${quality}`);
+                    } else {
+                        // JPEG 또는 기타 형식은 JPEG로 변환
+                        outputType = 'image/jpeg';
+                        console.log(`Converting to JPEG with quality ${quality}`);
+                    }
                     
                     canvas.toBlob(
                         (blob) => {
                             if (blob) {
-                                // Create new file with original name
-                                const resizedFile = new File([blob], file.name, {
-                                    type: 'image/jpeg',
+                                const processedFile = new File([blob], file.name, {
+                                    type: outputType,
                                     lastModified: Date.now()
                                 });
-                                resolve(resizedFile);
+                                
+                                const compressionRatio = ((file.size - processedFile.size) / file.size * 100).toFixed(1);
+                                console.log(`Processed ${file.name}: ${(file.size / 1024).toFixed(1)}KB → ${(processedFile.size / 1024).toFixed(1)}KB (${compressionRatio}% reduction)`);
+                                
+                                resolve(processedFile);
                             } else {
-                                reject(new Error('Failed to compress image'));
+                                reject(new Error('Failed to process image'));
                             }
                         },
-                        'image/jpeg',
-                        quality
+                        outputType,
+                        outputQuality
                     );
                 };
 
