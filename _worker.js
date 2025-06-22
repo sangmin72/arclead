@@ -953,6 +953,23 @@ async function handleSlidesRequest(request, env, corsHeaders) {
   }
 
   try {
+    // --- TEMPORARY DEBUGGING ---
+    // The purpose of this is to inspect the raw content of artists-data.json
+    // to diagnose why representative images are not being loaded.
+    const r2Object = await env.ARCLEAD_ASSETS.get('artists-data.json');
+    if (!r2Object) {
+      return new Response(JSON.stringify({ error: "artists-data.json not found in R2." }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+    const rawData = await r2Object.text();
+    return new Response(rawData, {
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache', ...corsHeaders }
+    });
+    // --- END TEMPORARY DEBUGGING ---
+
+    /*
     // Load artists data to create slides
     let artists = [];
     
@@ -984,8 +1001,12 @@ async function handleSlidesRequest(request, env, corsHeaders) {
         if (artist.representativeImages?.home) {
           slide.image = `/assets/artists/${artist.id}/${artist.representativeImages.home}`;
           console.log(`Adding home image for ${artist.name}: ${slide.image}`);
+        } else if (artist.images && artist.images.length > 0) {
+          // Fallback to the first available image for the artist
+          slide.image = `/assets/artists/${artist.id}/${artist.images[0]}`;
+          console.log(`No home representative image for ${artist.name}, falling back to first image: ${slide.image}`);
         } else {
-          console.log(`No home representative image for ${artist.name}`);
+          console.log(`No home representative or other images for ${artist.name}`);
         }
         
         slideData.slides.push(slide);
@@ -1017,6 +1038,7 @@ async function handleSlidesRequest(request, env, corsHeaders) {
         ...corsHeaders
       }
     });
+    */
   } catch (error) {
     console.error('Error generating slides:', error);
     
