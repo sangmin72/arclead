@@ -384,6 +384,88 @@
         .unset-representative:hover {
             background: #dee2e6;
         }
+
+        /* 이미지 선택 관련 스타일 */
+        .image-selection-area {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #e9ecef;
+        }
+
+        .image-checkbox {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .image-preview-container {
+            position: relative;
+            display: inline-block;
+            margin: 5px;
+            transition: transform 0.2s ease;
+        }
+
+        .image-preview-container:hover {
+            transform: scale(1.05);
+        }
+
+        .image-preview-container.selected {
+            transform: scale(1.05);
+        }
+
+        .image-preview-container.selected img {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+        }
+
+        .selection-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+
+        .selection-info {
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .selection-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-outline-danger {
+            background: transparent;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            background: transparent;
+            color: #6c757d;
+            border: 1px solid #6c757d;
+        }
+
+        .btn-outline-secondary:hover {
+            background: #6c757d;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -446,8 +528,32 @@
                     <label for="artistNameEn">홈화면 작은글씨</label>
                     <input type="text" id="artistNameEn" class="form-control">
                 </div>
+
+                <!-- 기존 이미지 관리 섹션 (수정 시에만 표시) -->
+                <div id="existingImagesSection" class="form-group" style="display: none;">
+                    <label>기존 업로드 이미지 관리</label>
+                    <div class="image-selection-area">
+                        <div class="selection-controls">
+                            <div class="selection-info">
+                                <span id="selectedCount">0</span>개 선택됨 / 총 <span id="totalImages">0</span>개
+                            </div>
+                            <div class="selection-actions">
+                                <button type="button" class="btn btn-small btn-outline-secondary" onclick="toggleAllSelection()">
+                                    <span id="toggleAllText">전체 선택</span>
+                                </button>
+                                <button type="button" class="btn btn-small btn-outline-danger" onclick="deleteSelectedImages()" id="deleteSelectedBtn" disabled>
+                                    🗑️ 선택된 이미지 삭제
+                                </button>
+                            </div>
+                        </div>
+                        <div id="existingImagePreview">
+                            <!-- Existing images will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label for="artistImages">이미지 파일 업로드</label>
+                    <label for="artistImages">새 이미지 파일 업로드</label>
                     <input type="file" id="artistImages" class="form-control" multiple accept="image/*" onchange="handleImageSelection(this)">
                     <small>여러 이미지를 선택할 수 있습니다. (각 파일 최대 50MB, 자동 리사이즈됩니다)</small>
                     <div id="imagePreview" style="margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
@@ -736,8 +842,11 @@
         // Open add artist modal
         function openAddArtistModal() {
             editingArtist = null;
+            currentEditingArtist = null;
+            selectedImages.clear();
             document.getElementById('modalTitle').textContent = '새 아티스트 추가';
             document.getElementById('artistForm').reset();
+            document.getElementById('existingImagesSection').style.display = 'none';
             clearFilmographyContainers();
             document.getElementById('artistModal').style.display = 'block';
         }
@@ -746,8 +855,12 @@
         function closeArtistModal() {
             document.getElementById('artistModal').style.display = 'none';
             editingArtist = null;
+            currentEditingArtist = null;
             processedImages = [];
+            selectedImages.clear();
             document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('existingImagePreview').innerHTML = '';
+            document.getElementById('existingImagesSection').style.display = 'none';
         }
 
         // Clear filmography containers
@@ -860,30 +973,129 @@
             });
         }
 
-        // Delete existing image
-        async function deleteExistingImage(artistId, imageName, previewDiv) {
-            if (!confirm(`"${imageName}" 이미지를 삭제하시겠습니까?`)) return;
+        // Multi-selection variables
+        let selectedImages = new Set();
+        let currentEditingArtist = null;
 
-            try {
-                const response = await fetch(`/admin/files/artists/${artistId}/${imageName}`, {
-                    method: 'DELETE'
-                });
+        // Toggle image selection
+        function toggleImageSelection(imageName, checkbox) {
+            if (checkbox.checked) {
+                selectedImages.add(imageName);
+            } else {
+                selectedImages.delete(imageName);
+            }
+            updateSelectionUI();
+        }
 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        // Update selection UI
+        function updateSelectionUI() {
+            document.getElementById('selectedCount').textContent = selectedImages.size;
+            
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+            deleteBtn.disabled = selectedImages.size === 0;
+            
+            const totalImages = document.querySelectorAll('.image-checkbox').length;
+            const toggleAllBtn = document.getElementById('toggleAllText');
+            
+            if (selectedImages.size === totalImages && totalImages > 0) {
+                toggleAllBtn.textContent = '전체 해제';
+            } else {
+                toggleAllBtn.textContent = '전체 선택';
+            }
 
-                // Remove from UI
-                previewDiv.remove();
-                
-                // Update the artist data locally
-                const artist = allArtists.find(a => a.id === artistId);
-                if (artist && artist.images) {
-                    artist.images = artist.images.filter(img => img !== imageName);
+            // Update visual selection state
+            document.querySelectorAll('.image-preview-container').forEach(container => {
+                const checkbox = container.querySelector('.image-checkbox');
+                if (checkbox && selectedImages.has(checkbox.value)) {
+                    container.classList.add('selected');
+                } else {
+                    container.classList.remove('selected');
                 }
+            });
+        }
 
-                showStatus('이미지가 삭제되었습니다.', 'success');
-            } catch (error) {
-                console.error('Error deleting image:', error);
-                showStatus('이미지 삭제에 실패했습니다: ' + error.message, 'error');
+        // Toggle all selection
+        function toggleAllSelection() {
+            const checkboxes = document.querySelectorAll('.image-checkbox');
+            const shouldSelectAll = selectedImages.size < checkboxes.length;
+            
+            selectedImages.clear();
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = shouldSelectAll;
+                if (shouldSelectAll) {
+                    selectedImages.add(checkbox.value);
+                }
+            });
+            
+            updateSelectionUI();
+        }
+
+        // Delete selected images
+        async function deleteSelectedImages() {
+            if (selectedImages.size === 0) {
+                showStatus('삭제할 이미지를 선택해주세요.', 'error');
+                return;
+            }
+
+            const imageNames = Array.from(selectedImages);
+            const confirmMsg = `선택된 ${imageNames.length}개의 이미지를 삭제하시겠습니까?\n\n${imageNames.join('\n')}`;
+            
+            if (!confirm(confirmMsg)) return;
+
+            setLoading(true);
+            let successCount = 0;
+            let failCount = 0;
+
+            for (const imageName of imageNames) {
+                try {
+                    const response = await fetch(`/admin/files/artists/${currentEditingArtist}/${imageName}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    successCount++;
+
+                    // Remove from UI
+                    const container = document.querySelector(`input[value="${imageName}"]`)?.closest('.image-preview-container');
+                    if (container) {
+                        container.remove();
+                    }
+
+                    // Update the artist data locally
+                    const artist = allArtists.find(a => a.id === currentEditingArtist);
+                    if (artist && artist.images) {
+                        artist.images = artist.images.filter(img => img !== imageName);
+                    }
+
+                } catch (error) {
+                    console.error(`Error deleting image ${imageName}:`, error);
+                    failCount++;
+                }
+            }
+
+            // Clear selection
+            selectedImages.clear();
+            updateSelectionUI();
+
+            // Update total images count
+            const totalImages = document.querySelectorAll('.image-checkbox').length;
+            document.getElementById('totalImages').textContent = totalImages;
+
+            // Update image selects for representative images
+            if (currentEditingArtist) {
+                const artist = allArtists.find(a => a.id === currentEditingArtist);
+                const existingImages = artist && artist.images ? artist.images : [];
+                updateImageSelectsWithExisting(existingImages);
+            }
+
+            setLoading(false);
+
+            if (successCount > 0 && failCount === 0) {
+                showStatus(`${successCount}개의 이미지가 삭제되었습니다.`, 'success');
+            } else if (successCount > 0 && failCount > 0) {
+                showStatus(`${successCount}개 삭제 성공, ${failCount}개 삭제 실패`, 'warning');
+            } else {
+                showStatus('이미지 삭제에 실패했습니다.', 'error');
             }
         }
 
@@ -1164,6 +1376,9 @@
             if (!artist) return;
 
             editingArtist = artistId;
+            currentEditingArtist = artistId;
+            selectedImages.clear(); // Clear previous selections
+            
             document.getElementById('modalTitle').textContent = '아티스트 수정';
             
             // Fill form
@@ -1171,15 +1386,25 @@
             document.getElementById('artistName').value = artist.name;
             document.getElementById('artistNameEn').value = artist.nameEn || '';
             
-            // Clear existing images and show existing ones
-            const preview = document.getElementById('imagePreview');
-            preview.innerHTML = '';
+            // Show existing images section
+            const existingImagesSection = document.getElementById('existingImagesSection');
+            const existingImagePreview = document.getElementById('existingImagePreview');
+            
+            // Clear new images preview and reset processed images
+            const newImagePreview = document.getElementById('imagePreview');
+            newImagePreview.innerHTML = '';
             processedImages = []; // Reset processed images
             
             if (artist.images && artist.images.length > 0) {
+                existingImagesSection.style.display = 'block';
+                existingImagePreview.innerHTML = '';
+                
+                // Update total images count
+                document.getElementById('totalImages').textContent = artist.images.length;
+                
                 artist.images.forEach((img, index) => {
                     const previewDiv = document.createElement('div');
-                    previewDiv.style.cssText = 'position: relative; display: inline-block; margin: 5px;';
+                    previewDiv.className = 'image-preview-container';
                     
                     const imgElement = document.createElement('img');
                     imgElement.src = `/assets/artists/${artist.id}/${img}`;
@@ -1189,16 +1414,26 @@
                     numberLabel.textContent = (index + 1).toString();
                     numberLabel.style.cssText = 'position: absolute; top: 2px; left: 2px; background: rgba(0,0,0,0.7); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;';
                     
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.textContent = '✕';
-                    deleteBtn.type = 'button';
-                    deleteBtn.style.cssText = 'position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer;';
-                    deleteBtn.onclick = () => deleteExistingImage(artist.id, img, previewDiv);
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'image-checkbox';
+                    checkbox.value = img;
+                    checkbox.title = '삭제할 이미지 선택';
+                    checkbox.onchange = function() {
+                        toggleImageSelection(img, this);
+                    };
+                    
+                    // Add filename label
+                    const filename = document.createElement('div');
+                    filename.textContent = img.length > 20 ? img.substring(0, 17) + '...' : img;
+                    filename.style.cssText = 'position: absolute; bottom: -15px; left: 0; font-size: 10px; color: #666; max-width: 100px; text-align: center; word-break: break-all;';
+                    filename.title = img;
                     
                     previewDiv.appendChild(imgElement);
                     previewDiv.appendChild(numberLabel);
-                    previewDiv.appendChild(deleteBtn);
-                    preview.appendChild(previewDiv);
+                    previewDiv.appendChild(checkbox);
+                    previewDiv.appendChild(filename);
+                    existingImagePreview.appendChild(previewDiv);
                 });
 
                 // Update image select options with existing images first
@@ -1225,6 +1460,8 @@
                     }
                 }, 100);
             } else {
+                existingImagesSection.style.display = 'none';
+                
                 // Clear select options if no images
                 const homeSelect = document.getElementById('homeImage');
                 const artistsSelect = document.getElementById('artistsImage');
@@ -1232,6 +1469,9 @@
                 while (homeSelect.options.length > 1) homeSelect.remove(1);
                 while (artistsSelect.options.length > 1) artistsSelect.remove(1);
             }
+            
+            // Initialize selection UI
+            updateSelectionUI();
             
             // Clear and fill filmography
             clearFilmographyContainers();
